@@ -122,10 +122,44 @@
       dest: C:\Users\{{ user }}\AppData\Roaming\Code\User\settings.json
 
   - name: Set Chrome to default Browser
-    win_shell: Set-ItemProperty HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\{{ item }}\UserChoice -name ProgId ChromeHTML
+    win_regedit:
+      path: HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\{{ item }}\UserChoice
+      name: ProgId
+      data: ChromeHTML
     with_items:
       - http
       - https
+
+  - name: Set Chrome to not ask about default browser
+    win_regedit:
+      path: HKLM:\Software\Policies\Google\Chrome
+      name: DefaultBrowserSettingEnabled
+      data: 0
+      type: dword
+
+  - name: Disable Chrome Welcome Screen
+    win_regedit:
+      path: HKLM:\Software\Policies\Google\Chrome
+      name: "{{ item }}"
+      data: 0
+      type: dword
+    with_items:
+      - PromotionalTabsEnabled
+      - WelcomePageOnOSUpgradeEnabled
+
+  - name: Disable Chrome Syncing
+    win_regedit:
+      path: HKLM:\Software\Policies\Google\Chrome
+      name: SyncDisabled
+      data: 1
+      type: dword
+
+  - name: Disable Server Management at Startup
+    win_regedit:
+      path: HKCU:\Software\Microsoft\ServerManager\
+      name: DoNotOpenServerManagerAtLogon
+      data: 1
+      type: dword
 
   - name: Remove EC2 Feedback Icon
     win_file:
@@ -141,4 +175,4 @@
   become_user: "{{ dns_domain_name_short }}\\{{ user_prefix }}{{ inventory_hostname | regex_replace('[^0-9]', '') }}"
   become_method: runas
 
-#- include_tasks: ansible.yml
+- include_tasks: myrtille.yml

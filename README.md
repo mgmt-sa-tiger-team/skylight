@@ -1,4 +1,4 @@
-![lightbulb-windows](content/ansible_tower_windows/images/skylight_logo_color.png)
+![skylight](content/ansible_tower_windows/images/skylight_logo_color.png)
 
 # Ansible Windows Workshop
 
