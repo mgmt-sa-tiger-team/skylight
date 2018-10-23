@@ -1,0 +1,51 @@
+---
+- name: Install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - NetworkManager
+
+- command: find /etc/sysconfig/network-scripts/ -type f -name "ifcfg-e*"
+  register: eths
+
+- name: Remove PeerDNS=yes entry
+  lineinfile:
+    path: "{{ item }}"
+    regexp: '^PEERDNS=yes'
+    line: ''
+  with_items: "{{ eths.stdout_lines }}"
+
+- name: set DNS resolution in ifcfg file
+  blockinfile:
+    dest: "{{ item }}"
+    block: |
+      DNS1={{ dns_server }}
+      DNS2=8.8.8.8
+      DOMAIN="{{dns_domain_name}} ec2.internal"
+      PEERDNS=no
+  register: dnschange
+  with_items: "{{ eths.stdout_lines }}"
+
+- name: restart NetworkManager
+  service:
+    name: NetworkManager
+    state: restarted
+  when: dnschange.changed
+
+- name: Add EPEL repo
+  yum_repository:
+    name: epel
+    description: EPEL for Enterprise Linux 7
+    baseurl: https://dl.fedoraproject.org/pub/epel/7/x86_64/
+    enabled: yes
+    gpgcheck: no
+
+- name: Install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - vim
+    - bind-utils
+

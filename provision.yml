@@ -1,0 +1,120 @@
+---
+- name: Provision Instances
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - manage-instances
+  vars:
+    teardown: false
+  tasks:
+  - name: Make sure we are running correct Ansible Version
+    assert:
+      that:
+        - ansible_version.major >= 2
+        - ansible_version.minor >= 6
+
+  - name: ensure workshop folder {{ name_prefix }} exists
+    file:
+      path: "{{ playbook_dir }}/workshops/{{ name_prefix }}"
+      state: directory
+
+  - name: Check that the provided license exists
+    stat:
+      path: "{{playbook_dir}}/tower_license.json"
+    register: stat_result
+  - fail:
+      msg: "You need a license located at {{playbook_dir}}/tower_license.json"
+    when:
+      - not stat_result.stat.exists
+
+  - name: Ensure eula is accepted if posting license
+    lineinfile:
+      path: "{{ playbook_dir }}/tower_license.json"
+      line: '    "eula_accepted": true,'
+      insertbefore: '"company_name"'
+      state: present
+
+  - include_role:
+      name: "manage-{{ instance_loc }}-instances"
+
+- name: Configure Active Directory Domain Controller
+  hosts: windows_domain_controllers
+  gather_facts: yes
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - windows-ad-controller
+  roles:
+    - windows-ad-controller
+
+- name: Configure Windows Servers
+  hosts: windows
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - windows_hosts
+  roles:
+    - windows-common
+
+- name: Configure GitLab Host
+  hosts: gitlab
+  become: True
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - gitlab
+  roles:
+    - { role: linux-common }
+    - { role: geerlingguy.gitlab }
+
+# Run post-config separate to avoid handler restart issue...
+- name: Gitlab Post Config
+  hosts: gitlab
+  become: True
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - gitlab
+  roles:
+    - { role: gitlab-postconfig }
+
+- name: Configure Ansible Host
+  hosts: tower
+  become: True
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - ansible-tower
+  roles:
+    - linux-common
+    - ansible-tower
+
+- name: Configure Windows Workstation
+  hosts: windows_workstations
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - windows-workstation
+  roles:
+    - windows-common
+    - windows-workstation
+
+- name: Configure Docs Host
+  hosts: docs
+  become: True
+  gather_facts: True
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - docs
+  roles:
+    - linux-common
+    - docs_nginx
+    - docs_setup

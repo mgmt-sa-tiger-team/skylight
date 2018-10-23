@@ -1,0 +1,12 @@
+#cloud-config
+hostname: {{'s' + item + 'tower'}}
+fqdn: {{'s' + item + 'tower'}}.{{ dns_domain_name }}
+manage_etc_hosts: true
+chpasswd: { expire: False }
+ssh_pwauth: True
+#groups: 
+#  - {{ user_prefix + item }}
+#users: 
+#  - name: {{ user_prefix + item }}
+#    passwd: {{ users_password }}
+#    groups: {{ user_prefix + item }}, wheel

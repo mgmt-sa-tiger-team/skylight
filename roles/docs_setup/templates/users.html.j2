@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<font face="verdana,sans,arial">
+<style>
+
+/* unvisited link */
+a:link {
+    color: #FF6978;
+}
+
+/* visited link */
+a:visited {
+    color: #FF6978;
+}
+
+/* mouse over link */
+a:hover {
+    color: #3DCCCC;
+}
+
+/* selected link */
+a:active {
+    color: blue;
+}
+Try it Yourself »
+
+</style>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+
+<div data-role="page" id="pageone">
+  <div data-role="header">
+    <h1>Ansible Windows Lightbulb Workshop</h1>
+  </div>
+  <div data-role="main">
+    <img src="https://www.ansible.com/hubfs/2016_Images/Assets/Ansible-Tower-Logotype-Small-RGB-FullBlack.png"/>
+
+
+GITHUB for Ansible Lightbulb: <a href="https://github.com/mgmt-sa-tiger-team/lightbulb-windows" target="lightbulb-windows">https://github.com/mgmt-sa-tiger-team/lightbulb-windows</a><br><br>
+
+</h3>
+
+<hr>
+
+</div>
+
+{% for u in range(1, user_count+1) %}
+  <div data-role="main" class="ui-content">
+    <div data-role="collapsible">
+      <h1>student{{ u }} - Click to see details!</h1>
+      <p>
+Username=ansibleworkshop\student{{ u }}<br />
+Password={{ users_password }}<br />
+<br />
+Workstation:<br />
+{% for host in hostvars %}
+{% if "s" + u|string + "-work" in host %}
+{{ hostvars[host].ansible_host }}<br />
+{% endif %}
+{% endfor %}</p>
+    </div>
+  </div>
+{% endfor %}
+</div>
+
+</body>
+</html>

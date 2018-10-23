@@ -1,0 +1,399 @@
+################### Build Instances ###################
+- name: DomainController | Launch Domain Controller Instance
+  vmware_guest2:
+    hostname: "{{ vCenterServer }}"
+    username: "{{ vCenterUsername }}"
+    password: "{{ vCenterPassword }}"
+    datacenter: "{{ vCenterDatacenter }}"
+    cluster: "{{ vCenterCluster }}"
+    folder: "{{ vCenterFolder }}"
+    name: "{{ name_prefix }}-dc"
+    template: "{{ vCenterCloneSourceWindows }}"
+    snapshot_src: "{{ VCenterCloneSnapshotWindows }}"
+    linked_clone: True
+    state: poweredon
+    wait_for_ip_address: true
+    validate_certs: false
+    networks:
+    - name: "{{ vCenterPortGroup }}"
+      type: dhcp
+    customization:
+      autologon: True
+      orgname: Workshop
+      fullname: Workshop
+      hostname: windc
+      # timezone 20 = Central Standard Time
+      # For more info see https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx[msdn.microsoft.com]
+      timezone: 20
+      password: "{{ domain_admin_password }}"
+      runonce:
+      - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
+      - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' –Value 0"
+      - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
+      - winrm set winrm/config/service/auth @{Basic="true"}
+      - winrm set winrm/config/service @{AllowUnencrypted="true"}
+      - powershell.exe -command "New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters -Name DisabledComponents -PropertyType DWord -Value 0xffffffff"
+  with_sequence: count=1
+  register: dc_jobs
+  async: 7200
+  poll: 0
+
+- name: GitLab | Launch Gitlab Instance
+  vmware_guest2:
+    hostname: "{{ vCenterServer }}"
+    username: "{{ vCenterUsername }}"
+    password: "{{ vCenterPassword }}"
+    datacenter: "{{ vCenterDatacenter }}"
+    cluster: "{{ vCenterCluster }}"
+    folder: "{{ vCenterFolder }}"
+    name: "{{ name_prefix }}-gitlab"
+    template: "{{ vCenterCloneSourceLinux }}"
+    snapshot_src: "{{ VCenterCloneSnapshotLinux }}"
+    linked_clone: True
+    state: poweredon
+    wait_for_ip_address: true
+    validate_certs: false
+    networks:
+    - name: "{{ vCenterPortGroup }}"
+      type: dhcp
+    customization:
+      hostname: gitlab
+  with_sequence: count=1
+  register: gitlab_jobs
+  async: 7200
+  poll: 0
+
+- name: Docs | Launch Docs Instance
+  vmware_guest2:
+    hostname: "{{ vCenterServer }}"
+    username: "{{ vCenterUsername }}"
+    password: "{{ vCenterPassword }}"
+    datacenter: "{{ vCenterDatacenter }}"
+    cluster: "{{ vCenterCluster }}"
+    folder: "{{ vCenterFolder }}"
+    name: "{{ name_prefix }}-docs"
+    template: "{{ vCenterCloneSourceLinux }}"
+    snapshot_src: "{{ VCenterCloneSnapshotLinux }}"
+    linked_clone: True
+    state: poweredon
+    wait_for_ip_address: true
+    validate_certs: false
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2
+    networks:
+    - name: "{{ vCenterPortGroup }}"
+      type: dhcp
+    - name: "{{ vCenterPortGroupExt }}"
+      type: dhcp
+    customization:
+      hostname: docs
+  with_sequence: count=1
+  register: docs_jobs
+  async: 7200
+  poll: 0
+
+- name: Tower | Launch Tower Instance
+  vmware_guest2:
+    hostname: "{{ vCenterServer }}"
+    username: "{{ vCenterUsername }}"
+    password: "{{ vCenterPassword }}"
+    datacenter: "{{ vCenterDatacenter }}"
+    cluster: "{{ vCenterCluster }}"
+    folder: "{{ vCenterFolder }}"
+    name: "{{ name_prefix }}-s{{ item }}-tower"
+    template: "{{ vCenterCloneSourceLinux }}"
+    snapshot_src: "{{ VCenterCloneSnapshotLinux }}"
+    linked_clone: True
+    state: poweredon
+    wait_for_ip_address: true
+    validate_certs: false
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2
+    networks:
+    - name: "{{ vCenterPortGroup }}"
+      type: dhcp
+    customization:
+      hostname: "s{{ item }}-tower"
+  with_sequence: count={{ user_count }}
+  register: tower_jobs
+  async: 7200
+  poll: 0
+
+- name: Windows | Launch instance 1
+  vmware_guest2:
+    hostname: "{{ vCenterServer }}"
+    username: "{{ vCenterUsername }}"
+    password: "{{ vCenterPassword }}"
+    datacenter: "{{ vCenterDatacenter }}"
+    cluster: "{{ vCenterCluster }}"
+    folder: "{{ vCenterFolder }}"
+    name: "{{ name_prefix }}-s{{ item }}-win1"
+    template: "{{ vCenterCloneSourceWindows }}"
+    snapshot_src: "{{ VCenterCloneSnapshotWindows }}"
+    linked_clone: True
+    state: poweredon
+    wait_for_ip_address: true
+    validate_certs: false
+    networks:
+    - name: "{{ vCenterPortGroup }}"
+      type: dhcp
+    customization:
+      autologon: True
+      orgname: Workshop
+      fullname: Workshop
+      hostname: "s{{ item }}-win1"
+      # timezone 20 = Central Standard Time
+      # For more info see https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx[msdn.microsoft.com]
+      timezone: 20
+      password: "{{ domain_admin_password }}"
+      runonce:
+      - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
+      - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' –Value 0"
+      - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
+      - winrm set winrm/config/service/auth @{Basic="true"}
+      - winrm set winrm/config/service @{AllowUnencrypted="true"}
+      - powershell.exe -command "New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters -Name DisabledComponents -PropertyType DWord -Value 0xffffffff"
+  with_sequence: count={{user_count}}
+  register: windows1_jobs
+  async: 7200
+  poll: 0
+
+- name: Workstation | Launch instance 1
+  vmware_guest2:
+    hostname: "{{ vCenterServer }}"
+    username: "{{ vCenterUsername }}"
+    password: "{{ vCenterPassword }}"
+    datacenter: "{{ vCenterDatacenter }}"
+    cluster: "{{ vCenterCluster }}"
+    folder: "{{ vCenterFolder }}"
+    name: "{{ name_prefix }}-s{{ item }}-work"
+    template: "{{ vCenterCloneSourceWindows }}"
+    snapshot_src: "{{ VCenterCloneSnapshotWindows }}"
+    linked_clone: True
+    state: poweredon
+    wait_for_ip_address: true
+    validate_certs: false
+    networks:
+    - name: "{{ vCenterPortGroup }}"
+      type: dhcp
+    - name: "{{ vCenterPortGroupExt }}"
+      type: dhcp
+    customization:
+      autologon: True
+      orgname: Workshop
+      fullname: Workshop
+      hostname: "s{{ item }}-work"
+      # timezone 20 = Central Standard Time
+      # For more info see https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx[msdn.microsoft.com]
+      timezone: 20
+      password: "{{ domain_admin_password }}"
+      runonce:
+      - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
+      - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' –Value 0"
+      - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
+      - winrm set winrm/config/service/auth @{Basic="true"}
+      - winrm set winrm/config/service @{AllowUnencrypted="true"}
+      - powershell.exe -command "New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters -Name DisabledComponents -PropertyType DWord -Value 0xffffffff"
+  with_sequence: count={{user_count}}
+  register: workstation_jobs
+  async: 7200
+  poll: 0
+
+###################  Wait for jobs to complete ###################
+
+- name: Wait for DC instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: dc_instances
+  until: dc_instances.finished
+  retries: 300
+  with_items: "{{ dc_jobs.results }}"
+
+- name: Wait for Gitlab instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: gitlab_instances
+  until: gitlab_instances.finished
+  retries: 300
+  with_items: "{{ gitlab_jobs.results }}"
+
+- name: Wait for Docs instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: docs_instances
+  until: docs_instances.finished
+  retries: 300
+  with_items: "{{ docs_jobs.results }}"
+
+- name: Wait for tower instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: tower_instances
+  until: tower_instances.finished
+  retries: 300
+  with_items: "{{ tower_jobs.results }}"
+
+- name: Wait for windows instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: windows_instances
+  until: windows_instances.finished
+  retries: 300
+  with_items:
+    - "{{ windows1_jobs.results }}"
+
+- name: Wait for Workstation instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: workstation_instances
+  until: workstation_instances.finished
+  retries: 300
+  with_items:
+    - "{{ workstation_jobs.results }}"
+
+################### Wait for Instances to completely come up ###################
+
+- name: DomainController | Wait for WinRM to come up
+  wait_for:
+    host: "{{ item.ipv4 }}"
+    port: 5986
+    delay: 1
+    timeout: 600
+    state: started
+  with_items: "{{ dc_instances.results | map(attribute='instance') | list }}"
+
+- name: DomainController | Add new instance to host group
+  add_host:
+    hostname: "windc"
+    ansible_host: "{{ item.ipv4  }}"
+    ansible_port: 5986
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "winrm"
+    private_ip: "{{ item.ipv4 }}"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_domain_controllers
+  with_items: "{{ dc_instances.results | map(attribute='instance') | list }}"
+
+- name: GitLab | Wait for SSH to come up
+  wait_for:
+    host: "{{ item.ipv4 }}"
+    port: 22
+    delay: 1
+    timeout: 320
+    state: started
+  with_items: "{{ gitlab_instances.results | map(attribute='instance') | list }}"
+
+- name: GitLab | Add new instance to host group
+  add_host:
+    hostname: "gitlab"
+    ansible_ssh_host: "{{ item.ipv4 }}"
+    ansible_host: "{{ item.ipv4 }}"
+    private_ip: "{{ item.ipv4 }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: gitlab
+  with_items: "{{ gitlab_instances.results | map(attribute='instance') | list }}"
+
+- name: Docs | Wait for SSH to come up
+  wait_for:
+    host: "{{ item.hw_eth0.ipaddresses[0] }}"
+    port: 22
+    delay: 1
+    timeout: 320
+    state: started
+  with_items: "{{ docs_instances.results | map(attribute='instance') | list }}"
+
+- name: Docs | Add new instance to host group
+  add_host:
+    hostname: "docs"
+    ansible_ssh_host: "{{ item.hw_eth0.ipaddresses[0] }}"
+    ansible_host: "{{ item.hw_eth0.ipaddresses[0] }}"
+    private_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
+    public_ip: "{{ item.hw_eth1.ipaddresses[0] }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: docs
+  with_items: "{{ docs_instances.results | map(attribute='instance') | list }}"
+
+- name: Tower | Wait for SSH to come up
+  wait_for:
+    host: "{{ item.ipv4 }}"
+    port: 22
+    delay: 1
+    timeout: 320
+    state: started
+  with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
+
+- name: Tower | Add new instance to host group
+  add_host:
+    hostname: "{{ item.hw_name|replace(name_prefix + '-', '') }}"
+    ansible_ssh_host: "{{ item.ipv4 }}"
+    ansible_host: "{{ item.ipv4 }}"
+    private_ip: "{{ item.ipv4 }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: tower
+  with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
+
+- name: Windows | Wait for WinRM to come up
+  wait_for:
+    host: "{{ item.ipv4 }}"
+    port: 5986
+    delay: 1
+    timeout: 600
+    state: started
+  with_items: "{{ windows_instances.results | map(attribute='instance') | list }}"
+
+- name: Windows | Add new instance to host group
+  add_host:
+    hostname: "{{ item.hw_name|replace(name_prefix + '-', '') }}"
+    ansible_host: "{{ item.ipv4  }}"
+    private_ip: "{{ item.ipv4 }}"
+    ansible_port: 5986
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "winrm"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows
+  with_items: "{{ windows_instances.results | map(attribute='instance') | list }}"
+
+- name: Workstation | Wait for WinRM to come up
+  wait_for:
+    host: "{{ item.hw_eth1.ipaddresses[0] }}"
+    port: 5986
+    delay: 1
+    timeout: 600
+    state: started
+  with_items: "{{ workstation_instances.results | map(attribute='instance') | list }}"
+
+- name: Workstation | Add new instance to host group
+  add_host:
+    hostname: "{{ item.hw_name|replace(name_prefix + '-', '') }}"
+    private_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
+    ansible_host: "{{ item.hw_eth1.ipaddresses[0] }}"
+#    ansible_host: "{{ item.ipv4  }}"
+#    private_ip: "{{ item.ipv4 }}"
+    ansible_port: 5986
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_become_password: "{{ users_password }}"
+    ansible_connection: "winrm"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_workstations
+  with_items: "{{ workstation_instances.results | map(attribute='instance') | list }}"
+
+################### Inventory ###################
+
+- name: Generate instructor inventory
+  template:
+    src: instructor_inventory.j2
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/instructor_inventory.txt"
+
+- name: Generate student inventories
+  template:
+    src: instances.txt.j2
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
+  with_sequence: count="{{ user_count }}"

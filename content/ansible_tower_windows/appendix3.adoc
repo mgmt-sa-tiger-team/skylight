@@ -1,0 +1,40 @@
+
+:icons: font
+:imagesdir: images
+
+
+
+= Exercise 3.1 - Using Ansible to run Powershell
+
+
+
+
+== Header 1
+
+TODO
+
+
+=== Step 1:
+
+TODO
+
+
+
+=== Step 2:
+
+TODO
+
+
+== Header 2
+
+TODO
+
+
+=== Step 1:
+
+TODO
+
+
+=== End Result
+
+TODO

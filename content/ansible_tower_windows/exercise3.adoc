@@ -1,0 +1,212 @@
+include::header.adoc[]
+
+
+:figure-caption!:
+:become_url: http://docs.ansible.com/ansible/become.html#new-command-line-options
+:dir_url: http://docs.ansible.com/ansible/playbooks_best_practices.html
+:win_feature_url: http://docs.ansible.com/ansible/latest/win_feature_module.html
+:win_service_url: http://docs.ansible.com/ansible/latest/win_service_module.html
+:yaml_url: http://docs.ansible.com/ansible/YAMLSyntax.html
+
+
+= Exercise 3 - Writing Your First playbook
+
+
+Let's begin by writing our first
+ansible *playbook*.  The playbook is where you list the steps you would like to automate into a repeatable set of *plays* and *tasks*.
+To begin we will setup our directory structure for storing our playbooks. This directory structure with sync with a
+*source control management* (SCM) system to version our playbooks. We will be using *git* as out SCM.
+
+A playbook can have multiple plays and a play
+can have one or multiple tasks.  The goal of a *play* is to map a group of hosts.  The goal of a *task* is to implement modules against those hosts.
+
+For our first playbook, we are only going to write 1 play and 3 tasks.
+
+All of our playbooks will be stored in a single git *repository*. Multiple users can use the same repository and git will manage file conflicts and versions.
+
+== Overview
+
+Starting at this task we are going to use Visual Studio Code as our editor.  In addition, we will use GitLab for source code control.
+This will allow us to minimize development work on the linux command line.  Other editors or source code solutions can be used, but this will show the general workflow.
+
+== Section 1: Creating a Directory Structure and Files for your Playbook
+
+There is a link:{dir_url}[best practice] on the preferred directory structures for playbooks.  We strongly encourage you to read and understand these practices as 
+you develop your Ansible skills.  That said, our playbook today is very basic and a complex directory structure is not necessary.
+
+Instead, we are going to create a very simple directory structure for our playbook, and add just a couple of files.
+
+
+*Step 1:* Open Visual Studio Code and Clone an empty git repository
+
+When you open Visual Studio Code, a 'Welcome' screen will load.  Choose `Chrome` when prompted for a default browser (and don't import anything).  You can close the browser for now.
+
+[NOTE]
+Internet Explorer has some issues with Ansible Tower and is unsupported.  Due to this we will use Chrome in these examples.
+
+
+For this lab, we have already created a clone of your Git repo for you.  It is located in your Documents folder, the full path will look like this (with the # replaced with your student number)
+'C:\Users\student#\Documents\student#'
+
+To access it, in Visual Code click on 'File' and then 'Open Folder'.  It should default to your documents folder, so select your student folder and press the 'Select Folder' button.
+
+At this point in the Explorer sidebar you should have a 'student#' section with only a README file in it.
+
+image::3-vscode-open-folder.png[title="Student Playbooks Repo",width=1000]
+
+*Step 2:* Create a directory called *iis_basic* and a file called `install_iis.yml`
+
+Hover over the 'student#' section and click on the 'New Folder' button. Create a folder called `iis_basic`.  Then click on that folder so it is selected.
+Right click on the new folder you've created and create a file called `install_iis.yml`.
+
+You should now have an editor open in the right pane that can be used for creating your playbook.
+
+image::3-vscode-create-folders.png[title="Empty install_iis.yml",width=1000]
+
+== Section 2: Defining Your Play
+
+Now that you are editing `install_iis.yml`, let's begin by defining the play and then understanding what each line accomplishes
+
+[source,bash]
+----
+---
+- name: install the iis web service
+  hosts: all
+
+----
+
+
+
+- `---` Defines the beginning of YAML
+- `name: install the iis web service` This describes our play
+- `hosts: all` Defines the host group in your inventory on which this play will run against
+
+
+
+== Section 3: Adding Tasks to Your Play
+
+Now that we've defined your play, let's add some tasks to get some things done.  Align (vertically) the *t* in `task` with the *h* in `hosts`.  +
+Yes, it does actually matter.  In fact, you should make sure all of your playbook statements are aligned in the way shown here. You also must use spaces for indentation. Tabs are not valid YAML syntax. +
+If you want to see the entire playbook for reference, skip to the bottom of this exercise.
+
+
+[source,bash]
+----
+  tasks:
+   - name: install iis
+     win_feature:
+       name: Web-Server
+       state: present
+
+   - name: start iis service
+     win_service:
+       name: W3Svc
+       state: started
+
+   - name: Create website index.html
+     win_copy:
+       content: "{{ iis_test_message }}"
+       dest: C:\Inetpub\wwwroot\index.html
+----
+
+
+- `tasks:` This denotes that one or more tasks are about to be defined
+- `- name:` Each task requires a name which will print to standard output when you run your playbook.
+Therefore, give your tasks a name that is short, sweet, and to the point
+
+
+[source,bash]
+----
+win_feature:
+  name: Web-Server
+  state: present
+----
+
+
+- These three lines are calling the Ansible module *win_feature* to install the IIS Web Server.
+link:{win_feature_url}[Click here] to see all options for the win_feature module.
+
+
+
+[source,bash]
+----
+win_service:
+  name: W3Svc
+  state: started
+----
+
+
+- The next few lines are using the ansible module *win_service* to start the IIS service.  The win_service module
+is the preferred way of controlling services on remote hosts.  link:{win_service_url}[Click here] to learn more
+about the *win_service* module.
+
+[source,bash]
+----
+win_copy:
+  content: "{{ iis_test_message }}"
+  dest: C:\Inetpub\wwwroot\index.html
+----
+
+
+- In this task, we use the win_copy module to create a file with specific contents in it.  We are getting a little more
+complex here as we are using a variable to source the contents.  We won't go into the variables just yet, since they 
+will be showcased in a later lesson.
+
+
+== Section 4: Saving your Playbook
+
+Now that you've completed writing your playbook, it would be a shame not to keep it. Click `File > Save` from the menu.
+
+And that should do it.  You should now have a fully written playbook called `install_iis.yml`.
+
+But wait!!! We haven't committed our changes from our *local* copy to *git*.
+Click on the Source Code icon as shown below (It is the middle on the far left of the page that has the blue circle with # 1 in it)
+
+Type in a commit message such as 'Adding install_iis.yml' in the text box at the top of the sidebar. Click the check box above to commit.
+This message is intended to describe the changes you made so that others (including yourself) better understand what is changing when comparing versions.
+
+image::3-vscode-commit.png[title="Git Commit install_iis.yml",width=1000]
+
+This will prompt to ask if you want to stage the changes.  Click on `Always` and you won't be prompted again.
+
+image::3-vscode-commit-always.png[title="Stage Commits Always"]
+
+Now you need to push the committed changes to your repository.
+
+On the bottom left blue bar, click the cloud with the up arrow on it to publish changes.
+
+image::3-vscode-push.png[title="Git Push Origin"]
+
+
+This may take as long as 30 seconds to push.  If you're interested in validating the code is in git, you can connect to gitlab to verify.  Open `Chrome` and connect to `https://gitlab.ansibleworkshop.com`.  Login with your AD user (student#) and password and you should see your repo.
+
+You are ready to automate!
+
+
+[NOTE]
+Ansible (well, YAML really) can be a bit particular about formatting especially around indentation/spacing.  When you all get back to the office,
+read up on this link:{yaml_url}[YAML Syntax] a bit more and it will save you some headaches later.  In the meantime, your completed playbook should look
+like this.  Take note of the spacing and alignment.
+
+[source,bash]
+----
+---
+- name: install the iis web service
+  hosts: all
+
+  tasks:
+    - name: install iis
+      win_feature:
+        name: Web-Server
+        state: present
+
+    - name: start iis service
+      win_service:
+        name: W3Svc
+        state: started
+
+    - name: Create website index.html
+      win_copy:
+        content: "{{ iis_test_message }}"
+        dest: C:\Inetpub\wwwroot\index.html
+----

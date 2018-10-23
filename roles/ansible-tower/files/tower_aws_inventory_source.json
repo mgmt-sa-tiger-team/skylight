@@ -1,0 +1,20 @@
+{
+    "name": "AWSSource",
+    "description": "",
+    "source": "ec2",
+    "source_path": "",
+    "source_script": null,
+    "source_vars": "",
+    "credential": 3,
+    "source_regions": "",
+    "instance_filters": "",
+    "group_by": "",
+    "overwrite": true,
+    "overwrite_vars": true,
+    "timeout": 0,
+    "verbosity": 1,
+    "update_on_launch": true,
+    "update_cache_timeout": 90,
+    "source_project": null,
+    "update_on_project_update": false
+}

@@ -1,0 +1,8 @@
+<powershell>
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v NoAutoUpdate /t REG_DWORD /d 1 /f net stop wuauserv net start wuauserv
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v AUOptions /t REG_DWORD /d 2 /f net stop wuauserv net start wuauserv
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile ConfigureRemotingForAnsible.ps1
+Rename-Computer -NewName {{ 's' + item + '-win1' }} 
+ConfigureRemotingForAnsible.ps1
+Restart-Computer
+</powershell>

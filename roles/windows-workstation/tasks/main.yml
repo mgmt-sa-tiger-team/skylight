@@ -1,0 +1,144 @@
+---
+# tasks file for windows-workstation
+
+### Req dot net 4.5.2 
+#- name: Install .Net framework 4.5.2 
+#  win_feature:
+#    name: DotNet-4-5-2
+#    state: present
+#    Win2016 has .NET 4.6... 
+- block:
+  - set_fact:
+      user: "{{ user_prefix }}{{ inventory_hostname | regex_replace('[^0-9]', '') }}"
+
+  - name: Install Visual Studio Code, Git, and Putty
+    win_chocolatey:
+      name: "{{ item }}"
+      ignore_checksums: true
+    with_items:
+      - visualstudiocode
+      - git
+      #- putty.install
+      #- firefox
+      - googlechrome
+      #- winscp
+      #- atom
+      #- notepadplusplus.install
+      #- sublimetext3
+
+#  - name: Add Putty Shortcut to administrator desktop
+#    win_shortcut:
+#      description: PuTTY
+#      src: '%ProgramFiles%\PuTTY\putty.exe'
+#      dest: '%Public%\Desktop\Putty.lnk'
+#      directory: '%ProgramFiles%\PuTTY\'
+
+  - name: Create an shortcut to Docs site
+    win_shortcut:
+      src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
+      dest: '%UserProfile%\Desktop\Workshop Docs.lnk'
+      args: --new-window http://docs.{{ dns_domain_name }}/
+      directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
+      icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
+
+  - name: Create an shortcut to Tower site
+    win_shortcut:
+      src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
+      dest: '%UserProfile%\Desktop\Ansible Tower.lnk'
+      args: --new-window http://s{{ user | regex_replace('[^0-9]', '') }}-tower.{{ dns_domain_name }}/
+      directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
+      icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
+
+  - name: Create an shortcut to Ansible Docs site
+    win_shortcut:
+      src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
+      dest: '%UserProfile%\Desktop\Ansible Docs.lnk'
+      args: --new-window http://docs.ansible.com/
+      directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
+      icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
+
+  - name: Set git to cache credentials
+    win_command: git config --global credential.helper manager
+
+  - name: Allow insecure git repos for self signed certificates
+    win_command: git config --global http.sslVerify "false"
+
+  - name: Set git user 
+    win_command: git config --global user.name "{{ user }}"
+
+  - name: Set git user email
+    win_command: git config --global user.email "{{ user }}@{{ dns_domain_name }}"
+
+  - name: Set git password
+    win_shell: cmdkey /generic:LegacyGeneric:target=git:https://gitlab.{{ dns_domain_name }} /user:{{ user }} /pass:"{{ users_password }}"
+
+  - name: Set git password
+    win_shell: cmdkey /generic:LegacyGeneric:target=git:https://{{ user }}@gitlab.{{ dns_domain_name }} /user:{{ user }} /pass:"{{ users_password }}"
+
+  - name: Copy .gitconfig to user directory
+    win_copy:
+      src: C:\Windows\.gitconfig
+      dest: C:\Users\{{ user }}\.gitconfig
+      remote_src: True
+
+  - name: Clone student git repo
+    win_command: git clone https://gitlab.{{ dns_domain_name }}/{{ user }}/{{ user }}.git
+    args:
+      chdir: C:\Users\{{ user }}\Documents
+      creates: C:\Users\{{ user }}\Documents\{{ user }}
+
+  - name: Create Readme file to intialize the repo
+    win_copy:
+      dest: C:\Users\{{ user }}\Documents\{{ user }}\README.md
+      content: ""
+    register: initialize
+
+  - name: Add initial file
+    win_command: git add C:\Users\{{ user }}\Documents\{{ user }}\README.md
+    args:
+      chdir: C:\Users\{{ user }}\Documents\{{ user }}
+    when: initialize.changed
+
+  - name: Commit initial file
+    win_command: git commit -m "Initialize"
+    args:
+      chdir: C:\Users\{{ user }}\Documents\{{ user }}
+    when: initialize.changed
+
+  - name: Push initial commit
+    win_command: git push
+    args:
+      chdir: C:\Users\{{ user }}\Documents\{{ user }}
+    when: initialize.changed
+
+  - name: Create VS Code Settings Directory
+    win_file:
+      path: C:\Users\{{ user }}\AppData\Roaming\Code\User\
+      state: directory
+
+  - name: Configure VS Code Settings File
+    win_copy:
+      src: files/settings.json
+      dest: C:\Users\{{ user }}\AppData\Roaming\Code\User\settings.json
+
+  - name: Set Chrome to default Browser
+    win_shell: Set-ItemProperty HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\{{ item }}\UserChoice -name ProgId ChromeHTML
+    with_items:
+      - http
+      - https
+
+  - name: Remove EC2 Feedback Icon
+    win_file:
+      path: C:\Users\{{ user }}\Desktop\EC2 Feedback.website
+      state: absent
+
+  - name: Remove EC2 Website Icon
+    win_file:
+      path: C:\Users\{{ user }}\Desktop\EC2 Microsoft Windows Guide.website
+      state: absent
+
+  become: yes
+  become_user: "{{ dns_domain_name_short }}\\{{ user_prefix }}{{ inventory_hostname | regex_replace('[^0-9]', '') }}"
+  become_method: runas
+
+#- include_tasks: ansible.yml

@@ -1,0 +1,22 @@
+
+:icons: font
+:iconsdir: http://people.redhat.com/~jduncan/images/icons
+:imagesdir: images
+:badges:
+:source-highlighter: highlight.js
+:source-language: yaml
+
+= Automation for Everyone
+
+
+== Table of Contents
+
+* link:index.html[Agenda]
+* link:exercise1.html[Exercise 1 - Configuring Ansible Tower]
+* link:exercise2.html[Exercise 2 - Ad-hoc commands in Tower]
+* link:exercise3.html[Exercise 3 - Writing Your First playbook]
+* link:exercise4.html[Exercise 4 - Creating and Running a Job Template]
+* link:exercise5.html[Exercise 5 - Using Variables, Loops, and Handlers]
+* link:exercise6.html[Exercise 6 - Roles: Making your playbooks reusable]
+
+* link:wrapup.html[Wrap UP]

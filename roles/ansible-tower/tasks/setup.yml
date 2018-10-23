@@ -1,0 +1,245 @@
+---
+- name: check if we need to do installer things
+  uri:
+    url: https://localhost/api/v1/ping/
+    method: GET
+    user: admin
+    password: "{{ towerpass }}"
+    validate_certs: False 
+  register: checkout
+  ignore_errors: True
+
+- name: set condtional if the above didn't error
+  set_fact:
+    towerchk: "{{ checkout.json.version }}"
+  when: checkout.json is defined
+
+- name: download tower installer
+  get_url:
+    url: https://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-{{ towerversion }}.tar.gz
+    dest: /tmp/ansible-tower-setup-{{ towerversion }}.tar.gz
+    mode: 0640
+  when: towerchk != towerversion
+
+- name: extract installer
+  unarchive:
+    src: /tmp/ansible-tower-setup-{{ towerversion }}.tar.gz
+    dest: /tmp/
+    remote_src: True
+  when: towerchk != towerversion
+
+- name: template inventory file
+  template:
+    src: inventory 
+    dest: /tmp/ansible-tower-setup-{{ towerversion }}/inventory 
+  when: towerchk != towerversion
+
+- name: run the tower installer
+  shell: ./setup.sh chdir=/tmp/ansible-tower-setup-{{ towerversion }}
+  when: towerchk != towerversion
+
+- name: wait for tower to be up
+  uri:
+    url: https://localhost/api/v1/ping/
+    method: GET
+    user: admin
+    password: "{{ towerpass }}"
+    validate_certs: False 
+    force_basic_auth: yes
+  register: check2
+  until: check2.json is defined and check2.json.version == towerversion
+  retries: 10
+  delay: 30
+  when: towerchk != towerversion
+
+- name: Post license key
+  uri:
+    url: https://localhost/api/v1/config/
+    method: POST
+    user: admin
+    password: "{{ towerpass }}"
+    body: "{{ lookup('file', playbook_dir+'/tower_license.json') }}"
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+  ignore_errors: True
+
+- name: Add LDAP Config
+  uri:
+    url: https://localhost/api/v2/settings/ldap/
+    method: PATCH
+    user: admin
+    password: "{{ towerpass }}"
+    body: "{{ lookup('template','ldap_conf.json.j2') }}"
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+
+- set_fact:
+    userid: "{{ inventory_hostname | regex_replace('[^0-9]', '') }}"
+
+- name: Delete demo inventory
+  uri:
+    url:  https://localhost/api/v2/inventories/1/
+    method: DELETE
+    user: admin
+    password: "{{ towerpass }}"
+    validate_certs: False 
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 202
+      - 204
+      - 400
+      - 404
+  register: response
+  changed_when: response.status == 204
+
+- name: Delete demo project
+  uri:
+    url:  https://localhost/api/v2/projects/4/
+    method: DELETE
+    user: admin
+    password: "{{ towerpass }}"
+    validate_certs: False 
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 202
+      - 204
+      - 400
+      - 404
+  register: response
+  changed_when: response.status == 204
+
+- name: Delete demo template
+  uri:
+    url:  https://localhost/api/v2/job_templates/5/
+    method: DELETE
+    user: admin
+    password: "{{ towerpass }}"
+    validate_certs: False 
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 202
+      - 204
+      - 400
+      - 404
+  register: response
+  changed_when: response.status == 204
+
+- name: Delete demo credential
+  uri:
+    url:  https://localhost/api/v2/credentials/1/
+    method: DELETE
+    user: admin
+    password: "{{ towerpass }}"
+    validate_certs: False 
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 202
+      - 204
+      - 400
+      - 404
+  register: response
+  changed_when: response.status == 204
+
+- name: create inventory
+  uri:
+    url:  https://localhost/api/v2/inventories/
+    method: POST
+    user: admin
+    password: "{{ towerpass }}"
+    body: "{{ lookup('file','tower_inventory.json') }}"
+    body_format: json
+    validate_certs: False 
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 400
+  register: response
+  changed_when: response.status == 201
+
+- name: create group
+  uri:
+    url:  https://localhost/api/v2/groups/
+    method: POST
+    user: admin
+    password: "{{ towerpass }}"
+    body: "{{ lookup('template','tower_group.json.j2') }}"
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 400
+  register: response
+  changed_when: response.status == 201
+
+- name: create host
+  uri:
+    url:  https://localhost/api/v2/hosts/
+    method: POST
+    user: admin
+    password: "{{ towerpass }}"
+    body: "{{ lookup('template','tower_host.json.j2') }}"
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 201
+      - 400
+  register: response
+  changed_when: response.status == 201
+
+- name: Associate host to group
+  uri:
+    url:  https://localhost/api/v2/groups/1/hosts/
+    method: POST
+    user: admin
+    password: "{{ towerpass }}"
+    body: '{ "id": 2 }'
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 204
+      - 400
+  register: response
+  changed_when: response.status == 204
+
+- name: Add win_shell/win_feature/win_reboot to allowed adhoc modules
+  uri:
+    url:  https://localhost/api/v2/settings/all/
+    method: PATCH
+    user: admin
+    password: "{{ towerpass }}"
+    body: "{{ lookup('template','tower_config_adhoc.json.j2') }}"
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 204
+      - 400
+  register: response
+  changed_when: response.status == 200
+
+- name: Disable GIT Cert validation
+  lineinfile:
+    path: /etc/tower/settings.py
+    regexp: 'GIT_SSL_NO_VERIFY'
+    line: "AWX_TASK_ENV['GIT_SSL_NO_VERIFY'] = 'True'"
+  notify: restart tower
+
+

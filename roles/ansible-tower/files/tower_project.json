@@ -1,0 +1,14 @@
+{
+    "name": "PFN Demo Project",
+    "description": "",
+    "scm_type": "git",
+    "scm_url": "https://github.com/dfederlein/ansible-demos.git",
+    "scm_branch": "",
+    "scm_clean": true,
+    "scm_delete_on_update": true,
+    "credential": null,
+    "timeout": 0,
+    "organization": 1,
+    "scm_update_on_launch": true,
+    "scm_update_cache_timeout": 0
+}

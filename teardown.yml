@@ -1,0 +1,16 @@
+- name: Destroy lab instances
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  vars:
+    teardown: true
+  tasks:
+  - include_role:
+      name: "manage-{{ instance_loc }}-instances"
+
+  post_tasks:
+   - name: Remove workshop local files
+     file:
+       dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}"
+       state: absent

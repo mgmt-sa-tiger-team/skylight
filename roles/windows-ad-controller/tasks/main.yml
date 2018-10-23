@@ -1,0 +1,206 @@
+---
+- name: Install AD-Domain-Services
+  win_feature:
+    name: AD-Domain-Services
+    state: present
+    include_management_tools: True
+    include_sub_features: True
+  register: winfeature
+
+- name: Reboot if needed
+  win_reboot:
+  when: winfeature.changed
+
+#- name: Sleep 180 seconds to wait for DNS config
+#  pause:
+#    minutes: 3
+#  when: winfeature.changed
+
+#- name: Install AD-Certificate
+#  win_feature:
+#    name: AD-Certificate
+#    state: present
+#    include_management_tools: True
+#    include_sub_features: True
+#  register: wincertfeature
+
+#- debug: var=wincertfeature
+
+#- name: Reboot if needed
+#  win_reboot:
+#  when: wincertfeature.reboot_required
+
+- name: Install DNS
+  win_feature:
+    name: DNS
+    state: present
+    include_management_tools: True
+  register: windnsfeature
+
+- name: Reboot if needed
+  win_reboot:
+  when: windnsfeature.reboot_required
+
+#- name: Sleep 180 seconds to wait for DNS config
+#  pause:
+#    minutes: 3
+#  when: windnsfeature.changed
+#
+#- name: Ensure AD services are started - will fail if install not complete
+#  win_service:
+#    name: "{{ item }}"
+#    state: started
+#    start_mode: auto
+#  with_items:
+#    - adws
+#    - dns
+#    - kdc
+#    - netlogon
+
+# Validate?
+# DCDIAG
+# Get-Service adws,kdc,netlogon,dns     # Services are running?
+# Get-smbshare          # sysvol & netlogin shares
+# get-eventlog "Directory Service" | select entrytype, source, eventid, message
+
+# get-eventlog "Active Directory Web Services" | select entrytype, source, eventid, message
+
+- name: Create DNS Domain
+  win_domain:
+    dns_domain_name: "{{ dns_domain_name }}"
+    safe_mode_password: "{{ ansible_password }}"
+  register: windomain
+
+# Every AMI I have tested has an issue, once you create the DNS Domain, all auth services stop.
+# You can RDP in, but you can't WinRM.  So we just restart it through AWS itself
+- name: If EC2, reboot the VM manually (ya it sucks)
+  ec2:
+    instance_tags:
+        Name: "{{ name_prefix }}-windc"
+    region: "{{ ec2_region }}"
+    state: restarted
+  when:
+    - instance_loc == 'ec2'
+    - windomain.reboot_required
+  delegate_to: localhost
+
+- name: If EC2, wait for it to come back up
+  wait_for_connection:
+    delay: 20
+    timeout: 300
+  when:
+    - instance_loc == 'ec2'
+    - windomain.reboot_required
+
+- name: Reboot if needed
+  win_reboot:
+  when:
+    - instance_loc != 'ec2'
+    - windomain.reboot_required
+
+- name: Sleep 300 seconds to wait for DNS config
+  pause:
+    minutes: 5
+  when:
+    - windomain.reboot_required
+
+- name: Ensure DNS services are started
+  win_service:
+    name: "{{ item }}"
+    state: started
+    start_mode: auto
+  with_items:
+    - dns
+
+- name: Set Reverse Lookup Zone
+  win_ad_reverse_dnszone:
+    subnet: "{{ ptr_zone_cidr }}"
+    zonename: "{{ ptr_zone_name }}"
+    state: present
+
+- name: Ensure AD services are started - will fail if install not complete
+  win_service:
+    name: "{{ item }}"
+    state: started
+    start_mode: auto
+  with_items:
+    - adws
+    - dns
+#    - kdc
+#    - netlogon
+
+- name: Create DNS A record for gitlab
+  win_ad_dnsrecord:
+    hostname: gitlab
+    zone: "{{ dns_domain_name }}"
+    ipaddr: "{{ hostvars['gitlab']['private_ip'] }}"
+    state: present
+
+- name: Create DNS A record for docs
+  win_ad_dnsrecord:
+    hostname: docs
+    zone: "{{ dns_domain_name }}"
+    ipaddr: "{{ hostvars['docs']['private_ip'] }}"
+    state: present
+
+- name: Create DNS A record for Towers
+  win_ad_dnsrecord:
+    hostname: s{{ item }}-tower
+    zone: "{{ dns_domain_name }}"
+    ipaddr: "{{ hostvars['s' + item + '-tower']['private_ip'] }}"
+    state: present
+  with_sequence: count={{ user_count }}
+
+- name: Create DNS A record for Windows
+  win_ad_dnsrecord:
+    hostname: s{{ item }}-win1
+    zone: "{{ dns_domain_name }}"
+    ipaddr: "{{ hostvars['s' + item + '-win1']['private_ip'] }}"
+    state: present
+  with_sequence: count={{ user_count }}
+
+- name: Add windows group
+  win_domain_group:
+    name: Ansible Users
+    scope: global
+
+- name: Add windows domain admin
+  win_domain_user:
+    name: "Admin"
+    upn: "Admin@{{ dns_domain_name }}"
+    state: present
+    enabled: yes
+    account_locked: no
+    groups:
+      - Domain Admins
+    password: "{{ domain_admin_password }}"
+    update_password: on_create
+    password_expired: false
+    firstname: admin
+    surname: user
+    company: AnsibleByRedHat
+    email: "Admin@{{ dns_domain_name }}"
+
+- name: Add windows AD users
+  win_domain_user:
+    name: "{{ user_prefix }}{{ item }}"
+    upn: "{{ user_prefix}}{{ item }}@{{ dns_domain_name }}"
+    state: present
+    enabled: yes
+    account_locked: no
+    groups:
+      - Ansible Users
+    password: "{{ users_password }}"
+    update_password: on_create
+    password_expired: false
+    firstname: "{{ user_prefix }}"
+    surname: "{{ item }}"
+    company: AnsibleByRedHat
+    email: "{{user_prefix}}{{ item }}@{{ dns_domain_name }}"
+  with_sequence: count="{{ user_count }}"
+
+- name: Set DNS search string to {{ dns_domain_name }}
+  win_dns_searchsuffix:
+    suffixes:
+      - "{{ dns_domain_name }}"
+
