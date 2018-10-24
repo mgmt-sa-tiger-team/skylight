@@ -1,10 +1,35 @@
+- name: Install MySQL and PHP
+  package:
+    name:
+      - mariadb-server
+      - php-fpm
+      - php-mysql
+      - php-pdo
+      - python-pip
+    state: present
+
+- name: Start Services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - mariadb
+    - php-fpm
+
+- file:
+    path: /var/lib/php/session/
+    owner: nginx
+    group: nginx
+    mode: 0777
+    state: directory
+
 - name: Install asciidoc packages
   package:
-    name: "{{ item }}"
+    name:
+      - asciidoc
+      - rubygem-asciidoctor
     state: present
-  with_items:
-    - asciidoc
-    - rubygem-asciidoctor
 
 - name: Install asciidoctor-pdf Gem
   gem:
@@ -34,12 +59,12 @@
     - exercise7
   when: copycontent.changed
 
-- name: Copy template to server
-  template:
-    src: templates/users.html.j2
-    dest: /usr/share/nginx/html/users.html
+- name: Copy users.php to server
+  copy:
+    src: files/users.php.j2
+    dest: /usr/share/nginx/html/users.php
 
-- name: Copy deck to server
+- name: Create deck directory on server
   file:
     path: /usr/share/nginx/html/decks/
     state: directory
@@ -55,3 +80,24 @@
 #    chdir: /tmp/content/
 #  when: copycontent.changed
 
+- name: Install PyMySQL
+  pip:
+    name: PyMySQL
+
+- name: Create a new database with name 'workshop'
+  mysql_db:
+    name: workshop
+    state: present
+
+- name: Copy SQL template to server
+  template:
+    src: templates/workshop.sql.j2
+    dest: /tmp/workshop.sql
+  register: workshopsql
+  
+- name: Import SQL file into workshop database
+  mysql_db:
+    state: import
+    name: workshop
+    target: /tmp/workshop.sql
+  when: workshopsql.changed

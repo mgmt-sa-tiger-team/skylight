@@ -327,7 +327,7 @@
 
 - name: Tower | Add new instance to host group
   add_host:
-    hostname: "{{ item.hw_name|replace(name_prefix + '-', '') }}"
+    hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     ansible_ssh_host: "{{ item.ipv4 }}"
     ansible_host: "{{ item.ipv4 }}"
     private_ip: "{{ item.ipv4 }}"
@@ -347,7 +347,7 @@
 
 - name: Windows | Add new instance to host group
   add_host:
-    hostname: "{{ item.hw_name|replace(name_prefix + '-', '') }}"
+    hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     ansible_host: "{{ item.ipv4  }}"
     private_ip: "{{ item.ipv4 }}"
     ansible_port: 5986
@@ -370,11 +370,12 @@
 
 - name: Workstation | Add new instance to host group
   add_host:
-    hostname: "{{ item.hw_name|replace(name_prefix + '-', '') }}"
+    hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     private_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
     ansible_host: "{{ item.hw_eth1.ipaddresses[0] }}"
 #    ansible_host: "{{ item.ipv4  }}"
 #    private_ip: "{{ item.ipv4 }}"
+    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
     ansible_port: 5986
     ansible_user: "Administrator"
     ansible_password: "{{ domain_admin_password }}"

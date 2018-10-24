@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS `users` (
+  `name` varchar(128) DEFAULT '',
+  `email` varchar(128) DEFAULT '',
+  `id` int(12) NOT NULL DEFAULT '0',
+  `ip` varchar(15) NOT NULL DEFAULT '',
+  `username` varchar(128) DEFAULT '',
+  `password` varchar(128) DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+{% for vm in groups['windows_workstations'] %}
+INSERT INTO `users` (`id`,`ip`, `username`, `password`) VALUES ({{ hostvars[vm].student }}, '{{ hostvars[vm].ansible_host }}', '{{ user_prefix + hostvars[vm].student }}', '{{ users_password }}')
+  ON DUPLICATE KEY UPDATE `ip` = '{{ hostvars[vm].ansible_host }}', `password` = '{{ users_password }}';
+{% endfor %}
