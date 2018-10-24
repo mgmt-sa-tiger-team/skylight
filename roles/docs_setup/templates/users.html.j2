@@ -41,7 +41,7 @@ Try it Yourself »
     <img src="https://www.ansible.com/hubfs/2016_Images/Assets/Ansible-Tower-Logotype-Small-RGB-FullBlack.png"/>
 
 
-GITHUB for Ansible Lightbulb: <a href="https://github.com/mgmt-sa-tiger-team/lightbulb-windows" target="lightbulb-windows">https://github.com/mgmt-sa-tiger-team/lightbulb-windows</a><br><br>
+GITHUB for Ansible Workshop: <a href="https://github.com/mgmt-sa-tiger-team/skylight" target="skylight">https://github.com/mgmt-sa-tiger-team/skylight</a><br><br>
 
 </h3>
 
@@ -61,6 +61,9 @@ Workstation:<br />
 {% for host in hostvars %}
 {% if "s" + u|string + "-work" in host %}
 {{ hostvars[host].ansible_host }}<br />
+<br />
+Webconnect:<br />
+ <a href="https://{{ hostvars[host].ansible_host }}/rdp" target=rdp>https://{{ hostvars[host].ansible_host }}/rdp</a>
 {% endif %}
 {% endfor %}</p>
     </div>
