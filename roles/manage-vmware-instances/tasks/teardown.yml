@@ -2,7 +2,7 @@
 
 # ----------------------- Destroy Tower Instances -----------------------
 - name: Destory Tower Instances
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -20,7 +20,7 @@
 
 # ----------------------- Destroy Gitlab Instances -----------------------
 - name: Destory Gitlab Instances
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -37,7 +37,7 @@
 
 # ----------------------- Destroy Docs Instances -----------------------
 - name: Destory Docs Instances
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -54,7 +54,7 @@
 
 # ----------------------- Destroy DC Instances -----------------------
 - name: Destory DC Instances
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -71,7 +71,7 @@
 
 # ----------------------- Destroy Windows Instances -----------------------
 - name: Destory Windows Instances
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -89,7 +89,7 @@
 
 # ----------------------- Destroy Workstation Instances -----------------------
 - name: Destory Workstation Instances
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
