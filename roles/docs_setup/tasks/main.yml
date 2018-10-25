@@ -7,6 +7,7 @@
       - php-pdo
       - python-pip
     state: present
+  notify: restart nginx
 
 - name: Start Services
   service:
@@ -16,6 +17,7 @@
   with_items:
     - mariadb
     - php-fpm
+  notify: restart nginx
 
 - file:
     path: /var/lib/php/session/
