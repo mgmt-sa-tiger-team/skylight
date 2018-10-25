@@ -11,6 +11,14 @@
     ec2_vpc_id: "{{ vpc_net_facts.vpcs[0].id }}"
   when: vpc_net_facts.vpcs|length > 0
 
+- name: grab route information for {{ ec2_name_prefix }} on {{ ec2_region }}
+  ec2_vpc_route_table_facts:
+    region: "{{ ec2_region }}"
+    filters:
+      vpc_id: "{{ec2_vpc_id}}"
+  register: route_table_facts
+  when: vpc_net_facts.vpcs|length > 0
+
 # ----------------------- Destroy Tower Instances -----------------------
 - name: Get ec2 Tower instance information
   ec2_instance_facts:
@@ -195,6 +203,32 @@
   retries: 20
   delay: 10
 
+- name: Remove Internet Gateway
+  ec2_vpc_igw:
+    vpc_id: "{{ ec2_vpc_id }}"
+    region: "{{ ec2_region }}"
+    tags:
+      Name: "{{ name_prefix }}-igw"
+    state: absent
+  register: result
+  until: result is success
+  retries: 20
+  delay: 10
+
+- name: Remove subnet route table
+  ec2_vpc_route_table:
+    region: "{{ ec2_region }}"
+    vpc_id: "{{ ec2_vpc_id }}"
+    route_table_id: "{{ item.id }}"
+    lookup: id
+    state: absent
+  with_items: "{{ route_table_facts.route_tables }}"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10
+  ignore_errors: true
+
 - name: Remove VPC {{ name_prefix }}-vpc
   ec2_vpc_net:
     name: "{{ name_prefix }}-vpc"
@@ -203,5 +237,5 @@
     state: absent
   register: result
   until: result is success
-  retries: 20
-  delay: 10
+  retries: 1
+  delay: 1
