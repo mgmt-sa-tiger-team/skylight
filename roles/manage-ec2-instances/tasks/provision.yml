@@ -2,7 +2,7 @@
 
 - include_tasks: aws_check_setup.yml
 
-################### Create Security Groups ###################
+################### Create Resources ###################
 #- name: Get Key Pairs
 #  command: aws ec2 describe-key-pairs
 #  register: ec2_keypairs
@@ -51,6 +51,40 @@
   set_fact:
     ec2_vpc_subnet_id: "{{ create_subnet.subnet.id }}"
 
+- name: Create Internet Gateway
+  ec2_vpc_igw:
+    vpc_id: "{{ ec2_vpc_id }}"
+    region: "{{ ec2_region }}"
+    tags:
+      Name: "{{ name_prefix }}-igw"
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+    state: present
+  register: igw
+  until: igw is not failed
+  retries: 15
+
+- name: vpc public subnet route table is present for {{ ec2_vpc_id }}
+  ec2_vpc_route_table:
+    region: "{{ ec2_region }}"
+    vpc_id: "{{ ec2_vpc_id }}"
+    subnets:
+      - "{{ ec2_vpc_subnet_id }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ igw.gateway_id }}"
+    tags:
+      Name: "{{ name_prefix }}-route"
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+  register: routetable
+  until: routetable is not failed
+  retries: 5
+
+################### Create Security Groups ###################
 - name: Tower | Create Ansible Control Node security group
   ec2_group:
     name: "{{ name_prefix }}-towersg"
@@ -75,6 +109,8 @@
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0
+      - proto: all
+        cidr_ip: "{{ ptr_zone_cidr }}"
 
 - name: GitLab | Create Gitlab Node security group
   ec2_group:
@@ -89,21 +125,11 @@
       Students: "{{ user_count }}"
     rules:
       - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 8080
-        to_port: 8080
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0
+      - proto: all
+        cidr_ip: "{{ ptr_zone_cidr }}"
 
 - name: Docs | Create Docs Node security group
   ec2_group:
@@ -129,18 +155,9 @@
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0
+      - proto: all
+        cidr_ip: "{{ ptr_zone_cidr }}"
 
-- name: DomainController | Get facts from vpc subnet
-  ec2_vpc_subnet_facts:
-    region: "{{ ec2_region }}"
-    filters:
-      subnet-id: "{{ ec2_vpc_subnet_id }}"
-  register: vpc_subnet_facts
-
-- set_fact:
-     vpc_subnet_cidr: "{{ vpc_subnet_facts.subnets[0].cidr_block }}"
-
-# VPC cidr used to restrict AD access to others in your subnet
 - name: DomainController | Create MS AD Domain Controller security group
   ec2_group:
     name: "{{ name_prefix }}-windcsg"
@@ -153,7 +170,6 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
-      ## WinRM / RDP
       - proto: tcp
         from_port: 5986
         to_port: 5986
@@ -163,104 +179,7 @@
         to_port: 3389
         cidr_ip: "0.0.0.0/0"
       - proto: all
-        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## LDAP / LDAPS
-#      - proto: tcp
-#        from_port: 389
-#        to_port: 389
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 389
-#        to_port: 389
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: tcp
-#        from_port: 636
-#        to_port: 636
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## LDAP GC / GC-SSL
-#      - proto: tcp
-#        from_port: 3268
-#        to_port: 3268
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: tcp
-#        from_port: 3269
-#        to_port: 3269
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## DNS & NTP
-#      - proto: tcp
-#        from_port: 53
-#        to_port: 53
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 53
-#        to_port: 53
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 123
-#        to_port: 123
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## Kerberos
-#      - proto: tcp
-#        from_port: 88
-#        to_port: 88
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 88
-#        to_port: 88
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## Replication
-#      - proto: tcp
-#        from_port: 25
-#        to_port: 25
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: tcp
-#        from_port: 135
-#        to_port: 135
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: tcp
-#        from_port: 5722
-#        to_port: 5722
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## Auth / NetBIOS / Group Policy
-#      - proto: udp
-#        from_port: 137
-#        to_port: 137
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 138
-#        to_port: 138
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: tcp
-#        from_port: 139
-#        to_port: 139
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## AD DS Web Services
-#      - proto: tcp
-#        from_port: 9389
-#        to_port: 9389
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## Replication, Auth, Trusts
-#      - proto: tcp
-#        from_port: 445
-#        to_port: 445
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 445
-#        to_port: 445
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: tcp
-#        from_port: 464
-#        to_port: 464
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      - proto: udp
-#        from_port: 464
-#        to_port: 464
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
-#      ## Dynamic / Group Policy
-#      - proto: udp
-#        from_port: 49152
-#        to_port: 65535
-#        cidr_ip: "{{ vpc_subnet_cidr }}"
+        cidr_ip: "{{ ptr_zone_cidr }}"
 
 - name: Windows | Create MS Windows security group
   ec2_group:
@@ -274,7 +193,6 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
-      ## WinRM / RDP
       - proto: tcp
         from_port: 5986
         to_port: 5986
@@ -283,41 +201,8 @@
         from_port: 3389
         to_port: 3389
         cidr_ip: "0.0.0.0/0"
-
-- name: Windows | Create HTTP security group
-  ec2_group:
-    name: "{{ name_prefix }}-websg"
-    description: "Web Server SG"
-    vpc_id: "{{ ec2_vpc_id }}"
-    region: "{{ ec2_region }}"
-    tags:
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-    rules:
-      ## HTTP/HTTPS
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        cidr_ip: "0.0.0.0/0"
-      ## Used for our example
-      - proto: tcp
-        from_port: 8080
-        to_port: 8080
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 8081
-        to_port: 8081
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 8443
-        to_port: 8443
-        cidr_ip: "0.0.0.0/0"
+      - proto: all
+        cidr_ip: "{{ ptr_zone_cidr }}"
 
 ################### Build Instances ###################
 
@@ -355,7 +240,6 @@
     key_name: "{{ ec2_keypair }}"
     group:
       - "{{ name_prefix }}-windowssg"
-      - "{{ name_prefix }}-websg"
     instance_type: "{{ ec2_windows_instance_type }}"
     exact_count: 1
     count_tag:
