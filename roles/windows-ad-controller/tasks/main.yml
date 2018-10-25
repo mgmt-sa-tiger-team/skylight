@@ -98,9 +98,9 @@
     - instance_loc != 'ec2'
     - windomain.reboot_required
 
-- name: Sleep 300 seconds to wait for DNS config
+- name: Sleep 120 seconds to wait for DNS config
   pause:
-    minutes: 5
+    minutes: 2
   when:
     - windomain.reboot_required
 
