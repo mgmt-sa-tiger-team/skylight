@@ -3,14 +3,14 @@
 - include_tasks: aws_check_setup.yml
 
 ################### Create Security Groups ###################
-- name: Get Key Pairs
-  command: aws ec2 describe-key-pairs
-  register: ec2_keypairs
-
-- name: Fail if keypair doesn't exist
-  fail:
-    msg: "Keypair <{{ ec2_keypair }}> does not exist"
-  when: "ec2_keypair not in ec2_keypairs.stdout"
+#- name: Get Key Pairs
+#  command: aws ec2 describe-key-pairs
+#  register: ec2_keypairs
+#
+#- name: Fail if keypair doesn't exist
+#  fail:
+#    msg: "Keypair <{{ ec2_keypair }}> does not exist"
+#  when: "ec2_keypair not in ec2_keypairs.stdout"
 
 - name: Tower | Create Ansible Control Node security group
   ec2_group:
@@ -681,6 +681,7 @@
     ansible_winrm_server_cert_validation: "ignore"
     ansible_winrm_operation_timeout_sec: 120
     ansible_winrm_read_timeout_sec: 150
+    student: "{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}"
     groups: windows_workstations
   with_items: "{{ ec2workstation_password.results }}"
   when: ec2workstation_password is defined
