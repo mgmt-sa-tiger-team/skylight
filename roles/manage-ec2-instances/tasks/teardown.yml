@@ -1,4 +1,16 @@
 ---
+- name: Get the VPC ID for {{ name_prefix }}
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{ name_prefix }}-vpc"
+    region: "{{ ec2_region }}"
+  register: vpc_net_facts
+
+- name: use set fact for easier variables
+  set_fact:
+    ec2_vpc_id: "{{ vpc_net_facts.vpcs[0].id }}"
+  when: vpc_net_facts.vpcs|length > 0
+
 # ----------------------- Destroy Tower Instances -----------------------
 - name: Get ec2 Tower instance information
   ec2_instance_facts:
@@ -115,6 +127,7 @@
 - name: Remove Tower security group
   ec2_group:
     name: "{{ name_prefix }}-towersg"
+    vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
   until: result is success
@@ -124,6 +137,7 @@
 - name: Remove Gitlab security group
   ec2_group:
     name: "{{ name_prefix }}-gitlabsg"
+    vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
   until: result is success
@@ -133,6 +147,7 @@
 - name: Remove Docs security group
   ec2_group:
     name: "{{ name_prefix }}-docssg"
+    vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
   until: result is success
@@ -142,6 +157,7 @@
 - name: Remove DC security group
   ec2_group:
     name: "{{ name_prefix }}-windcsg"
+    vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
   until: result is success
@@ -151,6 +167,7 @@
 - name: Remove Web security group
   ec2_group:
     name: "{{ name_prefix }}-websg"
+    vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
   until: result is success
@@ -160,6 +177,29 @@
 - name: Remove Windows security group
   ec2_group:
     name: "{{ name_prefix }}-windowssg"
+    vpc_id: "{{ ec2_vpc_id }}"
+    state: absent
+  register: result
+  until: result is success
+  retries: 20
+  delay: 10
+
+- name: Remove subnet for {{ name_prefix }}-vpc
+  ec2_vpc_subnet:
+    region: "{{ ec2_region }}"
+    vpc_id: "{{ ec2_vpc_id }}"
+    cidr: "{{ ptr_zone_cidr }}"
+    state: absent
+  register: result
+  until: result is success
+  retries: 20
+  delay: 10
+
+- name: Remove VPC {{ name_prefix }}-vpc
+  ec2_vpc_net:
+    name: "{{ name_prefix }}-vpc"
+    cidr_block: "{{ ptr_zone_cidr }}"
+    region: "{{ ec2_region }}"
     state: absent
   register: result
   until: result is success

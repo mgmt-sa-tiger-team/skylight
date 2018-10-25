@@ -12,6 +12,45 @@
 #    msg: "Keypair <{{ ec2_keypair }}> does not exist"
 #  when: "ec2_keypair not in ec2_keypairs.stdout"
 
+- name: Create AWS VPC {{ name_prefix }}-vpc
+  ec2_vpc_net:
+    name: "{{ name_prefix }}-vpc"
+    cidr_block: "{{ ptr_zone_cidr }}"
+    region: "{{ ec2_region }}"
+    tags:
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+  register: create_vpc
+  until: create_vpc is not failed
+  retries: 5
+
+- name: Set VPC ID
+  set_fact:
+    ec2_vpc_id: "{{ create_vpc.vpc.id }}"
+
+- name: Create subnet for {{ name_prefix }}-vpc
+  ec2_vpc_subnet:
+    region: "{{ ec2_region }}"
+    az: "{{ ec2_az }}"
+    vpc_id: "{{ ec2_vpc_id }}"
+    cidr: "{{ ptr_zone_cidr }}"
+    wait_timeout: 600
+    resource_tags:
+      Name: "{{ name_prefix }}-subnet"
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+  register: create_subnet
+  until: create_subnet is not failed
+  retries: 15
+
+- name: Set Subnet ID
+  set_fact:
+    ec2_vpc_subnet_id: "{{ create_subnet.subnet.id }}"
+
 - name: Tower | Create Ansible Control Node security group
   ec2_group:
     name: "{{ name_prefix }}-towersg"
@@ -21,7 +60,7 @@
     tags:
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
       - proto: tcp
@@ -46,7 +85,7 @@
     tags:
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
       - proto: tcp
@@ -75,7 +114,7 @@
     tags:
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
       - proto: tcp
@@ -111,7 +150,7 @@
     tags:
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
       ## WinRM / RDP
@@ -232,7 +271,7 @@
     tags:
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
       ## WinRM / RDP
@@ -254,7 +293,7 @@
     tags:
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
       ## HTTP/HTTPS
@@ -297,7 +336,7 @@
       Workshop: "{{ name_prefix }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'windc'
     image: "{{ ec2_windows_ami }}"
@@ -329,7 +368,7 @@
       Student: "{{ user_prefix + item }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-win1' }}"
     image: "{{ ec2_windows_ami }}"
@@ -360,7 +399,7 @@
       Student: "{{ user_prefix + item }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-work' }}"
     image: "{{ ec2_windows_ami }}"
@@ -390,7 +429,7 @@
       Student: "{{ user_prefix + item }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-tower' }}"
     image: "{{ ec2_rhel_ami }}"
@@ -419,7 +458,7 @@
       Workshop: "{{ name_prefix }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'gitlab'
     image: "{{ ec2_rhel_ami }}"
@@ -448,7 +487,7 @@
       Workshop: "{{ name_prefix }}"
       Username: "{{ skylight_user }}"
       Info: "Username that provisioned this-> {{ skylight_user }}"
-      Linklight: "This was provisioned through the skylight provisioner"
+      Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'docs'
     image: "{{ ec2_centos_ami }}"

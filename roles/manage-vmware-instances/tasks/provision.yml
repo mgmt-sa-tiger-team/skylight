@@ -373,8 +373,6 @@
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     private_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
     ansible_host: "{{ item.hw_eth1.ipaddresses[0] }}"
-#    ansible_host: "{{ item.ipv4  }}"
-#    private_ip: "{{ item.ipv4 }}"
     student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
     ansible_port: 5986
     ansible_user: "Administrator"

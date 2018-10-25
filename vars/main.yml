@@ -78,8 +78,6 @@ gitlab_smtp_enable: "false"
 ##########################################################
 
 ec2_keypair: "mykeypair"
-ec2_vpc_id: "vpc-########"
-ec2_vpc_subnet_id: "subnet-########"
 ec2_region: "us-east-1"
 ec2_key_file: "~/.ssh/mykeypair.pem"
 # Instance Sizes
