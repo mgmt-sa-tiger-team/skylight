@@ -43,9 +43,10 @@
 
 - name: Install packages
   package:
-    name: "{{ item }}"
+    name:
+      - vim
+      - bind-utils
     state: present
-  with_items:
-    - vim
-    - bind-utils
+
+
 

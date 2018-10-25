@@ -12,15 +12,14 @@
 
 - name: Install packages
   package:
-    name: "{{ item }}"
+    name:
+      - vim
+      - git
+      - sshpass
+      - ansible-2.5.4
+      - bind-utils
+      - python-pip
     state: present
-  with_items:
-    - vim
-    - git
-    - sshpass
-    - ansible-2.5.4
-    - bind-utils
-    - python-pip
 
 - name: Install devel branch
   pip:
@@ -43,16 +42,14 @@
 
 - name: Install dependencies for Kerberos auth
   package:
-    name: "{{ item }}"
+    name:
+      - python-devel
+      - krb5-devel
+      - krb5-libs
+      - krb5-workstation
+      - python-kerberos
+      - gcc
     state: present
-  with_items:
-    - python-devel
-    - krb5-devel
-    - krb5-libs
-    - krb5-workstation
-    - python-kerberos
-    - gcc
-    # gcc needed for pywinrm[kerberos]
 
 - name: Install pywinrm for connecting to windows hosts
   pip:
@@ -64,16 +61,15 @@
 
 - name: Install dependencies for domain join 
   package:
-    name: "{{ item }}"
+    name:
+      - oddjob
+      - oddjob-mkhomedir
+      - openldap-clients
+      - realmd
+      - sssd
+      - samba-common-tools 
+      - authconfig
     state: present
-  with_items:
-    - oddjob
-    - oddjob-mkhomedir
-    - openldap-clients
-    - realmd
-    - sssd
-    - samba-common-tools 
-    - authconfig
 
 ### Add something to check if it is already in a domain? 
 
