@@ -61,10 +61,15 @@
     - exercise7
   when: copycontent.changed
 
+- name: Create deck directory on server
+  file:
+    path: /usr/share/nginx/html/users/
+    state: directory
+
 - name: Copy users.php to server
   copy:
-    src: files/users.php.j2
-    dest: /usr/share/nginx/html/users.php
+    src: files/index.php.j2
+    dest: /usr/share/nginx/html/users/index.php
 
 - name: Create deck directory on server
   file:
