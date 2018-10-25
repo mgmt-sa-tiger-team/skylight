@@ -3,8 +3,6 @@
 
 # Base VPC / Region Detail
 ec2_keypair: "your-keypair"
-ec2_vpc_id: "your-vpc-id"
-ec2_vpc_subnet_id: "your-vpc-subnet-id"
 ec2_region: "us-east-1"
 
 # Key file to retrieve windows password
