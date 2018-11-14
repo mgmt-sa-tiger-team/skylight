@@ -106,6 +106,7 @@ vCenterCloneSourceWindows: Win2016Template
 VCenterCloneSnapshotWindows: LinkedSS
 vCenterCloneSourceLinux: CentosBase
 VCenterCloneSnapshotLinux: LinkedSS
+VCenterLinkedClone: true
 vCenterPortGroup: Workshops
 vCenterPortGroupExt: External
 

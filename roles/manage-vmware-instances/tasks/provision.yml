@@ -9,8 +9,8 @@
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-dc"
     template: "{{ vCenterCloneSourceWindows }}"
-    snapshot_src: "{{ VCenterCloneSnapshotWindows }}"
-    linked_clone: True
+    snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
+    linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
@@ -49,8 +49,8 @@
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-gitlab"
     template: "{{ vCenterCloneSourceLinux }}"
-    snapshot_src: "{{ VCenterCloneSnapshotLinux }}"
-    linked_clone: True
+    snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
+    linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
@@ -74,8 +74,8 @@
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-docs"
     template: "{{ vCenterCloneSourceLinux }}"
-    snapshot_src: "{{ VCenterCloneSnapshotLinux }}"
-    linked_clone: True
+    snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
+    linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
@@ -104,8 +104,8 @@
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-tower"
     template: "{{ vCenterCloneSourceLinux }}"
-    snapshot_src: "{{ VCenterCloneSnapshotLinux }}"
-    linked_clone: True
+    snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
+    linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
@@ -132,8 +132,8 @@
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-win1"
     template: "{{ vCenterCloneSourceWindows }}"
-    snapshot_src: "{{ VCenterCloneSnapshotWindows }}"
-    linked_clone: True
+    snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
+    linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
@@ -172,8 +172,8 @@
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-work"
     template: "{{ vCenterCloneSourceWindows }}"
-    snapshot_src: "{{ VCenterCloneSnapshotWindows }}"
-    linked_clone: True
+    snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
+    linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
