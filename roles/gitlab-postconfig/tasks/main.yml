@@ -78,4 +78,4 @@
     snippets_enabled: False
     state: present
   with_sequence: count="{{ user_count }}"
-
+  ignore_errors: true
