@@ -226,7 +226,7 @@
   register: result
   until: result is success
   retries: 5
-  delay: 10
+  delay: 5
   ignore_errors: true
 
 - name: Remove VPC {{ name_prefix }}-vpc
