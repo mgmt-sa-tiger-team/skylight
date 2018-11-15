@@ -5,7 +5,7 @@
     name:
       - Web-Server
       - NET-Framework-Core
-      - Application-Server
+#      - Application-Server
       - Web-Asp-Net45
     include_management_tools: True
     state: present
