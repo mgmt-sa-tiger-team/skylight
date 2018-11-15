@@ -87,10 +87,8 @@ ec2_windc_instance_type: "t2.medium"    # t2.micro fails
 ec2_windows_workstation_instance_type: "t2.medium"   # t2.small was slowwwwww...
 ec2_windows_instance_type: "t2.small"   # Small = 1 vCPU / 2GB
 # Ideally update to auto-pull the latest
-ec2_rhel_ami: ami-c998b6b2              # Rhel 7.4
-#ec2_windows_ami: ami-0a792a70           # Windows 2016 Base
-ec2_windows_ami: ami-013e197b           # Windows 2016 Base
-
+ec2_rhel_ami: ami-011b3ccf1bd6db744      # Rhel 7.6
+ec2_windows_ami: ami-050202fb72f001b47   # Windows 2016 Base
 
 ##########################################################
 ###################### VMWARE INFO #######################
