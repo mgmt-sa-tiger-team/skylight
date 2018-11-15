@@ -180,7 +180,6 @@ Add to your playbook, `site.yml`, opening your firewall ports and writing the te
         action: Allow
         direction: In
         protocol: Tcp
-        force: true
       with_items: "{{ iis_sites }}"
 
     - name: Template simple web site to iis_site_path as index.html
@@ -297,7 +296,6 @@ Now let's take a second look to make sure everything looks the way you intended.
         action: Allow
         direction: In
         protocol: Tcp
-        force: true
       with_items: "{{ iis_sites }}"
 
     - name: Template simple web site to iis_site_path as index.html
