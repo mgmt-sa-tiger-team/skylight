@@ -11,11 +11,6 @@
   win_reboot:
   when: winfeature.changed
 
-#- name: Sleep 180 seconds to wait for DNS config
-#  pause:
-#    minutes: 3
-#  when: winfeature.changed
-
 #- name: Install AD-Certificate
 #  win_feature:
 #    name: AD-Certificate
@@ -40,30 +35,6 @@
 - name: Reboot if needed
   win_reboot:
   when: windnsfeature.reboot_required
-
-#- name: Sleep 180 seconds to wait for DNS config
-#  pause:
-#    minutes: 3
-#  when: windnsfeature.changed
-#
-#- name: Ensure AD services are started - will fail if install not complete
-#  win_service:
-#    name: "{{ item }}"
-#    state: started
-#    start_mode: auto
-#  with_items:
-#    - adws
-#    - dns
-#    - kdc
-#    - netlogon
-
-# Validate?
-# DCDIAG
-# Get-Service adws,kdc,netlogon,dns     # Services are running?
-# Get-smbshare          # sysvol & netlogin shares
-# get-eventlog "Directory Service" | select entrytype, source, eventid, message
-
-# get-eventlog "Active Directory Web Services" | select entrytype, source, eventid, message
 
 - name: Create DNS Domain
   win_domain:
@@ -98,11 +69,12 @@
     - instance_loc != 'ec2'
     - windomain.reboot_required
 
-- name: Sleep 120 seconds to wait for DNS config
-  pause:
-    minutes: 2
-  when:
-    - windomain.reboot_required
+- name: Wait for Active Directory Web Services port
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 9389
+    timeout: 600
+  delegate_to: localhost
 
 - name: Ensure DNS services are started
   win_service:
