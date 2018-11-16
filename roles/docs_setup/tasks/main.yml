@@ -1,5 +1,10 @@
+- name: Setup Remi PHP 7 Repo
+  yum:
+    name: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+    state: present
+
 - name: Install MySQL and PHP
-  package:
+  yum:
     name:
       - mariadb-server
       - php-fpm
@@ -7,6 +12,7 @@
       - php-pdo
       - python-pip
     state: present
+    enablerepo: remi-php72
   notify: restart nginx
 
 - name: Start Services
@@ -27,11 +33,12 @@
     state: directory
 
 - name: Install asciidoc packages
-  package:
+  yum:
     name:
       - asciidoc
       - rubygem-asciidoctor
     state: present
+    enablerepo: rhui-REGION-rhel-server-optional 
 
 - name: Install asciidoctor-pdf Gem
   gem:
