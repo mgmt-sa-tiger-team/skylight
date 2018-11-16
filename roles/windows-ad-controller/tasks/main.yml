@@ -70,11 +70,10 @@
     - windomain.reboot_required
 
 - name: Wait for Active Directory Web Services port
-  wait_for:
-    host: "{{ ansible_host }}"
+  win_wait_for:
+    host: localhost
     port: 9389
     timeout: 600
-  delegate_to: localhost
 
 - name: Ensure DNS services are started
   win_service:
