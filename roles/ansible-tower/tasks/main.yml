@@ -40,6 +40,11 @@
     group: root
     mode: 0644
 
+- name: install the last version of OpenSSL
+  pip: 
+    name: pyOpenSSL
+    state: latest
+
 - name: Install dependencies for Kerberos auth
   package:
     name:
