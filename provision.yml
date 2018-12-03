@@ -93,3 +93,16 @@
     - linux-common
     - docs_nginx
     - docs_setup
+
+
+- name: Display Login Information
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - [ 'vars/custom.yml', 'vars/main.yml' ]
+  tags:
+    - docs-info
+  tasks:
+    - name: Login Information
+      debug:
+        msg:  Direct your students to http://{{ hostvars['docs'].ansible_host }}/users/
