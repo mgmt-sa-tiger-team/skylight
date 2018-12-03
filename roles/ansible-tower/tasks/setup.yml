@@ -235,6 +235,23 @@
   register: response
   changed_when: response.status == 200
 
+- name: Set Base URL of Tower to resolve issues with websocket
+  uri:
+    url:  https://localhost/api/v2/settings/system/
+    method: PATCH
+    user: admin
+    password: "{{ towerpass }}"
+    body: '{ "TOWER_URL_BASE": "https://s{{ userid }}-tower.{{ dns_domain_name }}" }'
+    body_format: json
+    validate_certs: False
+    force_basic_auth: yes
+    status_code:
+      - 200
+      - 204
+      - 400
+  register: response
+  changed_when: response.status == 200
+
 - name: Disable GIT Cert validation
   lineinfile:
     path: /etc/tower/settings.py
