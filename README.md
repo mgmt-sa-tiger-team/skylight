@@ -22,15 +22,18 @@ In addition to this, for AWS you will need Boto 1.7 for communicating.
 
 Then I have something like this: 
 ~/.aws/config
+```
 [default]
 region = us-east-1
 output = table
+```
 
 ~/.aws/credentials
+```
 [default]
 aws_access_key_id = <your ec2 access key>
 aws_secret_access_key = <your ec2 secret key>
-
+```
 
 Beyond that, the main thing that needs to be edited is the *vars/main.yml* file which contains the configuration details specific to your environment.  You can instead copy this file to *vars/custom.yml* and it will use that instead of the main.yml file.  It will check for the custom.yml file first, and use main.yml if its not found.  This ensure your settings are not overridden if you update git, and are not committed to git (this file is ignored).
 
