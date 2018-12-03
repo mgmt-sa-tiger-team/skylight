@@ -20,7 +20,8 @@ This workshop requires Ansible 2.6 and pywinrm.
 
 In addition to this, for AWS you will need Boto 1.7 for communicating.  
 
-Then I have something like this: 
+Then I have something like this:
+
 ~/.aws/config
 ```
 [default]
