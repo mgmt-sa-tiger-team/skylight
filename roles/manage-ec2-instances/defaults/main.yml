@@ -2,11 +2,7 @@
 # defaults file for manage-ec2-instances
 
 # Base VPC / Region Detail
-ec2_keypair: "your-keypair"
 ec2_region: "us-east-1"
-
-# Key file to retrieve windows password
-ec2_key_file: "/home/myuser/.ssh/mykey.pem"
 
 # Instance Sizes
 ec2_tower_instance_type: "t2.medium"    # Medium = 2 vCPU / 4GB

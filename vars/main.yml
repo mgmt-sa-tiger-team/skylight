@@ -77,9 +77,7 @@ gitlab_smtp_enable: "false"
 ######################## EC2 INFO ########################
 ##########################################################
 
-ec2_keypair: "mykeypair"
 ec2_region: "us-east-1"
-ec2_key_file: "~/.ssh/mykeypair.pem"
 # Instance Sizes
 ec2_tower_instance_type: "t2.medium"    # Medium = 2 vCPU / 4GB
 ec2_gitlab_instance_type: "t2.medium"   # Might be able to use small...

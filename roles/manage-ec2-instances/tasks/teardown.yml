@@ -19,6 +19,15 @@
   register: route_table_facts
   when: vpc_net_facts.vpcs|length > 0
 
+- name: grab information about AWS user
+  aws_caller_facts:
+    region: "{{ ec2_region }}"
+  register: whoami
+
+- name: save username of AWS user
+  set_fact:
+    skylight_user: '{{ whoami.arn.split("/")[-1] }}'
+
 # ----------------------- Destroy Tower Instances -----------------------
 - name: Get ec2 Tower instance information
   ec2_instance_facts:
@@ -186,6 +195,16 @@
   ec2_group:
     name: "{{ name_prefix }}-windowssg"
     vpc_id: "{{ ec2_vpc_id }}"
+    state: absent
+  register: result
+  until: result is success
+  retries: 20
+  delay: 10
+
+- name: Remove ssh key pair for workshop {{ name_prefix }}
+  ec2_key:
+    name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    region: "{{ ec2_region }}"
     state: absent
   register: result
   until: result is success
