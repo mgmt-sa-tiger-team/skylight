@@ -32,19 +32,22 @@
     mode: 0777
     state: directory
 
-- name: Install asciidoc packages
+- name: Install asciidoc packages (RHEL)
   yum:
     name:
       - asciidoc
       - rubygem-asciidoctor
     state: present
-    enablerepo: rhui-REGION-rhel-server-optional 
+    enablerepo: rhui-REGION-rhel-server-optional
+  when: ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: Install asciidoctor-pdf Gem
-  gem:
-    name: asciidoctor-pdf
-    version: 1.5.0.alpha.6
+- name: Install asciidoc packages (CentOS)
+  yum:
+    name:
+      - asciidoc
+      - rubygem-asciidoctor
     state: present
+  when: ansible_distribution == 'CentOS'
 
 - name: Copy lab guides to server
   copy:
@@ -88,6 +91,12 @@
     src: docs/decks/
     dest: /usr/share/nginx/html/decks/
 
+#- name: Install asciidoctor-pdf Gem
+#  gem:
+#    name: asciidoctor-pdf
+#    version: 1.5.0.alpha.6
+#    state: present
+#
 #- name: Build PDF Docs
 #  command: asciidoctor -b pdf -d book -r asciidoctor-pdf -o aww.pdf index.adoc
 #  args:
