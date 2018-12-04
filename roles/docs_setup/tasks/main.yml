@@ -81,6 +81,11 @@
     src: files/index.php.j2
     dest: /usr/share/nginx/html/users/index.php
 
+- name: Copy list file to server
+  template:
+    src: templates/list.php.j2
+    dest: /usr/share/nginx/html/users/list.php
+
 - name: Create deck directory on server
   file:
     path: /usr/share/nginx/html/decks/

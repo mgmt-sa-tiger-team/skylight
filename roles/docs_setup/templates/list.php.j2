@@ -4,6 +4,7 @@ $sql_server = "127.0.0.1";
 $port = '3306';
 $sql_user = "root";
 $sql_pass = "";
+$login_pass = "{{ domain_admin_password }}";
 
 $mydb="workshop";
 
@@ -21,77 +22,47 @@ if (!$db) {
 
 session_start();
 
-if (!isset($_SESSION['email'])) {
-	if (!isset($_POST['email'])) {
+if (!isset($_SESSION['pass'])) {
+	if (!isset($_POST['pass'])) {
 		display_header();
 		display_form();
 		display_footer ();
 		exit;
 	} else {
-		if (!isValidEmail($_POST['email'])) {
+		if ($_POST['pass'] != $login_pass) {
 			display_header();
-			print '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=red>Email is invalid</font>';
+			print '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=red>Unauthorized</font>';
 			display_form();
 			display_footer ();
 			exit;
 		} else {
-			// Check if student already exists
-			$student = db_fetch_assoc_prepare("SELECT * FROM `users` WHERE email = ?", array($_POST['email']));
-			if (!isset($student['id'])) {
-				$id = db_fetch_cell("SELECT id FROM `users` WHERE email = '' LIMIT 1", 'id');
-				if (!$id) {
-					display_header();
-					print '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=red>Sorry, all available student accounts are taken.  Please let the instructor know.</font>';
-					display_footer ();
-					exit;
-				} else {
-					db_execute_prepare('UPDATE `users` set name=?, email=? WHERE id = ?', array(sql_clean_username($_POST['name']), sql_clean_username($_POST['email']), $id));
-					$_SESSION['email'] = $_POST['email'];
-					$student = db_fetch_assoc_prepare("SELECT * FROM `users` WHERE email = ?", array($_POST['email']));
-				}
-			} else {
-				$_SESSION['email'] = $_POST['email'];
-			}
+			$_SESSION['pass'] = $_POST['pass'];
 		}
 	}
-} else {
-	$student = db_fetch_assoc_prepare("SELECT * FROM `users` WHERE email = ?", array($_SESSION['email']));
 }
 
 display_header();
-//print_r($student);
 
-print "  <div data-role='main' class='ui-content'>
-    <div data-role='collapsible' data-collapsed='false'>
-      <h1>" . $student['username'] . "</h1>
-      <p>
-Username=ansibleworkshop\\" . $student['username'] . "<br />
-Password=" . $student['password'] . "<br />
-<br />
-Workstation:<br />
-" . $student['ip'] . "<br />
-<br />
-Webconnect:<br />
- <a href='https://" . $student['ip'] . "/rdp' target=rdp>https://" . $student['ip'] . "/rdp</a>
-</p>";
+$students = db_fetch_assocs("SELECT * FROM `users` WHERE email != ''");
 
+print "<table cellpadding=3 cellspacing=0 border=1><tr><td>Name</td><td>EMail</td><td>Student</td><td>IP</td></tr>";
+foreach ($students as $s) {
+	print '<tr><td>' . $s['name'] . '</td><td>' . $s['email'] . '</td><td>' . $s['id'] . '</td><td>' . $s['ip'] . '</td></tr>';
+}
+print "</table>";
 
 display_footer ();
 
 
 
-function isValidEmail($email){ 
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-}
 
 function display_form() {
 	print "  <div data-role='main' class='ui-content'>
 	    <div data-role='collapsible' data-collapsed='false'>
-	      <h1>Please enter your Name and Email address</h1>
+	      <h1>Please login</h1>
 	      <p>";
 	print "<form action='/users/' method=POST enctype='multipart/form-data'>";
-	print "<table><tr><td align=right>Name: </td><td><input type=text name=name size=20></td></tr>";
-	print "<tr><td align=right>Email: </td><td><input type=text name=email size=20></td></tr>";
+	print "<table><tr><td></td><td><input type=password name=pass size=20></td></tr>";
 	print "<tr><td></td><td><input type=submit value='Submit'></td></tr></table></form>";
 	print "</p>";
 }
