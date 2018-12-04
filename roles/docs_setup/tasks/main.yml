@@ -48,7 +48,7 @@
 
 - name: Copy content to server
   copy:
-    src: content/ansible_tower_windows/
+    src: content/docs/
     dest: /usr/share/nginx/html/
   register: copycontent
 
@@ -68,12 +68,12 @@
     - exercise7
   when: copycontent.changed
 
-- name: Create deck directory on server
+- name: Create users directory on server
   file:
     path: /usr/share/nginx/html/users/
     state: directory
 
-- name: Copy users.php to server
+- name: Copy users file to server
   copy:
     src: files/index.php.j2
     dest: /usr/share/nginx/html/users/index.php
@@ -85,7 +85,7 @@
 
 - name: Copy deck to server
   copy:
-    src: decks/
+    src: content/decks/
     dest: /usr/share/nginx/html/decks/
 
 #- name: Build PDF Docs
