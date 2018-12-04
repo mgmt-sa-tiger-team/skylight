@@ -39,7 +39,7 @@
       - rubygem-asciidoctor
     state: present
     enablerepo: rhui-REGION-rhel-server-optional
-  when: ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == 'RedHat'
 
 - name: Install asciidoc packages (CentOS)
   yum:
