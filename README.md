@@ -1,18 +1,18 @@
-![skylight](content/ansible_tower_windows/images/skylight_logo_color.png)
+![skylight](docs/lab_guide/images/skylight_logo_color.png)
 
 # Ansible Windows Workshop
 
 These ansible playbooks provision a lab on AWS for use in delivering a workshop focused on Windows.  This provisions the following:
 
 * Base Infrastructure
-  * A Microsoft Active Directory Server (and AD domain)
+  * A Microsoft Active Directory Server
   * A Gitlab server
 * Per-Student Infrastructure
-  * An Ansible/Tower control node
+  * An Ansible Tower control node
   * A Windows Workstation for interacting with the environment
-  * A Windows Hosts for running playbooks against
+  * A Windows Host(s) for running playbooks against
 
-The client pre-requisite to use this workshop is simply to have an RDP client which can connect to the Windows Workstation.  All other activities will take place from that jump point.  The workstation has Visual Studio Code, Chrome, Putty, and Git for Windows.  
+The client pre-requisite to use this workshop is simply to have an RDP client which can connect to the Windows Workstation.  If RDP is not allowed through a corporate firewall, a HTML5 RDP client is also running on each Workstation.  All other activities will take place from that Workstation.  The Workstation has Visual Studio Code, Chrome, Putty, and Git for Windows.  
 
 ## Usage
 
@@ -20,7 +20,7 @@ This workshop requires Ansible 2.6 and pywinrm.
 
 In addition to this, for AWS you will need Boto 1.7 for communicating.  
 
-Then I have something like this:
+You will need to setup your AWS configuration and Credentials.  You can set it up like this. 
 
 ~/.aws/config
 ```
