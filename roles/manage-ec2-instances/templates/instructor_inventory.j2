@@ -24,14 +24,17 @@ ansible_port=5986
 [tower:vars]
 ansible_port=22
 ansible_ssh_user={{ root_user }}
+ansible_ssh_private_key_file="{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
 
 [gitlab:vars]
 ansible_port=22
 ansible_ssh_user={{ root_user }}
+ansible_ssh_private_key_file="{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
 
 [docs:vars]
 ansible_port=22
 ansible_ssh_user={{ root_user }}
+ansible_ssh_private_key_file="{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
 
 
 [instructor]
