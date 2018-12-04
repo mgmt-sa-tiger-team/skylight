@@ -105,5 +105,5 @@
     - name: Login Information
       debug:
         msg:
-          - Student Login  : http://{{ hostvars['docs'].ansible_host }}/users/
-          - Lab Slide Deck : http://{{ hostvars['docs'].ansible_host }}/decks/
+          - Student Login  - http://{{ hostvars['docs'].ansible_host }}/users/
+          - Lab Slide Deck - http://{{ hostvars['docs'].ansible_host }}/decks/
