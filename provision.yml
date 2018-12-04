@@ -1,7 +1,7 @@
 ---
 - name: Provision Instances
   hosts: localhost
-  gather_facts: no
+  gather_facts: False
   vars_files:
     - [ 'vars/custom.yml', 'vars/main.yml' ]
   tags:
@@ -16,7 +16,7 @@
 
 - name: Configure Active Directory Domain Controller
   hosts: windows_domain_controllers
-  gather_facts: yes
+  gather_facts: True
   vars_files:
     - [ 'vars/custom.yml', 'vars/main.yml' ]
   tags:
@@ -96,7 +96,7 @@
 
 - name: Display Login Information
   hosts: localhost
-  gather_facts: false
+  gather_facts: False
   vars_files:
     - [ 'vars/custom.yml', 'vars/main.yml' ]
   tags:
