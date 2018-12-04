@@ -46,9 +46,9 @@
     version: 1.5.0.alpha.6
     state: present
 
-- name: Copy content to server
+- name: Copy lab guides to server
   copy:
-    src: content/docs/
+    src: docs/lab_guide/
     dest: /usr/share/nginx/html/
   register: copycontent
 
@@ -85,13 +85,13 @@
 
 - name: Copy deck to server
   copy:
-    src: content/decks/
+    src: docs/decks/
     dest: /usr/share/nginx/html/decks/
 
 #- name: Build PDF Docs
 #  command: asciidoctor -b pdf -d book -r asciidoctor-pdf -o aww.pdf index.adoc
 #  args:
-#    chdir: /tmp/content/
+#    chdir: /usr/share/nginx/html
 #  when: copycontent.changed
 
 - name: Install PyMySQL
