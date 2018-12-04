@@ -94,7 +94,6 @@
     - docs_nginx
     - docs_setup
 
-
 - name: Display Login Information
   hosts: localhost
   gather_facts: false
@@ -105,4 +104,6 @@
   tasks:
     - name: Login Information
       debug:
-        msg:  Direct your students to http://{{ hostvars['docs'].ansible_host }}/users/
+        msg:
+          - Student Login  : http://{{ hostvars['docs'].ansible_host }}/users/
+          - Lab Slide Deck : http://{{ hostvars['docs'].ansible_host }}/decks/
