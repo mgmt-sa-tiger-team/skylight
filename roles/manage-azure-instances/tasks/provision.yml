@@ -475,6 +475,7 @@
     ansible_connection: "winrm"
     ansible_winrm_transport: "ntlm"
     ansible_winrm_server_cert_validation: "ignore"
+    student: "{{ item.invocation.module_args.name | regex_replace('[^0-9]', '') }}"
     groups: windows
   with_items: "{{ windows_instances.results }}"  
 
