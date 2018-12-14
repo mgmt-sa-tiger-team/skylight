@@ -159,12 +159,12 @@
             <div class="columns">
               <div class="col">
                 <ul>
-                  <li>33,000+ stars &amp; 13,000+ forks on GitHub</li>
+                  <li>34,000+ stars &amp; 13,000+ forks on GitHub</li>
                   <li>3900+ GitHub Contributors</li>
-                  <li>Over 1800 modules shipped with Ansible</li>
+                  <li>Over 2000 modules shipped with Ansible</li>
                   <li>New contributors added every day</li>
                   <li>1200+ users on IRC channel</li>
-                  <li>Top 10 open source projects in 2017</li>
+                  <li>Top 10 open source projects in 2017/2018</li>
                   <li>World-wide meetups taking place every week</li>
                   <li>Ansible Galaxy: over 18,000 subscribers</li>
                   <li>250,000+ downloads a month</li>
@@ -1026,12 +1026,13 @@ tasks:
             <h2>Loops</h2>
             <p>Loops can do one task on multiple things, such as create a lot of users, install a lot of packages, or repeat a polling step until a certain result is reached.</p>
             <pre class="language-yaml"><code data-noescape>
-- yum:
+- name: Ensure IIS Server is present
+  win_feature:
     name: <mark>&quot;{{ item }}&quot;</mark>
-    state: latest
+    state: present
   <mark>with_items:</mark>
-  <mark>- httpd</mark>
-  <mark>- mod_wsgi</mark>
+  <mark>- Web-Server</mark>
+  <mark>- NET-Framework-Core</mark>
             </code></pre>
             <aside class="notes">
               <p>This example demonstrates a basic loop with <code>with_items</code>. The loop sets a variable called &quot;item&quot;, a template variable courtesy of the embedded Jinja2 template engine, with the list value that is in context.</p>
@@ -1042,10 +1043,11 @@ tasks:
             <h2>Conditionals</h2>
             <p>Ansible supports the conditional execution of a task based on the run-time evaluation of variable, fact, or previous task result.</p>
             <pre class="language-yaml"><code data-noescape>
-- yum:
-    name: httpd
-    state: latest
-  <mark>when: ansible_os_family == &quot;RedHat&quot;</mark>
+- name: Ensure IIS Server is present
+  win_feature:
+    name: Web-Server
+    state: present
+  <mark>when: ansible_os_family == &quot;Windows&quot;</mark>
             </code></pre>
             <aside class="notes">
               <p>Conditionals are another instance of Jinja2 in action within Ansible plays themselves. In the provided example &quot;ansible_os_family&quot; is a fact variable Ansible will set.</p>
@@ -1057,23 +1059,25 @@ tasks:
             <h2>Tags</h2>
             <p>Tags are useful to be able to run a subset of a playbook on-demand.</p>
             <pre class="language-yaml"><code data-noescape>
-- yum:
-    name: &quot;{{ item }}&quot;
-    state: latest
-  with_items:
-  - httpd
-  - mod_wsgi
+- name: Ensure IIS Server is present
+  win_feature:
+    name: <mark>&quot;{{ item }}&quot;</mark>
+    state: present
+  <mark>with_items:</mark>
+  <mark>- Web-Server</mark>
+  <mark>- NET-Framework-Core</mark>
   <mark>tags:</mark>
      <mark>- packages</mark>
 
- - template:
-     src: templates/httpd.conf.j2
-     dest: /etc/httpd/conf/httpd.conf
+- name: Copy web.config template to Server
+  win_template:
+    src: templates/web.config.j2
+    dest: C:\inetpub\wwwroot\web.config
   <mark>tags:</mark>
      <mark>- configuration</mark>
             </code></pre>
             <aside class="notes">
-              <p>In the provided example, if the playbook were run with <code>--tags &quot;packages&quot;</code> the yum task would execute and the template task would be skipped. If the playbook were run with <code>--tags &quot;configuration&quot;</code> the opposite would happen. Without a <code>--tags</code> both tasks would execute like normal.</p>
+              <p>In the provided example, if the playbook were run with <code>--tags &quot;packages&quot;</code> the win_feature task would execute and the template task would be skipped. If the playbook were run with <code>--tags &quot;configuration&quot;</code> the opposite would happen. Without a <code>--tags</code> both tasks would execute like normal.</p>
               <p>Tags can be seen as a simple though specialized form of conditional statement designed to enable the execution of a subset tasks. Tags are a bit more than simple boolean flags though. To dig deeper see the <a href="http://docs.ansible.com/ansible/playbooks_tags.html">playbook Tags documentation</a>.</p>
             </aside>
           </section>
@@ -1082,17 +1086,19 @@ tasks:
             <p>Blocks cut down on repetitive task directives, allow for logical grouping of tasks and even in play error handling.</p>
             <pre class="language-yaml"><code data-noescape>
 - <mark>block:</mark>
-  - yum:
-      name: &quot;{{ item }}&quot;
-      state: latest
-    with_items:
-    - httpd
-    - mod_wsgi
+  - name: Ensure IIS Server is present
+    win_feature:
+      name: <mark>&quot;{{ item }}&quot;</mark>
+      state: present
+    <mark>with_items:</mark>
+    <mark>- Web-Server</mark>
 
-  - template:
-      src: templates/httpd.conf.j2
-      dest: /etc/httpd/conf/httpd.conf
-  when: ansible_os_family == &quot;RedHat&quot;
+  - name: Copy web.config template to Server
+    win_template:
+      src: templates/web.config.j2
+      dest: C:\inetpub\wwwroot\web.config
+
+  when: ansible_os_family == &quot;Windows&quot;
             </code></pre>
             <aside class="notes">
               <p>In the provided example we use a block to group two tasks that are to be conditional executed if a host is running a Red Hat family linux using one conditional clause. In practice, we could have copied the <code>when</code> clause onto each task and gotten same result. Using a block, there is less clutter thereby less to maintain and nothing to keep in sync. The utility of using a block increases the more tasks and clauses are in use.</p>
@@ -1136,7 +1142,7 @@ roles/
      vars/
      defaults/
      meta/
-   apache/
+   iis/
      files/
      templates/
      tasks/
@@ -1158,7 +1164,7 @@ roles/
   hosts: web
   roles:
      - common
-     - apache
+     - iis
           </code></pre>
           <aside class="notes">
             <p>This slide shows the site.yml playbook using the roles in our example project. Notice that it is much more concise than what we've seen.</p>
