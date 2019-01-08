@@ -57,7 +57,7 @@ ansible windows -m setup
 
 [IMPORTANT]
 Do not cut and paste text from this document.  We really want you to learn ansible during this workshop,
-and part of that experience is typing out YAML and understanding it's syntax, spacing, and alignments.
+and part of that experience is typing out YAML and understanding its syntax, spacing, and alignments.
 
 == Document Copyright
 
