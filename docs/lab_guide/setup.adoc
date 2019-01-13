@@ -2,7 +2,7 @@
 
 :badges:
 :icons: font
-:iconsdir: http://people.redhat.com/~jduncan/images/icons
+:iconsdir: icons/
 :source-highlighter: highlight.js
 :source-language: yaml
 
@@ -30,8 +30,8 @@ Each student's personal lab is equipped with the following:
 ** Windows 2012/2016
 * (1) Windows Endpoint nodes (to execute ansible playbooks upon).
 ** Windows 2012/2016
-* Ansible Engine 2.5
-* Ansible Tower 3.3
+* Ansible Engine 2.7
+* Ansible Tower 3.2
 
 == Testing your environment
 

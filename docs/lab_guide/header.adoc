@@ -1,6 +1,6 @@
 
 :icons: font
-:iconsdir: http://people.redhat.com/~jduncan/images/icons
+:iconsdir: icons/
 :badges:
 :source-highlighter: highlight.js
 :source-language: yaml
