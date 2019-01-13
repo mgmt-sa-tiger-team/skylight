@@ -3,14 +3,13 @@
 :badges:
 :icons: font
 :iconsdir: http://people.redhat.com/~jduncan/images/icons
-:imagesdir: images
 :source-highlighter: highlight.js
 :source-language: yaml
 
 
 = Workshop Lab Setup
 
-image::tower.002.png['Tower']
+image::images/tower.002.png['Tower']
 
 == Setup
 

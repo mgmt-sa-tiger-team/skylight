@@ -19,7 +19,7 @@ Within Visual Studio Code, create a new directory in your git repo and create a 
 
 In the Explorer accordion you should have a 'student#' section where you previously made iis_basic.
 
-image::3-vscode-create-folders.png[title="Student Playbooks",width=1000]
+image::images/3-vscode-create-folders.png[title="Student Playbooks",width=1000]
 
 Hover over the 'student#' section and click on the 'New Folder' button
 
@@ -31,7 +31,7 @@ Type `site.yml` and hit enter.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::3-vscode-create-folders.png[title="Empty site.yml",width=1000]
+image::images/3-vscode-create-folders.png[title="Empty site.yml",width=1000]
 
 
 == Section 2: Write your Playbook
@@ -75,15 +75,15 @@ Your playbook is done! But remember we still need to commit the changes to sourc
 
 Click `File` -> `Save All` to save the files you've written
 
-image::5-vscode-iis-yaml-2.png[title="site.yml part 2"]
+image::images/5-vscode-iis-yaml-2.png[title="site.yml part 2"]
 
 Click on the Source Code icon, type in a commit message such as 'Adding windows update playbook', and click the check box above.
 
-image::5-commit.png[title="Commit site.yml"]
+image::images/5-commit.png[title="Commit site.yml"]
 
 Sync to gitlab by clicking the arrows on the lower left blue bar.  When prompted, click `OK` to push and pull commits.
 
-image::5-push.png[title="Push to Gitlab.yml"]
+image::images/5-push.png[title="Push to Gitlab.yml"]
 
 It should take 5-30 seconds to finish the commit.  The blue bar should stop rotating and indicate 0 problems...
 
@@ -112,14 +112,14 @@ a|
 |===
 
 
-image::5-create-template.png[title="Create Job Template",width=1000]
+image::images/5-create-template.png[title="Create Job Template",width=1000]
 
 
 
 
 === Step 2:
 
-Click SAVE image:at_save.png[Save] and then select ADD SURVEY image:at_add_survey.png[Add]
+Click SAVE image:images/at_save.png[Save] and then select ADD SURVEY image:images/at_add_survey.png[Add]
 
 === Step 3:
 
@@ -164,21 +164,21 @@ a|
 |DEFAULT ANSWER|Yes
 |===
 
-image::6-survey.png[title="Survey Form",width=1000]
+image::images/6-survey.png[title="Survey Form",width=1000]
 
 
 
 === Step 4:
 
-Select ADD image:at_add.png[Add,35,25]
+Select ADD image:images/at_add.png[Add,35,25]
 
 === Step 5:
 
-Select SAVE image:at_save.png[Add,35,25]
+Select SAVE image:images/at_save.png[Add,35,25]
 
 === Step 6:
 
-Back on the main Job Template page, select SAVE image:at_save.png[Add,35,25] again.
+Back on the main Job Template page, select SAVE image:images/at_save.png[Add,35,25] again.
 
 
 == Section 6: Running your new playbook
@@ -194,7 +194,7 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 2:
 
-Click on the rocketship icon image:at_launch_icon.png[Add,35,25] for the *Windows Updates* Job Template.
+Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *Windows Updates* Job Template.
 
 === Step 3:
 

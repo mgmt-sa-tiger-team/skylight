@@ -52,7 +52,7 @@ To access it, in Visual Code click on 'File' and then 'Open Folder'.  It should 
 
 At this point in the Explorer sidebar you should have a 'student#' section with only a README file in it.
 
-image::3-vscode-open-folder.png[title="Student Playbooks Repo",width=1000]
+image::images/3-vscode-open-folder.png[title="Student Playbooks Repo",width=1000]
 
 *Step 2:* Create a directory called *iis_basic* and a file called `install_iis.yml`
 
@@ -61,7 +61,7 @@ Right click on the new folder you've created and create a file called `install_i
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::3-vscode-create-folders.png[title="Empty install_iis.yml",width=1000]
+image::images/3-vscode-create-folders.png[title="Empty install_iis.yml",width=1000]
 
 == Section 2: Defining Your Play
 
@@ -165,17 +165,17 @@ Click on the Source Code icon as shown below (It is the middle on the far left o
 Type in a commit message such as 'Adding install_iis.yml' in the text box at the top of the sidebar. Click the check box above to commit.
 This message is intended to describe the changes you made so that others (including yourself) better understand what is changing when comparing versions.
 
-image::3-vscode-commit.png[title="Git Commit install_iis.yml",width=1000]
+image::images/3-vscode-commit.png[title="Git Commit install_iis.yml",width=1000]
 
 This will prompt to ask if you want to stage the changes.  Click on `Always` and you won't be prompted again.
 
-image::3-vscode-commit-always.png[title="Stage Commits Always"]
+image::images/3-vscode-commit-always.png[title="Stage Commits Always"]
 
 Now you need to push the committed changes to your repository.
 
 On the bottom left blue bar, click the cloud with the up arrow on it to publish changes.
 
-image::3-vscode-push.png[title="Git Push Origin"]
+image::images/3-vscode-push.png[title="Git Push Origin"]
 
 
 This may take as long as 30 seconds to push.  If you're interested in validating the code is in git, you can connect to gitlab to verify.  Open `Chrome` and connect to `https://gitlab.ansibleworkshop.com`.  Login with your AD user (student#) and password and you should see your repo.

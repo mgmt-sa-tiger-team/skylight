@@ -35,7 +35,7 @@ including machine, network, and various cloud providers.  In this workshop, we a
 
 === Step 1:
 
-Select the gear icon     image:at_gear.png[Gear,20,20]
+Select the gear icon     image:images/at_gear.png[Gear,20,20]
 
 === Step 2:
 
@@ -43,7 +43,7 @@ Select CREDENTIALS
 
 === Step 3:
 
-Click on ADD     image:at_add.png[Add,35,25]
+Click on ADD     image:images/at_add.png[Add,35,25]
 
 === Step 4:
 
@@ -58,12 +58,12 @@ Complete the form using the following entries:
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
-image::1-tower-add-machine-credential.png[title="Add Machine Credential",width=1000]
+image::images/1-tower-add-machine-credential.png[title="Add Machine Credential",width=1000]
 
 
 === Step 5:
 
-Select SAVE     image:at_save.png[Save,35,25] +
+Select SAVE     image:images/at_save.png[Save,35,25] +
 
 == Create an SCM Credential
 
@@ -80,7 +80,7 @@ Our first credential was to access our Windows machines.  We need another to acc
 
 Make sure you select SAVE!
 
-image::1-tower-add-scm-credential.png[title="Add SCM Credential",width=1000]
+image::images/1-tower-add-scm-credential.png[title="Add SCM Credential",width=1000]
 
 == Creating a Project
 
@@ -95,7 +95,7 @@ Click on PROJECTS at the upper left
 
 === Step 2:
 
-Select ADD     image:at_add.png[Add,35,25]
+Select ADD     image:images/at_add.png[Add,35,25]
 
 === Step 3:
 
@@ -119,13 +119,13 @@ a|
 
 
 
-image::1-tower-create-project.png[title="Defining a Project",width=1000]
+image::images/1-tower-create-project.png[title="Defining a Project",width=1000]
 
 
 
 === Step 4:
 
-Select SAVE     image:at_save.png[Save,35,25]
+Select SAVE     image:images/at_save.png[Save,35,25]
 
 
 
@@ -141,13 +141,13 @@ A static Inventory has already been created for you today.  We will now take a l
 
 === Step 1:
 
-Click on INVENTORIES up top.  You will see the preconfigured Inventory listed.  Click on the Inventories' name *Ansible Workshop Inventory* or on the Edit button. image:at_edit.png[Edit,35,35]
+Click on INVENTORIES up top.  You will see the preconfigured Inventory listed.  Click on the Inventories' name *Ansible Workshop Inventory* or on the Edit button. image:images/at_edit.png[Edit,35,35]
 
 === Step 2:
 
 You will now be viewing the Inventory.  From here you can add Hosts, Groups, or even add Variables specific to this Inventory.
 
-image::1-tower-edit-inventory.png[title="Edit Inventory",width=1000]
+image::images/1-tower-edit-inventory.png[title="Edit Inventory",width=1000]
 
 We will be viewing the hosts, so click on the *HOSTS* button.
 
@@ -156,14 +156,14 @@ We will be viewing the hosts, so click on the *HOSTS* button.
 In the Hosts view, we can see every host associated with with this inventory.  You will also see which groups a host is associated with.
 Hosts can be associated with multiple groups.  These groups can later then be used to narrow down to the exact hosts we will later run our playbooks on.
 
-image::1-tower-hosts-view.png[title="Hosts View",width=1000]
+image::images/1-tower-hosts-view.png[title="Hosts View",width=1000]
 
 
 === Step 4:
 
-If you click on the Host's name or on the Edit Button image:at_edit.png[Edit,35,35] we will be able to look at variables specific to this host.
+If you click on the Host's name or on the Edit Button image:images/at_edit.png[Edit,35,35] we will be able to look at variables specific to this host.
 
-image::1-tower-host-edit.png[title="Host Edit",width=1000]
+image::images/1-tower-host-edit.png[title="Host Edit",width=1000]
 
 
 Today we have already setup various variables to tell Ansible that this host is a Windows machine.  You do not have to define these variables as a Host variable here, 

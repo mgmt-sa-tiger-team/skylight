@@ -26,7 +26,7 @@ Let's begin with seeing how your iis-basic-playbook will break down into a role.
 
 In Visual Studio Code, navigate to explorer and your `student#` project where you previously made iis_advanced.
 
-image::5-create-folder.png[title="iis_advanced",width=1000]
+image::images/5-create-folder.png[title="iis_advanced",width=1000]
 
 Select the *iis_advanced* folder.
 
@@ -51,7 +51,7 @@ Create a file called `main.yml` in each of these folders.  You will not do this 
 
 The finished structure will look like this:
 
-image::6-create-role.png[title="Role Structure",width=1000]
+image::images/6-create-role.png[title="Role Structure",width=1000]
 
 == Section 2: Breaking Your `site.yml` Playbook into the Newly Created `iis_simple` Role
 
@@ -79,7 +79,7 @@ Update site.yml to look like to only call your role.  It should look like below:
     - iis_simple
 ----
 
-image::6-new-site.png[title="New site.yml",width=1000]
+image::images/6-new-site.png[title="New site.yml",width=1000]
 
 === Step 3:
 
@@ -215,7 +215,7 @@ Click on the Source Code icon as shown below.
 
 Type in a commit message like `Add iis_simple role` and click the check box above.
 
-image::6-commit.png[title="Commit iis_simple_role",width=1000]
+image::images/6-commit.png[title="Commit iis_simple_role",width=1000]
 
 Click on the `synchronize changes` button on the blue bar at the bottom left (and click `OK`).  This should again return with no problems.
 
@@ -236,7 +236,7 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 2:
 
-Click on the rocketship icon image:at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
+Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
 
 === Step 3:
 
@@ -244,7 +244,7 @@ When prompted, enter your desired test message
 
 If successful, your standard output should look similar to the figure below.  Note that most of the tasks return OK because we've previously configured the servers and services are already running.
 
-image::6-results.png[title="Role site.yml stdout",width=1000]
+image::images/6-results.png[title="Role site.yml stdout",width=1000]
 
 
 == Section 5: Review
