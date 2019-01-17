@@ -144,6 +144,7 @@
 - name: Remove Tower security group
   ec2_group:
     name: "{{ name_prefix }}-towersg"
+    region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
@@ -154,6 +155,7 @@
 - name: Remove Gitlab security group
   ec2_group:
     name: "{{ name_prefix }}-gitlabsg"
+    region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
@@ -164,6 +166,7 @@
 - name: Remove Docs security group
   ec2_group:
     name: "{{ name_prefix }}-docssg"
+    region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
@@ -174,6 +177,7 @@
 - name: Remove DC security group
   ec2_group:
     name: "{{ name_prefix }}-windcsg"
+    region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
@@ -184,6 +188,7 @@
 - name: Remove Web security group
   ec2_group:
     name: "{{ name_prefix }}-websg"
+    region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
@@ -194,6 +199,7 @@
 - name: Remove Windows security group
   ec2_group:
     name: "{{ name_prefix }}-windowssg"
+    region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
   register: result
