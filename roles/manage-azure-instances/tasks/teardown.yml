@@ -1,6 +1,318 @@
 ---
-# Create a resource group
-- name: Azure | Create a resource group
+# # ----------------------- Destroy Instances -----------------------
+
+- name: Azure | DomainController | Destroy instance
+  azure_rm_virtualmachine:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix }}-dc"
+    started: False
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Gitlab | Destroy instance
+  azure_rm_virtualmachine:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix }}-gitlab"
+    started: False
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Docs | Destroy instance
+  azure_rm_virtualmachine:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix }}-docs"
+    started: False
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Windows | Destroy instance 1
+  azure_rm_virtualmachine:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-w1'}}"
+    started: False
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Workstation | Destroy instance
+  azure_rm_virtualmachine:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-work'}}"
+    started: False
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Tower | Destroy instance
+  azure_rm_virtualmachine:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-tower'}}"
+    started: False
+    state: absent
+  with_sequence: count={{ user_count }}
+
+# # ----------------------- Remove Network Interfaces -----------------------
+
+- name: Azure | Windows | Delete network interface
+  azure_rm_networkinterface:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-w101'}}" 
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Workstation | Delete network interface
+  azure_rm_networkinterface:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-wk01'}}"
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Tower | Delete network interface
+  azure_rm_networkinterface:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-tower01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Gitlab | Delete network interface
+  azure_rm_networkinterface:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-gitlab01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Docs | Delete network interface
+  azure_rm_networkinterface:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-docs01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | DC | Delete network interface
+  azure_rm_networkinterface:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-dc01'}}"
+    state: absent
+  with_sequence: count=1
+
+# # ----------------------- Remove Security Groups -----------------------
+
+- name: Azure | Windows | Delete Security Group
+  azure_rm_securitygroup:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-w101'}}"
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Workstation | Delete Security Group
+  azure_rm_securitygroup:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-wk01'}}"
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Tower | Delete Security Group
+  azure_rm_securitygroup:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-tower01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Gitlab | Delete Security Group
+  azure_rm_securitygroup:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-gitlab01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Docs | Delete Security Group
+  azure_rm_securitygroup:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-docs01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | DC | Delete Security Group
+  azure_rm_securitygroup:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-dc01'}}"
+    state: absent
+
+# # ----------------------- Remove Public IP Addresses -----------------------
+
+- name: Azure | Windows | Delete Public IP Addresses
+  azure_rm_publicipaddress:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-w101'}}"
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Workstation | Delete Public IP Addresses
+  azure_rm_publicipaddress:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-wk01'}}"
+    state: absent
+  with_sequence: count={{ user_count }}
+
+- name: Azure | Tower | Delete Public IP Addresses
+  azure_rm_publicipaddress:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-s' + item + '-tower01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Gitlab | Delete Public IP Addresses
+  azure_rm_publicipaddress:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-gitlab01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | Docs | Delete Public IP Addresses
+  azure_rm_publicipaddress:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-docs01'}}"
+    state: absent
+  with_sequence: count=1
+
+- name: Azure | DC | Delete Public IP Addresses
+  azure_rm_publicipaddress:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ name_prefix + '-dc01'}}"
+    state: absent
+
+# # ----------------------- Remove Subnets -----------------------
+
+- name: Azure | Destroy subnet
+  azure_rm_subnet:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"    
+    resource_group: "{{ azure_resource_group }}"    
+    name: "{{ azure_virtual_subnet }}"
+    virtual_network_name: "{{ azure_virtual_network }}"
+    address_prefix_cidr: "{{ ptr_zone_cidr }}"     
+    state: absent
+
+- name: Azure | Destroy virtual network
+  azure_rm_virtualnetwork:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"    
+    resource_group: "{{ azure_resource_group }}"  
+    name: "{{ azure_virtual_network }}" 
+    address_prefixes_cidr:
+        - "{{ ptr_zone_cidr }}"
+    state: absent
+
+- name: Azure | Destroy storage account
+  azure_rm_storageaccount:
+    client_id: "{{ azure_client_id }}"
+    secret: "{{ azure_secret }}"
+    subscription_id: "{{ azure_subscription_id }}"
+    tenant: "{{ azure_tenant }}"    
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ azure_storage_account }}"
+    account_type: "{{ azure_storage_account_type }}"
+    state: absent
+
+- name: Azure | Destroy resource group
   azure_rm_resourcegroup:
     client_id: "{{ azure_client_id }}"
     secret: "{{ azure_secret }}"
@@ -10,142 +322,3 @@
     location: "{{ azure_location }}"
     state: absent
 
-# # ----------------------- Destroy Tower Instances -----------------------
-# - name: Get ec2 Tower instance information
-#   ec2_instance_facts:
-#     region: "{{ region }}"
-#     filters:
-#       vpc-id: "{{ vpc_id }}"
-#       "tag:Name": "{{ name_prefix + '-s' + item + '-tower'}}"
-#   with_sequence: count={{ user_count }}
-#   register: ec2_tower_instances
-
-# - name: Terminate Tower Instances
-#   ec2:
-#     region: "{{ region }}"
-#     state: "absent"
-#     instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-#   with_items:
-#     - "{{ ec2_tower_instances.results }}"
-#   when: item.instances.0 is defined and item.instances.0.instance_id is defined
-
-# # ----------------------- Destroy Gitlab Instances -----------------------
-# - name: Get ec2 Gitlab instance information
-#   ec2_instance_facts:
-#     region: "{{ region }}"
-#     filters:
-#       vpc-id: "{{ vpc_id }}"
-#       "tag:Name": "{{ name_prefix }}-gitlab"
-#   register: ec2_gitlab_instances
-
-# - name: Terminate Gitlab Instances
-#   ec2:
-#     region: "{{ region }}"
-#     state: "absent"
-#     instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-#   with_items:
-#     - "{{ ec2_gitlab_instances }}"
-#   when: item.instances.0 is defined
-
-# # ----------------------- Destroy DC Instances -----------------------
-# - name: Get ec2 DC instance information
-#   ec2_instance_facts:
-#     region: "{{ region }}"
-#     filters:
-#       vpc-id: "{{ vpc_id }}"
-#       "tag:Name": "{{ name_prefix }}-windc"
-#   register: ec2_dc_instances
-
-# - name: Terminate DC Instances
-#   ec2:
-#     region: "{{ region }}"
-#     state: "absent"
-#     instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-#   with_items:
-#     - "{{ ec2_dc_instances }}"
-#   when: item.instances.0 is defined
-
-# # ----------------------- Destroy Windows Instances -----------------------
-# - name: Get ec2 Windows instance information
-#   ec2_instance_facts:
-#     region: "{{ region }}"
-#     filters:
-#       vpc-id: "{{ vpc_id }}"
-#       "tag:Name": "{{ name_prefix + '-s' + item + 'win1'}}"
-#   with_sequence: count={{user_count}}
-#   register: ec2_windows_instances
-
-# - name: Terminate Windows Instances
-#   ec2:
-#     region: "{{ region }}"
-#     state: "absent"
-#     instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-#   with_items:
-#     - "{{ ec2_windows_instances.results }}"
-#   when: item.instances.0 is defined and item.instances.0.instance_id is defined
-
-# # ----------------------- Destroy Workstation Instances -----------------------
-# - name: Get ec2 Workstation instance information
-#   ec2_instance_facts:
-#     region: "{{ region }}"
-#     filters:
-#       vpc-id: "{{ vpc_id }}"
-#       "tag:Name": "{{ name_prefix + '-s' + item + 'workstation'}}"
-#   with_sequence: count={{user_count}}
-#   register: ec2_workstation_instances
-
-# - name: Terminate Workstation Instances
-#   ec2:
-#     region: "{{ region }}"
-#     state: "absent"
-#     instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-#   with_items:
-#     - "{{ ec2_workstation_instances.results }}"
-#   when: item.instances.0 is defined and item.instances.0.instance_id is defined
-
-# ################### Remove Security Groups ###################
-
-# - name: Remove Tower security group   
-#   ec2_group:  
-#     name: "{{ name_prefix }}-towersg"
-#     state: absent
-#   register: result
-#   until: result|success
-#   retries: 20
-#   delay: 10
-
-# - name: Remove Gitlab security group   
-#   ec2_group:  
-#     name: "{{ name_prefix }}-gitlabsg"
-#     state: absent
-#   register: result
-#   until: result|success
-#   retries: 20
-#   delay: 10
-
-# - name: Remove DC security group   
-#   ec2_group:  
-#     name: "{{ name_prefix }}-windcsg"
-#     state: absent
-#   register: result
-#   until: result|success
-#   retries: 20
-#   delay: 10
-
-# - name: Remove Web security group   
-#   ec2_group:  
-#     name: "{{ name_prefix }}-websg"
-#     state: absent
-#   register: result
-#   until: result|success
-#   retries: 20
-#   delay: 10
-
-# - name: Remove Windows security group   
-#   ec2_group:  
-#     name: "{{ name_prefix }}-windowssg"
-#     state: absent
-#   register: result
-#   until: result|success
-#   retries: 20
-#   delay: 10

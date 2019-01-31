@@ -201,7 +201,7 @@
     subscription_id: "{{ azure_subscription_id }}"
     tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"
-    name: "{{ name_prefix + '-s' + item + '-gitlab'}}"
+    name: "{{ name_prefix + '-gitlab'}}"
     vm_size: "{{ azure_gitlab_instance_type }}"
     storage_account_name: "{{ azure_storage_account }}"
     admin_username: "{{ azure_admin_user }}"
@@ -217,9 +217,8 @@
       - 8080
       - 443
     tags:
-      Name: "{{ name_prefix + '-s' + item + '-gitlab'}}"
+      Name: "{{ name_prefix + '-gitlab'}}"
       App: AnsibleWorkshop
-      User: "{{ user_prefix + item }}"
     image:
       publisher: "{{ azure_rhel_publisher }}"
       offer: "{{ azure_rhel_offer }}"
@@ -237,7 +236,7 @@
     subscription_id: "{{ azure_subscription_id }}"
     tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"
-    name: "{{ name_prefix + '-s' + item + '-docs'}}"
+    name: "{{ name_prefix + '-docs'}}"
     vm_size: "{{ azure_gitlab_instance_type }}"
     storage_account_name: "{{ azure_storage_account }}"
     admin_username: "{{ azure_admin_user }}"
@@ -253,9 +252,8 @@
       - 8080
       - 443
     tags:
-      Name: "{{ name_prefix + '-s' + item + '-docs'}}"
+      Name: "{{ name_prefix + '-docs'}}"
       App: AnsibleWorkshop
-      User: "{{ user_prefix + item }}"
     image:
       publisher: "{{ azure_rhel_publisher }}"
       offer: "{{ azure_rhel_offer }}"
