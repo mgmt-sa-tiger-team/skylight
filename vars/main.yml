@@ -133,13 +133,13 @@ azure_windc_instance_type: "Standard_A2_v2"    # t2.micro fails
 azure_windows_workstation_instance_type: "Standard_A2_v2"   # t2.small was slowwwwww...
 azure_windows_instance_type: "Standard_A1_v2"   # Small = 1 vCPU / 2GB
 
-# Ideally update to auto-pull the latest
-azure_rhel_publisher: "RedHat"
-azure_rhel_offer: "RHEL"
-azure_rhel_sku: "7.3"
-azure_rhel_version: "7.3.2017090723"
+azure_rhel_publisher: "OpenLogic"
+azure_rhel_offer: "CentOS"
+azure_rhel_sku: "7.5"
+azure_rhel_version: "latest"
 
 azure_win_publisher: "MicrosoftWindowsServer"
 azure_win_offer: "WindowsServer"
 azure_win_sku: "2016-Datacenter"
-azure_win_version: "2016.127.20171217"
+azure_win_version: "latest"
+
