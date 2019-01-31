@@ -56,7 +56,7 @@
     subscription_id: "{{ azure_subscription_id }}"
     tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"
-    name: "{{ name_prefix + '-s' + item + '-work'}}"
+    name: "{{ name_prefix + '-s' + item + '-wk'}}"
     started: False
     state: absent
   with_sequence: count={{ user_count }}
