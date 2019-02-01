@@ -3,7 +3,7 @@
     name: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
     state: present
 
-- name: Install MySQL and PHP
+- name: Install MySQL, PHP, Git
   yum:
     name:
       - mariadb-server
@@ -11,6 +11,7 @@
       - php-mysql
       - php-pdo
       - python-pip
+      - git
     state: present
     enablerepo: remi-php72
   notify: restart nginx
