@@ -63,6 +63,7 @@
     - pywinrm>=0.2.2
     - pywinrm[kerberos]
     - pywinrm[credssp]
+    - requests-credssp
 
 - name: Configure KRB5.conf file
   template:
