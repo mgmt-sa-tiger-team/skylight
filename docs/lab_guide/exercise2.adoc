@@ -42,7 +42,7 @@ These logs can be auto-rotated and can also be exported automatically to another
 
 The first part of the log shows you the details of the job.  This includes information such as who launched the job, against what hosts, and when.
 
-image::images/2-win_ping_success.png[title="Win_Ping Log Details",width=1000]
+image::images/2-win_ping_success.png[title="Win_Ping Log Details",width=400]
 
 The 2nd part of the job log shows you the actual output from the command.  If your connection was successful, you should see a result such as this.
 
