@@ -35,7 +35,7 @@ Fill out this form as follows
 |MACHINE CREDENTIAL|Student Account
 |===
 
-image::2-win_ping.png[title="Run Win_Ping",width=1000]
+image::images/2-win_ping.png[title="Run Win_Ping",width=1000]
 
 Once you click *LAUNCH* you will be redirected to the Job log.  Every job and action in Ansible Tower is recorded and stored.
 These logs can be auto-rotated and can also be exported automatically to another logging system such as Splunk or ELK.
