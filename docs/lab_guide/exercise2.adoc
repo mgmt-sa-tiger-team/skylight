@@ -20,6 +20,9 @@ Now that you are on the Inventory Details page, we will need to go select our Ho
 
 Next to each host is a checkbox.  Check the box next to each host you want to run an Ad-Hoc Command on.  You will then see the Run Commands button become enabled.  Click it now.
 
+image::images/run_command.png[title="Run Command",width=1000]
+
+
 This will pop up the *Execute Command* window.  From here is where we can run a single task against our hosts.
 
 
