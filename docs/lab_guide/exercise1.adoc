@@ -41,13 +41,9 @@ image:images/credentials.png[Cred,200,400]
 
 === Step 2:
 
-Select CREDENTIALS
-
-=== Step 3:
-
 Click on the image:images/add.png[Add,35,25] icon and add new credential     
 
-=== Step 4:
+=== Step 3:
 
 Complete the form using the following entries:
 
@@ -56,14 +52,14 @@ Complete the form using the following entries:
 |DESCRIPTION|
 |ORGANIZATION|Default
 |TYPE|Machine
-|USERNAME| <your USER ID - instructor provided (ie. student1) >
+|USERNAME| <your USER ID - instructor provided (ie. student1)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
 image::images/credential_add.png[title="Add Machine Credential",width=1000]
 
 
-=== Step 5:
+=== Step 4:
 
 Select SAVE     image:images/at_save.png[Save,35,25] +
 
@@ -76,13 +72,13 @@ Our first credential was to access our Windows machines.  We need another to acc
 |DESCRIPTION|SCM credential for playbook sync
 |ORGANIZATION|Default
 |TYPE|Source Control
-|USERNAME| student#
+|USERNAME| <your USER ID - instructor provided (ie. student1)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
 Make sure you select SAVE!
 
-image::images/1-tower-add-scm-credential.png[title="Add SCM Credential",width=1000]
+image::images/credential_git.png[title="Add SCM Credential",width=1000]
 
 == Creating a Project
 
@@ -93,11 +89,14 @@ a source code management (SCM) system supported by Tower, including Git, Subvers
 
 === Step 1:
 
-Click on PROJECTS at the upper left
+Click on PROJECTS on the left hand panel.
+
+image:images/project.png[Proj,200,400]
+
 
 === Step 2:
 
-Select ADD     image:images/at_add.png[Add,35,25]
+Click on the image:images/add.png[Add,35,25] icon and add new project  
 
 === Step 3:
 
@@ -121,7 +120,7 @@ a|
 
 
 
-image::images/1-tower-create-project.png[title="Defining a Project",width=1000]
+image::images/project_add.png[title="Defining a Project",width=1000]
 
 
 
