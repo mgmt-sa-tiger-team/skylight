@@ -45,7 +45,7 @@ Select CREDENTIALS
 
 === Step 3:
 
-Click on the + icon and add new credential     image:images/add.png[Add,35,25]
+Click on the image:images/add.png[Add,35,25] icon and add new credential     
 
 === Step 4:
 
@@ -56,7 +56,7 @@ Complete the form using the following entries:
 |DESCRIPTION|
 |ORGANIZATION|Default
 |TYPE|Machine
-|USERNAME| <your USER ID ie. student1 >
+|USERNAME| <your USER ID - instructor provided (ie. student1) >
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
