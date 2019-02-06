@@ -35,7 +35,7 @@ including machine, network, and various cloud providers.  In this workshop, we a
 
 === Step 1:
 
-Select the gear icon     image:images/at_gear.png[Gear,20,20]
+Select CREDENTIALS from the left hand panel under resources     image:images/credentials.png[Cred,20,20]
 
 === Step 2:
 
@@ -43,7 +43,7 @@ Select CREDENTIALS
 
 === Step 3:
 
-Click on ADD     image:images/at_add.png[Add,35,25]
+Click on the + icon and add new credential     image:images/add.png[Add,35,25]
 
 === Step 4:
 
@@ -54,11 +54,11 @@ Complete the form using the following entries:
 |DESCRIPTION|
 |ORGANIZATION|Default
 |TYPE|Machine
-|USERNAME| student#
+|USERNAME| <your USER ID ie. student1 >
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
-image::images/1-tower-add-machine-credential.png[title="Add Machine Credential",width=1000]
+image::images/credential_add.png[title="Add Machine Credential",width=1000]
 
 
 === Step 5:
