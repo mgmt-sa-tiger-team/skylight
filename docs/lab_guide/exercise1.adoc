@@ -157,7 +157,7 @@ We will be viewing the hosts, so click on the *HOSTS* button.
 In the Hosts view, we can see every host associated with with this inventory.  You will also see which groups a host is associated with.
 Hosts can be associated with multiple groups.  These groups can later then be used to narrow down to the exact hosts we will later run our playbooks on.
 
-image::images/inventory_hosts.png[title="Hosts View",width=1000]
+image::images/inventory_host.png[title="Hosts View",width=1000]
 
 
 === Step 4:
