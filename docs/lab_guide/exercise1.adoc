@@ -35,7 +35,7 @@ including machine, network, and various cloud providers.  In this workshop, we a
 
 === Step 1:
 
-Select CREDENTIALS from the left hand panel under resources     image:images/credentials.png[Cred,20,20]
+Select CREDENTIALS from the left hand panel under resources     image:images/credentials.png[Cred,300,100]
 
 === Step 2:
 
