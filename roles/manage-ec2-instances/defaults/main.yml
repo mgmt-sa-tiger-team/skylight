@@ -15,4 +15,4 @@ ec2_docs_instance_type: "t2.small"
 # Ideally update to auto-pull the latest
 ec2_rhel_ami: ami-c998b6b2              # Rhel 7
 ec2_centos_ami: ami-9887c6e7              # Centos 7
-ec2_windows_ami: ami-27a58d5c           # Windows 2016 Base
+ec2_windows_ami: ami-897e75f2           # Windows 2016 Base
