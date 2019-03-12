@@ -19,7 +19,6 @@
         - name: Reboot, if needed.
           win_reboot:
             reboot_timeout: 3600
-            shutdown_timeout: 3600
           when: update_result.reboot_required
       when: update_count.found_update_count|int >= 1
 
