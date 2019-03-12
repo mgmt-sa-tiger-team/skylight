@@ -58,17 +58,14 @@
 
 - name: Install pywinrm for connecting to windows hosts
   pip:
-    name: "{{ item }}"
-  with_items:
-    - pywinrm>=0.2.2
-    - pywinrm[kerberos]
-    - pywinrm[credssp]
+    name:
+      - pywinrm>=0.2.2
+      - pywinrm[kerberos]
+      - pywinrm[credssp]
     
 - name: Install requests-credssp for Tower 3.2
   pip:
-    name: "{{ item }}"
-  with_items:
-    - requests-credssp
+    name: requests-credssp
   when: towerversion < 3.3
 
 - name: Configure KRB5.conf file
