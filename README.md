@@ -98,6 +98,8 @@ The decks are located at
 ```
 http://<IPADDRESS>/decks/
 ```
+When viewing the deck, you can bring up the speaker notes by pressing 's'
+
 The User Signup page is located at
 ```
 http://<IPADDRESS>/users/
