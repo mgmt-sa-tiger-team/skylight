@@ -9,7 +9,7 @@ ec2_tower_instance_type: "t2.medium"    # Medium = 2 vCPU / 4GB
 ec2_gitlab_instance_type: "t2.medium"   # Might be able to use small...
 ec2_windc_instance_type: "t3.medium"    # t2.micro fails
 ec2_windows_workstation_instance_type: "t3.medium"   # t2.small was slowwwwww...
-ec2_windows_instance_type: "t2.small"   # Small = 1 vCPU / 2GB
+ec2_windows_instance_type: "t3.small"   # Small = 1 vCPU / 2GB
 ec2_docs_instance_type: "t2.small"
 
 # Ideally update to auto-pull the latest
