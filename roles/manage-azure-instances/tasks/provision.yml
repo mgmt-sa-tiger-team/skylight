@@ -310,7 +310,7 @@
   retries: 300
   with_items: "{{ workstation_jobs.results }}"
 
-################### Disable Windows Firewall ###################  
+################### Custom VM Extension ###################  
 
 - name: DomainController create VM Extension
   azure_rm_virtualmachine_extension:
@@ -319,12 +319,12 @@
     subscription_id: "{{ azure_subscription_id }}"
     tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"    
-    name: disable-firewall
+    name: custom-script
     virtual_machine_name: "{{ item.invocation.module_args.name }}"
     publisher: Microsoft.Compute
     virtual_machine_extension_type: CustomScriptExtension
     type_handler_version: 1.9
-    settings: '{"commandToExecute": "netsh advfirewall set allprofiles state off"}'
+    settings: '{"commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File CustomScript.ps1 -ForceNewSSLCert -EnableCredSSP", "fileUris": ["https://raw.githubusercontent.com/mgmt-sa-tiger-team/skylight/master/roles/manage-azure-instances/templates/CustomScript.ps1"]}'
     auto_upgrade_minor_version: true
   with_items: "{{ dc_instances.results }}"
 
@@ -335,12 +335,12 @@
     subscription_id: "{{ azure_subscription_id }}"
     tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"    
-    name: disable-firewall
+    name: custom-script
     virtual_machine_name: "{{ item.invocation.module_args.name }}"
     publisher: Microsoft.Compute
     virtual_machine_extension_type: CustomScriptExtension
     type_handler_version: 1.9
-    settings: '{"commandToExecute": "netsh advfirewall set allprofiles state off"}'
+    settings: '{"commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File CustomScript.ps1 -ForceNewSSLCert -EnableCredSSP", "fileUris": ["https://raw.githubusercontent.com/mgmt-sa-tiger-team/skylight/master/roles/manage-azure-instances/templates/CustomScript.ps1"]}'
     auto_upgrade_minor_version: true
   with_items: "{{ workstation_instances.results }}"
   
@@ -351,14 +351,14 @@
     subscription_id: "{{ azure_subscription_id }}"
     tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"    
-    name: disable-firewall
+    name: custom-script
     virtual_machine_name: "{{ item.invocation.module_args.name }}"
     publisher: Microsoft.Compute
     virtual_machine_extension_type: CustomScriptExtension
     type_handler_version: 1.9
-    settings: '{"commandToExecute": "netsh advfirewall set allprofiles state off"}'
+    settings: '{"commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File CustomScript.ps1 -ForceNewSSLCert -EnableCredSSP", "fileUris": ["https://raw.githubusercontent.com/mgmt-sa-tiger-team/skylight/master/roles/manage-azure-instances/templates/CustomScript.ps1"]}'
     auto_upgrade_minor_version: true
-  with_items: "{{ windows_instances.results }}"  
+  with_items: "{{ windows_instances.results }}"
 
 ################### Wait for Instances ###################
 
@@ -452,12 +452,12 @@
   add_host:
     hostname: "{{ item.invocation.module_args.name }}"  
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    ansible_port: 5985
+    ansible_port: 5986
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
     ansible_connection: "winrm"
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
-    ansible_winrm_transport: "ntlm"
+    ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
     groups: windows_domain_controllers
   with_items: "{{ dc_instances.results }}"      
@@ -467,11 +467,11 @@
     hostname: "{{ item.invocation.module_args.name }}"  
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     private_ip:  "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
-    ansible_port: 5985
+    ansible_port: 5986
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
     ansible_connection: "winrm"
-    ansible_winrm_transport: "ntlm"
+    ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
     student: "{{ item.invocation.module_args.name | regex_replace('[^0-9]', '') }}"
     groups: windows
@@ -482,12 +482,12 @@
     hostname: "{{ item.invocation.module_args.name }}"  
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     private_ip:  "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
-    ansible_port: 5985
+    ansible_port: 5986
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
     ansible_become_password: "{{ users_password }}"
     ansible_connection: "winrm"
-    ansible_winrm_transport: "ntlm"
+    ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
     student: "{{ item.invocation.module_args.name | regex_replace('[^0-9]', '') }}"
     groups: windows_workstations
