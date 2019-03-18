@@ -430,6 +430,7 @@
     ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"    
+    ansible_become_pass: "{{ azure_admin_pass }}"
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     groups: tower
   with_items: "{{ tower_instances.results }}"  
@@ -439,7 +440,8 @@
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
-    ansible_password: "{{ azure_admin_pass }}"    
+    ansible_password: "{{ azure_admin_pass }}"
+    ansible_become_pass: "{{ azure_admin_pass }}"
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     groups: gitlab
   with_items: "{{ gitlab_instances.results }}"
@@ -449,7 +451,8 @@
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
-    ansible_password: "{{ azure_admin_pass }}"    
+    ansible_password: "{{ azure_admin_pass }}"
+    ansible_become_pass: "{{ azure_admin_pass }}" 
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     groups: docs
   with_items: "{{ docs_instances.results }}"  
