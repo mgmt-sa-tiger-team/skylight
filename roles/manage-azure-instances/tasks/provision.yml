@@ -73,7 +73,8 @@
       - 3389  # RDP
     tags:
       Name: "{{ name_prefix }}-dc"
-      App: AnsibleWorkshop    
+      DNSName: "{{ 'windc' }}"
+      App: AnsibleWorkshop
     image:
       publisher: "{{ azure_win_publisher }}"
       offer: "{{ azure_win_offer }}"
@@ -111,6 +112,7 @@
       - 3389  # RDP
     tags:
       Name: "{{ name_prefix + '-s' + item + '-w1'}}"
+      DNSName: "{{ 's' + item + '-w1'}}"
       App: AnsibleWorkshop
       User: "{{ user_prefix + item }}"
     image:
@@ -147,6 +149,7 @@
       - 3389  # RDP
     tags:
       Name: "{{ name_prefix + '-s' + item + '-wk'}}"
+      DNSName: "{{ 's' + item + '-win1'}}"
       App: AnsibleWorkshop
       User: "{{ user_prefix + item }}"
     image:
@@ -182,6 +185,7 @@
       - 443
     tags:
       Name: "{{ name_prefix + '-s' + item + '-tower'}}"
+      DNSName: "{{ 's' + item + '-tower'}}"
       App: AnsibleWorkshop
       User: "{{ user_prefix + item }}"
     image:
@@ -218,6 +222,7 @@
       - 443
     tags:
       Name: "{{ name_prefix + '-gitlab'}}"
+      DNSName: "{{ 'gitlab' }}"
       App: AnsibleWorkshop
     image:
       publisher: "{{ azure_rhel_publisher }}"
@@ -253,6 +258,7 @@
       - 443
     tags:
       Name: "{{ name_prefix + '-docs'}}"
+      DNSName: "{{ 'docs' }}"
       App: AnsibleWorkshop
     image:
       publisher: "{{ azure_rhel_publisher }}"
@@ -420,7 +426,7 @@
 
 - name: Tower | Add new instance to host group  
   add_host:  
-    hostname: "{{ item.invocation.module_args.name }}"  
+    hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"    
@@ -430,7 +436,7 @@
 
 - name: GitLab | Add new instance to host group  
   add_host:  
-    hostname: "{{ item.invocation.module_args.name }}"  
+    hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"    
@@ -440,7 +446,7 @@
 
 - name: Docs | Add new instance to host group  
   add_host:  
-    hostname: "{{ item.invocation.module_args.name }}"  
+    hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"    
@@ -450,7 +456,7 @@
 
 - name: DomainController | Add new instance to host group
   add_host:
-    hostname: "{{ item.invocation.module_args.name }}"  
+    hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_port: 5986
     ansible_user: "{{ azure_admin_user }}"
@@ -464,7 +470,7 @@
 
 - name: Windows | Add new instance to host group
   add_host:
-    hostname: "{{ item.invocation.module_args.name }}"  
+    hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     private_ip:  "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     ansible_port: 5986
@@ -479,7 +485,7 @@
 
 - name: Workstation | Add new instance to host group
   add_host:
-    hostname: "{{ item.invocation.module_args.name }}"  
+    hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     private_ip:  "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     ansible_port: 5986
