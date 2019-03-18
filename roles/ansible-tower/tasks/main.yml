@@ -63,10 +63,10 @@
       - pywinrm[kerberos]
       - pywinrm[credssp]
     
-- name: Install requests-credssp for Tower 3.2
-  pip:
-    name: requests-credssp
-  when: towerversion < 3.3
+#- name: Install requests-credssp for Tower 3.2
+#  pip:
+#    name: requests-credssp
+#  when: towerversion < 3.3
 
 - name: Configure KRB5.conf file
   template:
