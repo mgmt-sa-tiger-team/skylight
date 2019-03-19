@@ -73,7 +73,7 @@
       - 3389  # RDP
     tags:
       Name: "{{ name_prefix }}-dc"
-      DNSName: "{{ 'windc' }}"
+      DNSName: "windc"
       App: AnsibleWorkshop
     image:
       publisher: "{{ azure_win_publisher }}"
@@ -222,7 +222,7 @@
       - 443
     tags:
       Name: "{{ name_prefix + '-gitlab'}}"
-      DNSName: "{{ 'gitlab' }}"
+      DNSName: "gitlab"
       App: AnsibleWorkshop
     image:
       publisher: "{{ azure_rhel_publisher }}"
@@ -258,7 +258,7 @@
       - 443
     tags:
       Name: "{{ name_prefix + '-docs'}}"
-      DNSName: "{{ 'docs' }}"
+      DNSName: "docs"
       App: AnsibleWorkshop
     image:
       publisher: "{{ azure_rhel_publisher }}"
