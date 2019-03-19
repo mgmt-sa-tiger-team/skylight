@@ -11,6 +11,16 @@
   - set_fact:
       user: "{{ user_prefix }}{{ inventory_hostname | regex_replace('[^0-9]', '') }}"
 
+  - name: install Chocolatey
+    win_chocolatey:
+      name: chocolatey
+      state: present
+
+  - name: disable enhanced exit codes
+    win_chocolatey_feature:
+      name: useEnhancedExitCodes
+      state: disabled
+
   - name: Install Visual Studio Code, Git, and Putty
     win_chocolatey:
       name: "{{ item }}"
