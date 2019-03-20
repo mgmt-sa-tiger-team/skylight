@@ -540,7 +540,7 @@
 
 - name: Tower | Add new instance to host group
   add_host:
-    hostname: "s{{ item.tags.Student | regex_replace('[^0-9]', '') }}-tower"
+    hostname: "s{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}-tower"
     ansible_user: "{{ root_user }}"
     ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     ansible_host: "{{ item.public_ip }}"
