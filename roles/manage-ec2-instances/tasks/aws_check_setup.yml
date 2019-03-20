@@ -17,7 +17,7 @@
     - create_login_page
     - "'_' in ec2_name_prefix"
 
-- name: FIND AZ ZONE FOR REGION {{ec2_region}}
+- name: FIND AZ ZONE FOR REGION {{ ec2_region }}
   aws_az_facts:
     region: "{{ ec2_region }}"
   register: az_names

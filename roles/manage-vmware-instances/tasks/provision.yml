@@ -1,6 +1,6 @@
 ################### Build Instances ###################
 - name: DomainController | Launch Domain Controller Instance
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -29,7 +29,8 @@
       runonce:
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
-      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' –Value 0"
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters' -Name 'DisabledComponents' -PropertyType DWord -Value 0xff"
       - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
       - winrm set winrm/config/service/auth @{Basic="true"}
       - winrm set winrm/config/service @{AllowUnencrypted="true"}
@@ -40,7 +41,7 @@
   poll: 0
 
 - name: GitLab | Launch Gitlab Instance
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -65,7 +66,7 @@
   poll: 0
 
 - name: Docs | Launch Docs Instance
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -85,8 +86,6 @@
     networks:
     - name: "{{ vCenterPortGroup }}"
       type: dhcp
-    - name: "{{ vCenterPortGroupExt }}"
-      type: dhcp
     customization:
       hostname: docs
   with_sequence: count=1
@@ -95,7 +94,7 @@
   poll: 0
 
 - name: Tower | Launch Tower Instance
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -123,7 +122,7 @@
   poll: 0
 
 - name: Windows | Launch instance 1
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -152,18 +151,18 @@
       runonce:
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
-      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' –Value 0"
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters' -Name 'DisabledComponents' -PropertyType DWord -Value 0xff"
       - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
       - winrm set winrm/config/service/auth @{Basic="true"}
       - winrm set winrm/config/service @{AllowUnencrypted="true"}
-      - powershell.exe -command "New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters -Name DisabledComponents -PropertyType DWord -Value 0xffffffff"
   with_sequence: count={{user_count}}
   register: windows1_jobs
   async: 7200
   poll: 0
 
 - name: Workstation | Launch instance 1
-  vmware_guest2:
+  vmware_guest:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -180,8 +179,8 @@
     networks:
     - name: "{{ vCenterPortGroup }}"
       type: dhcp
-    - name: "{{ vCenterPortGroupExt }}"
-      type: dhcp
+#    - name: "{{ vCenterPortGroupExt }}"
+#      type: dhcp
     customization:
       autologon: True
       orgname: Workshop
@@ -194,11 +193,11 @@
       runonce:
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
-      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' –Value 0"
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
+      - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters' -Name 'DisabledComponents' -PropertyType DWord -Value 0xff"
       - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
       - winrm set winrm/config/service/auth @{Basic="true"}
       - winrm set winrm/config/service @{AllowUnencrypted="true"}
-      - powershell.exe -command "New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters -Name DisabledComponents -PropertyType DWord -Value 0xffffffff"
   with_sequence: count={{user_count}}
   register: workstation_jobs
   async: 7200
@@ -297,7 +296,7 @@
 
 - name: Docs | Wait for SSH to come up
   wait_for:
-    host: "{{ item.hw_eth0.ipaddresses[0] }}"
+    host: "{{ item.ipv4 }}"
     port: 22
     delay: 1
     timeout: 320
@@ -310,7 +309,7 @@
     ansible_ssh_host: "{{ item.hw_eth0.ipaddresses[0] }}"
     ansible_host: "{{ item.hw_eth0.ipaddresses[0] }}"
     private_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
-    public_ip: "{{ item.hw_eth1.ipaddresses[0] }}"
+    public_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
     ansible_user: "{{ root_user }}"
     ansible_password: "{{ root_password }}"
     groups: docs
@@ -334,7 +333,7 @@
     ansible_user: "{{ root_user }}"
     ansible_password: "{{ root_password }}"
     tower_license: "{{ tower_license }}"
-    student: "{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
     groups: tower
   with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
 
@@ -364,7 +363,7 @@
 
 - name: Workstation | Wait for WinRM to come up
   wait_for:
-    host: "{{ item.hw_eth1.ipaddresses[0] }}"
+    host: "{{ item.ipv4 }}"
     port: 5986
     delay: 1
     timeout: 600
@@ -374,8 +373,8 @@
 - name: Workstation | Add new instance to host group
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
-    private_ip: "{{ item.hw_eth0.ipaddresses[0] }}"
-    ansible_host: "{{ item.hw_eth1.ipaddresses[0] }}"
+    private_ip: "{{ item.ipv4 }}"
+    ansible_host: "{{ item.ipv4 }}"
     student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
     ansible_port: 5986
     ansible_user: "Administrator"
