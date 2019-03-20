@@ -1,13 +1,4 @@
 ---
-# tasks file for windows-workstation
-
-### Req dot net 4.5.2 
-#- name: Install .Net framework 4.5.2 
-#  win_feature:
-#    name: DotNet-4-5-2
-#    state: present
-#    Win2016 has .NET 4.6... 
-
 - set_fact:
     user: "{{ user_prefix }}{{ hostvars[inventory_hostname].student | regex_replace('[^0-9]', '') }}"
 
@@ -29,20 +20,7 @@
     with_items:
       - visualstudiocode
       - git
-      #- putty.install
-      #- firefox
       - googlechrome
-      #- winscp
-      #- atom
-      #- notepadplusplus.install
-      #- sublimetext3
-
-#  - name: Add Putty Shortcut to administrator desktop
-#    win_shortcut:
-#      description: PuTTY
-#      src: '%ProgramFiles%\PuTTY\putty.exe'
-#      dest: '%Public%\Desktop\Putty.lnk'
-#      directory: '%ProgramFiles%\PuTTY\'
 
   - name: Create an shortcut to Docs site
     win_shortcut:
