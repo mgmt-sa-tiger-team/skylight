@@ -120,11 +120,7 @@ azure_subscription_id: ''
 azure_tenant: ''
 azure_location: ''
 
-azure_resource_group: skylight_rg
-azure_storage_account: skylightstorage
 azure_storage_account_type: Standard_LRS
-azure_virtual_network: skylightnetwork
-azure_virtual_subnet: skylightsubnet
 
 # Instance Sizes
 azure_tower_instance_type: "Standard_A2_v2"    # Medium = 2 vCPU / 4GB
