@@ -444,6 +444,7 @@
     ansible_become_pass: "{{ azure_admin_pass }}"
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
+    tower_license: "{{ tower_license }}"
     groups: tower
   with_items: "{{ tower_instances.results }}"  
 

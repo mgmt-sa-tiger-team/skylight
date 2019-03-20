@@ -333,6 +333,8 @@
     private_ip: "{{ item.ipv4 }}"
     ansible_user: "{{ root_user }}"
     ansible_password: "{{ root_password }}"
+    tower_license: "{{ tower_license }}"
+    student: "{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}"
     groups: tower
   with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
 
