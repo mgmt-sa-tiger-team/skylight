@@ -17,18 +17,18 @@
 
 - name: Check if Myrtille is downloaded
   win_stat:
-    path: C:\Temp\Myrtille_2.2.0_x86_x64_Setup.exe
+    path: C:\Temp\Myrtille_2.3.1_x86_x64_Setup.exe
   register: myrtille
 
 - name: Download Myrtille to specified path only if modified
   win_get_url:
-    url: https://github.com/cedrozor/myrtille/releases/download/v2.2.0/Myrtille_2.2.0_x86_x64_Setup.exe
-    dest: C:\Temp\Myrtille_2.2.0_x86_x64_Setup.exe
+    url: https://github.com/cedrozor/myrtille/releases/download/v2.3.1/Myrtille_2.3.1_x86_x64_Setup.exe
+    dest: C:\Temp\Myrtille_2.3.1_x86_x64_Setup.exe
   when: not myrtille.stat.exists
 
 
 - name: Extract the binary
-  win_command: Myrtille_2.2.0_x86_x64_Setup.exe -o "C:\Temp" -y
+  win_command: Myrtille_2.3.1_x86_x64_Setup.exe -o "C:\Temp" -y
   args:
     chdir: C:\Temp\
     creates: C:\Temp\setup.exe
