@@ -97,8 +97,7 @@ function display_form() {
 }
 
 function sql_clean_username($text) {
-	$text = str_replace(array("\\"), "\\\\", $text);
-	$text = str_replace(array("%", '/', "'", '"', '|'), '', $text);
+	$text = preg_replace("/[^[:alnum:][:space:] @\.-_]/u", '', $text);
 	return $text;
 }
 
