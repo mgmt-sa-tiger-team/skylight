@@ -11,17 +11,28 @@
 
 - name: Check that the provided license exists
   stat:
-    path: "{{playbook_dir}}/tower_license.json"
+    path: "{{ playbook_dir }}/tower_license.json"
   register: stat_result
 
 - fail:
-    msg: "You need a license located at {{playbook_dir}}/tower_license.json"
+    msg: "You need a license located at {{ playbook_dir }}/tower_license.json"
   when:
     - not stat_result.stat.exists
+    - tower_license is undefined
 
 - name: Ensure eula is accepted if posting license
   lineinfile:
     path: "{{ playbook_dir }}/tower_license.json"
-    line: '    "eula_accepted": true,'
+    line: '   "eula_accepted": true,'
     insertbefore: '"company_name"'
     state: present
+  when:
+    - stat_result.stat.exists
+    - tower_license is undefined
+
+- name: set tower_license variable if not defined
+  set_fact:
+    tower_license: "{{ lookup('file', playbook_dir+'/tower_license.json') }}"
+  when:
+    - stat_result.stat.exists
+    - tower_license is undefined
