@@ -1,11 +1,19 @@
 ---
+- name: Set resource facts
+  set_fact:
+    azure_resource_group:  "{{ name_prefix }}-resource"
+    azure_storage_account: "{{ (name_prefix + 'storage') | lower | regex_replace('[^0-9a-z]+', '') }}"
+    azure_virtual_network: "{{ name_prefix }}-network"
+    azure_virtual_subnet:  "{{ (name_prefix + 'subnet')  | lower | regex_replace('[^0-9a-z]+', '') }}"
+
+
 # Create a resource group
 - name: Azure | Create a resource group
   azure_rm_resourcegroup:
     client_id: "{{ azure_client_id }}"
     secret: "{{ azure_secret }}"
     subscription_id: "{{ azure_subscription_id }}"
-    tenant: "{{ azure_tenant }}"  
+    tenant: "{{ azure_tenant }}"
     name: "{{ azure_resource_group }}"
     location: "{{ azure_location }}"
     state: present
@@ -16,7 +24,7 @@
     client_id: "{{ azure_client_id }}"
     secret: "{{ azure_secret }}"
     subscription_id: "{{ azure_subscription_id }}"
-    tenant: "{{ azure_tenant }}"    
+    tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"
     name: "{{ azure_storage_account }}"
     account_type: "{{ azure_storage_account_type }}"
@@ -28,9 +36,9 @@
     client_id: "{{ azure_client_id }}"
     secret: "{{ azure_secret }}"
     subscription_id: "{{ azure_subscription_id }}"
-    tenant: "{{ azure_tenant }}"    
+    tenant: "{{ azure_tenant }}"
     resource_group: "{{ azure_resource_group }}"  
-    name: "{{ azure_virtual_network }}" 
+    name: "{{ azure_virtual_network }}"
     address_prefixes_cidr:
         - "{{ ptr_zone_cidr }}"
     dns_servers:
@@ -43,11 +51,11 @@
     client_id: "{{ azure_client_id }}"
     secret: "{{ azure_secret }}"
     subscription_id: "{{ azure_subscription_id }}"
-    tenant: "{{ azure_tenant }}"    
-    resource_group: "{{ azure_resource_group }}"    
+    tenant: "{{ azure_tenant }}"
+    resource_group: "{{ azure_resource_group }}"
     name: "{{ azure_virtual_subnet }}"
     virtual_network_name: "{{ azure_virtual_network }}"
-    address_prefix_cidr: "{{ ptr_zone_cidr }}"     
+    address_prefix_cidr: "{{ ptr_zone_cidr }}"
 
 ################### Build Instances ###################
 - name: DomainController | Launch instance
@@ -68,7 +76,7 @@
     public_ip_allocation_method: Dynamic
     virtual_network_name: "{{ azure_virtual_network }}"
     open_ports:
-      - 5986  # WinRM secure       
+      - 5986  # WinRM secure
       - 5985
       - 3389  # RDP
     tags:
