@@ -435,7 +435,7 @@
 - name: Tower | Add new instance to host group  
   add_host:  
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
-    ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
+    ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"    
     ansible_become_pass: "{{ azure_admin_pass }}"
@@ -446,7 +446,7 @@
 - name: GitLab | Add new instance to host group  
   add_host:  
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
-    ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
+    ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
     ansible_become_pass: "{{ azure_admin_pass }}"
@@ -457,7 +457,7 @@
 - name: Docs | Add new instance to host group  
   add_host:  
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
-    ansible_ssh_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
+    ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
     ansible_become_pass: "{{ azure_admin_pass }}" 
@@ -520,6 +520,6 @@
 - name: Generate student inventories
   template:
     src: instances.txt.j2
-    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}instances.txt"
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
   with_sequence: count="{{ user_count }}"
 

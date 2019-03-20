@@ -23,31 +23,31 @@ ansible_port=5986
 
 [tower:vars]
 ansible_port=22
-ansible_ssh_user="{{ azure_admin_user }}"
+ansible_user="{{ azure_admin_user }}"
 ansible_password="{{ azure_admin_pass }}"
 ansible_become_password="{{ azure_admin_pass }}"
 
 [gitlab:vars]
 ansible_port=22
-ansible_ssh_user="{{ azure_admin_user }}"
+ansible_user="{{ azure_admin_user }}"
 ansible_password="{{ azure_admin_pass }}"
 ansible_become_password="{{ azure_admin_pass }}"
 
 [docs:vars]
 ansible_port=22
-ansible_ssh_user="{{ azure_admin_user }}"
+ansible_user="{{ azure_admin_user }}"
 ansible_password="{{ azure_admin_pass }}"
 ansible_become_password="{{ azure_admin_pass }}"
 
 
 [instructor]
 {% for host in hostvars %}
-{%   if "-dc" in host %}
+{%   if "windc" in host %}
 {{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}" private_ip={{ hostvars[host].private_ip }}
 {%   elif "gitlab" in host %}
-{{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_ssh_host }}
+{{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_host }}
 {%   elif "docs" in host %}
-{{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_ssh_host }}
+{{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_host }}
 {%   endif %}
 {% endfor %}
 
@@ -59,7 +59,7 @@ ansible_become_password="{{ azure_admin_pass }}"
 {%       elif "gitlab" in host -%}
 {%       elif "docs" in host -%}
 {%       elif "tower" in host %}
-{{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_ssh_host }}
+{{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_host }}
 {%       else %}
 {{ host|replace(name_prefix + "-", "") }} ansible_host={{ hostvars[host].ansible_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}" student="{{ hostvars[host].student }}"
 {%       endif %}
