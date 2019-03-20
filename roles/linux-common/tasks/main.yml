@@ -21,17 +21,23 @@
     dest: "{{ item }}"
     block: |
       DNS1={{ dns_server }}
-      DNS2=8.8.8.8
       DOMAIN="{{dns_domain_name}} ec2.internal"
       PEERDNS=no
   register: dnschange
   with_items: "{{ eths.stdout_lines }}"
 
+- name: set DNS resolution in resolv.conf file
+  template:
+    src: templates/resolv.conf.j2
+    dest: /etc/resolv.conf
+
+  register: etchost
+
 - name: restart NetworkManager
   service:
     name: NetworkManager
     state: restarted
-  when: dnschange.changed
+  when: dnschange.changed or etchost.changed
 
 - name: Add EPEL repo
   yum_repository:
