@@ -15,7 +15,7 @@
   register: stat_result
 
 - fail:
-    msg: "You need a license located at {{ playbook_dir }}/tower_license.json"
+    msg: "You need a license located at {{ playbook_dir }}/tower_license.json or to provide a license in variable 'tower_license'"
   when:
     - not stat_result.stat.exists
     - tower_license is undefined
