@@ -122,6 +122,7 @@
       Name: "{{ name_prefix + '-s' + item + '-w1'}}"
       DNSName: "{{ 's' + item + '-w1'}}"
       App: AnsibleWorkshop
+      Student: "{{ item }}"
       User: "{{ user_prefix + item }}"
     image:
       publisher: "{{ azure_win_publisher }}"
@@ -159,6 +160,7 @@
       Name: "{{ name_prefix + '-s' + item + '-wk'}}"
       DNSName: "{{ 's' + item + '-win1'}}"
       App: AnsibleWorkshop
+      Student: "{{ item }}"
       User: "{{ user_prefix + item }}"
     image:
       publisher: "{{ azure_win_publisher }}"
@@ -195,6 +197,7 @@
       Name: "{{ name_prefix + '-s' + item + '-tower'}}"
       DNSName: "{{ 's' + item + '-tower'}}"
       App: AnsibleWorkshop
+      Student: "{{ item }}"
       User: "{{ user_prefix + item }}"
     image:
       publisher: "{{ azure_rhel_publisher }}"
@@ -440,6 +443,7 @@
     ansible_password: "{{ azure_admin_pass }}"    
     ansible_become_pass: "{{ azure_admin_pass }}"
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
+    student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
     groups: tower
   with_items: "{{ tower_instances.results }}"  
 
@@ -490,7 +494,7 @@
     ansible_connection: "winrm"
     ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
-    student: "{{ item.invocation.module_args.name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
     groups: windows
   with_items: "{{ windows_instances.results }}"  
 
@@ -506,7 +510,7 @@
     ansible_connection: "winrm"
     ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
-    student: "{{ item.invocation.module_args.name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
     groups: windows_workstations
   with_items: "{{ workstation_instances.results }}"  
 
