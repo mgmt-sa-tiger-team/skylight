@@ -91,7 +91,7 @@
   with_sequence: count=1
   register: dc_jobs
   async: 7200
-  poll: 0      
+  poll: 0
 
 - name: Windows | Launch instance 1
   azure_rm_virtualmachine:
@@ -132,7 +132,7 @@
   with_sequence: count={{ user_count }}
   register: windows1_jobs
   async: 7200
-  poll: 0    
+  poll: 0
 
 - name: Workstation | Launch instance
   azure_rm_virtualmachine:
@@ -170,7 +170,7 @@
   with_sequence: count={{ user_count }}
   register: workstation_jobs
   async: 7200
-  poll: 0  
+  poll: 0
 
 - name: Launch Tower Instance  
   azure_rm_virtualmachine:
@@ -207,7 +207,7 @@
   with_sequence: count={{ user_count }}
   register: tower_jobs
   async: 7200
-  poll: 0  
+  poll: 0
 
 - name: GitLab | Launch Instance
   azure_rm_virtualmachine:

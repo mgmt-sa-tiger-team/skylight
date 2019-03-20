@@ -6,7 +6,7 @@
     azure_virtual_network: "{{ name_prefix }}-network"
     azure_virtual_subnet:  "{{ (name_prefix + 'subnet')  | lower | regex_replace('[^0-9a-z]+', '') }}"
 
-# # ----------------------- Destroy Instances -----------------------
+################### Destroy Instances ###################
 
 - name: Azure | DomainController | Destroy instance
   azure_rm_virtualmachine:
@@ -19,6 +19,9 @@
     started: False
     state: absent
   with_sequence: count=1
+  register: dc_jobs
+  async: 7200
+  poll: 0
 
 - name: Azure | Gitlab | Destroy instance
   azure_rm_virtualmachine:
@@ -31,6 +34,9 @@
     started: False
     state: absent
   with_sequence: count=1
+  register: gitlab_jobs
+  async: 7200
+  poll: 0
 
 - name: Azure | Docs | Destroy instance
   azure_rm_virtualmachine:
@@ -43,6 +49,9 @@
     started: False
     state: absent
   with_sequence: count=1
+  register: docs_jobs
+  async: 7200
+  poll: 0
 
 - name: Azure | Windows | Destroy instance 1
   azure_rm_virtualmachine:
@@ -55,6 +64,9 @@
     started: False
     state: absent
   with_sequence: count={{ user_count }}
+  register: windows1_jobs
+  async: 7200
+  poll: 0
 
 - name: Azure | Workstation | Destroy instance
   azure_rm_virtualmachine:
@@ -67,6 +79,9 @@
     started: False
     state: absent
   with_sequence: count={{ user_count }}
+  register: workstation_jobs
+  async: 7200
+  poll: 0
 
 - name: Azure | Tower | Destroy instance
   azure_rm_virtualmachine:
@@ -79,8 +94,21 @@
     started: False
     state: absent
   with_sequence: count={{ user_count }}
+  register: tower_jobs
+  async: 7200
+  poll: 0
 
-# # ----------------------- Remove Network Interfaces -----------------------
+################### Wait for Jobs ###################
+
+- name: Wait for instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: instances
+  until: instances.finished
+  retries: 600
+  with_items: "{{ tower_jobs.results + gitlab_jobs.results + docs_jobs.results + windows1_jobs.results + workstation_jobs.results}}"
+  ignore_errors: yes
+
+################### Remove Network Interfaces ###################
 
 - name: Azure | Windows | Delete network interface
   azure_rm_networkinterface:
@@ -92,6 +120,7 @@
     name: "{{ name_prefix + '-s' + item + '-w101'}}" 
     state: absent
   with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Workstation | Delete network interface
   azure_rm_networkinterface:
@@ -103,6 +132,7 @@
     name: "{{ name_prefix + '-s' + item + '-wk01'}}"
     state: absent
   with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Tower | Delete network interface
   azure_rm_networkinterface:
@@ -113,7 +143,8 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-s' + item + '-tower01'}}"
     state: absent
-  with_sequence: count=1
+  with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Gitlab | Delete network interface
   azure_rm_networkinterface:
@@ -124,7 +155,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-gitlab01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
 - name: Azure | Docs | Delete network interface
   azure_rm_networkinterface:
@@ -135,7 +166,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-docs01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
 - name: Azure | DC | Delete network interface
   azure_rm_networkinterface:
@@ -146,9 +177,9 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-dc01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
-# # ----------------------- Remove Security Groups -----------------------
+################### Remove Security Groups ###################
 
 - name: Azure | Windows | Delete Security Group
   azure_rm_securitygroup:
@@ -160,6 +191,7 @@
     name: "{{ name_prefix + '-s' + item + '-w101'}}"
     state: absent
   with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Workstation | Delete Security Group
   azure_rm_securitygroup:
@@ -171,6 +203,7 @@
     name: "{{ name_prefix + '-s' + item + '-wk01'}}"
     state: absent
   with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Tower | Delete Security Group
   azure_rm_securitygroup:
@@ -181,7 +214,8 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-s' + item + '-tower01'}}"
     state: absent
-  with_sequence: count=1
+  with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Gitlab | Delete Security Group
   azure_rm_securitygroup:
@@ -192,7 +226,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-gitlab01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
 - name: Azure | Docs | Delete Security Group
   azure_rm_securitygroup:
@@ -203,7 +237,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-docs01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
 - name: Azure | DC | Delete Security Group
   azure_rm_securitygroup:
@@ -214,8 +248,9 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-dc01'}}"
     state: absent
+  ignore_errors: yes
 
-# # ----------------------- Remove Public IP Addresses -----------------------
+################### Remove Public IP Addresses ###################
 
 - name: Azure | Windows | Delete Public IP Addresses
   azure_rm_publicipaddress:
@@ -227,6 +262,7 @@
     name: "{{ name_prefix + '-s' + item + '-w101'}}"
     state: absent
   with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Workstation | Delete Public IP Addresses
   azure_rm_publicipaddress:
@@ -238,6 +274,7 @@
     name: "{{ name_prefix + '-s' + item + '-wk01'}}"
     state: absent
   with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Tower | Delete Public IP Addresses
   azure_rm_publicipaddress:
@@ -248,7 +285,8 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-s' + item + '-tower01'}}"
     state: absent
-  with_sequence: count=1
+  with_sequence: count={{ user_count }}
+  ignore_errors: yes
 
 - name: Azure | Gitlab | Delete Public IP Addresses
   azure_rm_publicipaddress:
@@ -259,7 +297,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-gitlab01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
 - name: Azure | Docs | Delete Public IP Addresses
   azure_rm_publicipaddress:
@@ -270,7 +308,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-docs01'}}"
     state: absent
-  with_sequence: count=1
+  ignore_errors: yes
 
 - name: Azure | DC | Delete Public IP Addresses
   azure_rm_publicipaddress:
@@ -281,8 +319,9 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-dc01'}}"
     state: absent
+  ignore_errors: yes
 
-# # ----------------------- Remove Subnets -----------------------
+################### Remove Subnets ###################
 
 - name: Azure | Destroy subnet
   azure_rm_subnet:
@@ -295,6 +334,7 @@
     virtual_network_name: "{{ azure_virtual_network }}"
     address_prefix_cidr: "{{ ptr_zone_cidr }}"     
     state: absent
+  ignore_errors: yes
 
 - name: Azure | Destroy virtual network
   azure_rm_virtualnetwork:
@@ -307,6 +347,7 @@
     address_prefixes_cidr:
         - "{{ ptr_zone_cidr }}"
     state: absent
+  ignore_errors: yes
 
 - name: Azure | Destroy storage account
   azure_rm_storageaccount:
@@ -318,6 +359,7 @@
     name: "{{ azure_storage_account }}"
     account_type: "{{ azure_storage_account_type }}"
     state: absent
+  ignore_errors: yes
 
 - name: Azure | Destroy resource group
   azure_rm_resourcegroup:
