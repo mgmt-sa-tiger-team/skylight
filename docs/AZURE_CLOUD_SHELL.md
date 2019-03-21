@@ -9,6 +9,7 @@ pip install ansible
 pip install packaging
 pip install msrestazure
 pip install ansible[azure]
+pip install cryptography==2.4.2
 
 git clone https://github.com/mgmt-sa-tiger-team/skylight.git
 cd skylight/vars/
