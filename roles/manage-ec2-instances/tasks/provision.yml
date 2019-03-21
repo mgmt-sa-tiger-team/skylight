@@ -386,7 +386,6 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'docs'
-#    image: "{{ ec2_centos_ami }}"
     image: "{{ ec2_rhel_ami }}"
     wait: true
     region: "{{ ec2_region }}"
