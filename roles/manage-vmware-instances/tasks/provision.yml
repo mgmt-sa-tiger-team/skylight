@@ -1,6 +1,6 @@
 ################### Build Instances ###################
 - name: DomainController | Launch Domain Controller Instance
-  vmware_guest:
+  vmware_guest2:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -41,7 +41,7 @@
   poll: 0
 
 - name: GitLab | Launch Gitlab Instance
-  vmware_guest:
+  vmware_guest2:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -66,7 +66,7 @@
   poll: 0
 
 - name: Docs | Launch Docs Instance
-  vmware_guest:
+  vmware_guest2:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -94,7 +94,7 @@
   poll: 0
 
 - name: Tower | Launch Tower Instance
-  vmware_guest:
+  vmware_guest2:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -122,7 +122,7 @@
   poll: 0
 
 - name: Windows | Launch instance 1
-  vmware_guest:
+  vmware_guest2:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
@@ -162,7 +162,7 @@
   poll: 0
 
 - name: Workstation | Launch instance 1
-  vmware_guest:
+  vmware_guest2:
     hostname: "{{ vCenterServer }}"
     username: "{{ vCenterUsername }}"
     password: "{{ vCenterPassword }}"
