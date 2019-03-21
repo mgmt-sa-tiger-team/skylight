@@ -22,6 +22,6 @@ vi tower_license.json
 
 
 # RUN THE PROVISIONER
-ansible-playbook provision.yml
+ansible-playbook provision.yml -c paramiko
 ```
 
