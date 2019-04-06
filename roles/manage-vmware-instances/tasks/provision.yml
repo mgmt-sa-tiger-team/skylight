@@ -249,16 +249,7 @@
   with_items:
     - "{{ workstation_jobs.results }}"
 
-################### Wait for Instances to completely come up ###################
-
-- name: DomainController | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 5986
-    delay: 1
-    timeout: 600
-    state: started
-  with_items: "{{ dc_instances.results | map(attribute='instance') | list }}"
+################### Add hosts ######################
 
 - name: DomainController | Add new instance to host group
   add_host:
@@ -274,15 +265,6 @@
     groups: windows_domain_controllers
   with_items: "{{ dc_instances.results | map(attribute='instance') | list }}"
 
-- name: GitLab | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ gitlab_instances.results | map(attribute='instance') | list }}"
-
 - name: GitLab | Add new instance to host group
   add_host:
     hostname: "gitlab"
@@ -293,15 +275,6 @@
     ansible_password: "{{ root_password }}"
     groups: gitlab
   with_items: "{{ gitlab_instances.results | map(attribute='instance') | list }}"
-
-- name: Docs | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ docs_instances.results | map(attribute='instance') | list }}"
 
 - name: Docs | Add new instance to host group
   add_host:
@@ -315,15 +288,6 @@
     groups: docs
   with_items: "{{ docs_instances.results | map(attribute='instance') | list }}"
 
-- name: Tower | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
-
 - name: Tower | Add new instance to host group
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
@@ -336,15 +300,6 @@
     student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
     groups: tower
   with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
-
-- name: Windows | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 5986
-    delay: 1
-    timeout: 600
-    state: started
-  with_items: "{{ windows_instances.results | map(attribute='instance') | list }}"
 
 - name: Windows | Add new instance to host group
   add_host:
@@ -361,15 +316,6 @@
     groups: windows
   with_items: "{{ windows_instances.results | map(attribute='instance') | list }}"
 
-- name: Workstation | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 5986
-    delay: 1
-    timeout: 600
-    state: started
-  with_items: "{{ workstation_instances.results | map(attribute='instance') | list }}"
-
 - name: Workstation | Add new instance to host group
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
@@ -385,6 +331,38 @@
     ansible_winrm_server_cert_validation: "ignore"
     groups: windows_workstations
   with_items: "{{ workstation_instances.results | map(attribute='instance') | list }}"
+
+################### Wait for Instances ###################
+
+- name: Tower | Wait for SSH to come up  
+  wait_for_connection:  
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['tower'] }}"  
+
+- name: GitLab | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['gitlab'] }}"  
+
+- name: Docs | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['docs'] }}"  
+
+- name: DomainController | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_domain_controllers'] }}"  
+
+- name: Windows | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows'] }}" 
+
+- name: Workstation | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_workstations'] }}" 
 
 ################### Inventory ###################
 
