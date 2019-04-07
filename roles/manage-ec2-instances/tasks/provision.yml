@@ -2,6 +2,8 @@
 
 - include_tasks: aws_check_setup.yml
 
+- include_tasks: find_ami_ids.yml
+
 ################### Create Resources ###################
 - name: Create AWS VPC {{ name_prefix }}-vpc
   ec2_vpc_net:
@@ -236,7 +238,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'windc'
-    image: "{{ ec2_windows_ami }}"
+    image: "{{ ec2_ami_ids[ec2_windc_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
@@ -267,7 +269,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-win1' }}"
-    image: "{{ ec2_windows_ami }}"
+    image: "{{ ec2_ami_ids[ec2_windows_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
@@ -298,7 +300,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-work' }}"
-    image: "{{ ec2_windows_ami }}"
+    image: "{{ ec2_ami_ids[ec2_windows_workstation_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
@@ -328,7 +330,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-tower' }}"
-    image: "{{ ec2_rhel_ami }}"
+    image: "{{ ec2_ami_ids[ec2_tower_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
@@ -357,7 +359,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'gitlab'
-    image: "{{ ec2_rhel_ami }}"
+    image: "{{ ec2_ami_ids[ec2_gitlab_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
@@ -386,7 +388,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'docs'
-    image: "{{ ec2_rhel_ami }}"
+    image: "{{ ec2_ami_ids[ec2_docs_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
     vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
