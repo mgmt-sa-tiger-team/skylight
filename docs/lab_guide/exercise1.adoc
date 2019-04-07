@@ -100,7 +100,7 @@ Click on the image:images/add.png[Add,35,25] icon and add new project
 
 === Step 3:
 
-Complete the form using the following entries (using your student number)
+Complete the form using the following entries (*using your student number in SCM URL*)
 
 |===
 |NAME |Ansible Workshop Project

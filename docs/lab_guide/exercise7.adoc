@@ -44,18 +44,12 @@ Typically you would have even more tasks to accomplish the entire update process
 ----
 ---
 - hosts: Windows
-  name: This is a play within a playbook
+  name: This is my Windows patching playbook
   tasks:
     - name: Install Windows Updates
       win_updates:
         category_names: "{{ categories }}"
-      register: update_result
-
-    - name: Reboot if any installed Updates require it
-      win_reboot:
-        shutdown_timeout_sec: 3600
-        reboot_timeout_sec: 3600
-      when: update_result.reboot_required and reboot_server
+        reboot: '{{ reboot_server | default(yes) }}'
 ----
 
 [NOTE]
@@ -63,8 +57,7 @@ Typically you would have even more tasks to accomplish the entire update process
 *What are we doing?*
 
 
-- `win_updates:` This module is used for checking or installing updates.  We tell it to only install updates from specific categories using a variable.
-- `win_reboot:` The `win_updates` module will return a flag telling us if any update needed us to reboot.  We will also use a survey variable to stop us from rebooting even if needed.
+- `win_updates:` This module is used for checking or installing updates.  We tell it to only install updates from specific categories using a variable. `reboot` attribute will automatically reboot the remote host if it is required and continue to install updates after the reboot.  We will also use a survey variable to stop us from rebooting even if needed. If the reboot_server value is not specified we will set the reboot attribute to yes.
 ====
 
 
