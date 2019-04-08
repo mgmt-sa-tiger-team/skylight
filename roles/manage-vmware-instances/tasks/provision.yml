@@ -297,7 +297,7 @@
     ansible_user: "{{ root_user }}"
     ansible_password: "{{ root_password }}"
     tower_license: "{{ tower_license }}"
-    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | replace(name_prefix, '') | regex_replace('[^0-9]', '') }}"
     groups: tower
   with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
 
@@ -305,7 +305,7 @@
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     ansible_host: "{{ item.ipv4  }}"
-    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | replace(name_prefix, '') | regex_replace('[^0-9]', '') }}"
     private_ip: "{{ item.ipv4 }}"
     ansible_port: 5986
     ansible_user: "Administrator"
@@ -321,7 +321,7 @@
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     private_ip: "{{ item.ipv4 }}"
     ansible_host: "{{ item.ipv4 }}"
-    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | replace(name_prefix, '') | regex_replace('[^0-9]', '') }}"
     ansible_port: 5986
     ansible_user: "Administrator"
     ansible_password: "{{ domain_admin_password }}"
