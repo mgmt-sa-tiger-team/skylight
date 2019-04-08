@@ -52,7 +52,7 @@ Complete the form using the following entries:
 |DESCRIPTION|
 |ORGANIZATION|Default
 |TYPE|Machine
-|USERNAME| <your USER ID - instructor provided (ie. student1)>
+|USERNAME| <your USER ID - instructor provided (ie. domain_name\student1)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
