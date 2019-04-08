@@ -8,7 +8,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-dc"
-    template: "{{ vCenterCloneSourceWindows }}"
+    template: "{{ vmware_windc_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -49,7 +49,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-gitlab"
-    template: "{{ vCenterCloneSourceLinux }}"
+    template: "{{ vmware_gitlab_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -74,7 +74,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-docs"
-    template: "{{ vCenterCloneSourceLinux }}"
+    template: "{{ vmware_docs_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -102,7 +102,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-tower"
-    template: "{{ vCenterCloneSourceLinux }}"
+    template: "{{ vmware_tower_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -130,7 +130,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-win1"
-    template: "{{ vCenterCloneSourceWindows }}"
+    template: "{{ vmware_windows_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -170,7 +170,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-work"
-    template: "{{ vCenterCloneSourceWindows }}"
+    template: "{{ vmware_windows_workstation_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon

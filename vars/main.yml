@@ -119,6 +119,12 @@ VCenterLinkedClone: true
 vCenterPortGroup: Workshops
 vCenterPortGroupExt: External
 
+vmware_tower_template: "{{ vCenterCloneSourceLinux }}"
+vmware_gitlab_template: "{{ vCenterCloneSourceLinux }}"
+vmware_docs_template: "{{ vCenterCloneSourceLinux }}"
+vmware_windc_template: "{{ vCenterCloneSourceWindows }}"
+vmware_windows_workstation_template: "{{ vCenterCloneSourceWindows }}"
+vmware_windows_template: "{{ vCenterCloneSourceWindows }}"
 
 ##########################################################
 ####################### AZURE INFO #######################
