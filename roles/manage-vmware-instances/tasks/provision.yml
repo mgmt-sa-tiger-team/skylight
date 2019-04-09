@@ -27,6 +27,7 @@
       timezone: 20
       password: "{{ domain_admin_password }}"
       runonce:
+      - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
       - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
@@ -149,6 +150,7 @@
       timezone: 20
       password: "{{ domain_admin_password }}"
       runonce:
+      - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
       - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
@@ -191,6 +193,7 @@
       timezone: 20
       password: "{{ domain_admin_password }}"
       runonce:
+      - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
       - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
