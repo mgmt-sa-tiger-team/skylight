@@ -1,0 +1,25 @@
+- name: Create git directory on server
+  file:
+    path: /usr/share/nginx/html/git/
+    state: directory
+
+- name: Copy lab guides to server
+  copy:
+    src: docs/git_guide/
+    dest: /usr/share/nginx/html/git/
+  register: copycontent
+
+- name: Build HTML Docs
+  command: asciidoc -d book -v -o {{ item }}.html {{ item }}.adoc
+  args:
+    chdir: /usr/share/nginx/html/git/
+  with_items:
+    - index
+#    - prerequisites
+#    - environment-setup
+    - repositories
+    - committing
+    - branching-merging
+#    - remotes
+#    - workflows
+  when: copycontent.changed

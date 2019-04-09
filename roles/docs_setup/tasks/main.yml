@@ -97,18 +97,6 @@
     src: docs/decks/
     dest: /usr/share/nginx/html/decks/
 
-#- name: Install asciidoctor-pdf Gem
-#  gem:
-#    name: asciidoctor-pdf
-#    version: 1.5.0.alpha.6
-#    state: present
-#
-#- name: Build PDF Docs
-#  command: asciidoctor -b pdf -d book -r asciidoctor-pdf -o aww.pdf index.adoc
-#  args:
-#    chdir: /usr/share/nginx/html
-#  when: copycontent.changed
-
 - name: Install PyMySQL
   pip:
     name: PyMySQL
@@ -130,3 +118,6 @@
     name: workshop
     target: /tmp/workshop.sql
   when: workshopsql.changed
+
+- include_tasks: git_lab.yml
+- include_tasks: adv_lab.yml

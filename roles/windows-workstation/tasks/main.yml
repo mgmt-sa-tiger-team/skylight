@@ -165,3 +165,4 @@
   become_method: runas
 
 - include_tasks: myrtille.yml
+- include_tasks: git_lab.yml

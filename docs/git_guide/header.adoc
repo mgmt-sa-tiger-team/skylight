@@ -1,0 +1,17 @@
+
+:icons: font
+:iconsdir: icons/
+:badges:
+:source-highlighter: highlight.js
+:source-language: yaml
+
+== Table of Contents
+
+* link:index.html[Agenda]
+//* link:prerequisites.html[Prerequisites]
+//* link:environment-setup.html[Setting up your environment]
+* link:repositories.html[Exercise 1 - Repositories]
+* link:committing.html[Exercise 2 - Committing]
+* link:branching-merging.html[Exercise 3 - Branching and Merging]
+//* link:remotes.html[Exercise 4 - Remotes]
+//* link:workflows.html[Exercise 5 - Git Workflows]

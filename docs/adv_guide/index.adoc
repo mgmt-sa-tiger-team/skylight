@@ -1,0 +1,13 @@
+:scrollbar:
+:data-uri:
+:linkattrs:
+:labname: Advanced Ansible Workshop
+:show_solution: false
+
+
+== {labname}
+.Overview
+Welcome to the {labname}.  This workshop is designed for users who have experience with Ansible and now want to dive deeper.  The goal of this workshop is to take you into topics that will help you build more efficient playbooks and ultimately become more fluent with Ansible.
+
+
+include::header.adoc[]

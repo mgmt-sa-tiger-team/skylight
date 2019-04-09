@@ -1,0 +1,350 @@
+:scrollbar:
+:data-uri:
+:linkattrs:
+:labname: Ansible Filtering
+:show_solution: false
+:source-highlighter: highlight.js
+:source-language: yaml
+
+include::header.adoc[]
+
+
+== {labname} Lab
+
+As emphasized by the prior lab, the Jinja2 templating engine is utilized throughout the Ansible ecosystem. One of the features provided by Jinja is filtering. Filtering can be accomplished within `{{ braces }}` in both playbooks and template files and resemble Unix pipes. Jinja itself provides a set of built in filters which are then augmented by those provided by Ansible.  
+
+.Goals
+* Understand how to utilize Ansible filters
+* Utilize common Ansible filters
+* Create A Custom Filter
+
+:numbered:
+== Lab Setup
+. Create a folder for this lab called it lab03
++
+[source,sh]
+----
+mkdir lab03
+
+or use Visual Code Studio to create it
+
+----
+
+:numbered:
+== Understanding Ansible Filters
+
+. Before we walk through some of the common filters found in Ansible, we should review how a filter is constructed as well as utilized. As mentioned previously, filters resemble unix pipes to signify their action. 
++
+Here is a simple playbook that prints out an "Invalid Variable" if a variable has yet to be defined
++
+. Lets create a new file named `filters.yml`.  For the rest of this exercise, we will just modify the same file over and over instead of creating new files for each task.
++
+[source,ruby]
+----
+- name: Print variable if it exists, print default message if not
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ does_not_exist_variable | default('Invalid Variable') }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost| SUCCESS => {
+    "msg": "Invalid Variable"
+}
+----
+
+:numbered:
+== Utilizing Common Filters
+
+In this section, we will create a series of playbooks that demonstrate how to utilize Ansible filters.  Playbooks, when utilized, will have a common structure. Either a custom fact will be created using the `set_fact` module, or a variable provided by Ansible's fact gathering module will be utilized.
+
+:numbered:
+=== Calculating Checksums
+
+. A checksum can be calculated against a string using the `checksum` filter:
++
+[source,bash]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ 'text I want to obtain a checksum' | checksum }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "394f552ed03a06108ca7233b0235eba100270820"
+}
+----
+
+:numbered:
+=== List Operations
+
+. Lists can be manipulated using Ansible filters. 
++
+First, display the maximum value from a list containing -2, 5 and 10
++
+[source,bash]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ [-2, 5, 10] | max }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "10"
+}
+----
++
+. The inverse can be seen using the _min_ filter
++
+[source,bash]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ [-2, 5, 10] | min }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "-2"
+}
+----
+
+:numbered:
+=== Random Numbers
+
+. Random numbers can be generated in a variety of ways.
++
+First, print out a random number between 0 and 100
++
+[source,bash]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ 100 | random }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "31"
+}
+----
++
+. Or, an even number between 0 and 100 that utilizes the step feature
++
+[source,sh]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ 100 | random(step=2) }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "48"
+}
+----
+
+:numbered:
+=== Mathematical Operations
+
+. Various mathematical can be performed using Ansible filters.
++
+First, find the square root of 144
++
+[source,sh]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ 144 | root | int }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "12"
+}
+----
++
+. In the previous example, we demonstrated how filters can be chained together. The result of the _root_ filter is a decimal value (12.0). Much like piping in Linux, Ansible filters can be combined to take the value of the prior result as their input. The _int_ filter converts a number into an Integer. 
++
+. Now, lets find the absolute value of -169
++
+[source,sh]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ -169 | abs }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "169"
+}
+----
++
+. Finally, lets round 13.6
++
+[source,sh]
+----
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+      - debug:
+          msg: "{{ 13.6 | round | int }}"
+----
++
+.Sample Output
+[source,sh]
+----
+localhost | SUCCESS => {
+    "msg": "14"
+}
+----
+
+:numbered:
+=== Ternary
+
+. A common programming construct is a Ternary Operator. This conditional operation allows for an if statement to be shortcut. The operator provides a value if a condition is true or false.
++
+. Create a playbook called `ternary_filter.yml` with the following content:
++
+[source,bash]
+----
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Ternary Example
+      debug:
+        msg: "{{ (ansible_os_family == 'Windows') | ternary('Windows','Not Windows') }}"
+----
++
+The result of the playbook will display "Windows" if the machine is Windows based. Otherwise it will display "Not Windows".
++
+. Execute the playbook
++
+[source,sh]
+----
+ok: [node-1] => {
+    "msg": "Windows"
+}
+----
+
+:numbered:
+== Creating a Custom Filter
+
+. While Jinja and Ansible provide a wide range of filters, there may be a desire to extend the based set of features. Fortunately, Ansible provides the mechanism for users to create their own filters. In this section, we will create a custom filter that appends the trademark symbol (™) at the end of the string.
++
+Custom filters are python scripts that contain the logic to format text appropriately. Ansible will look for custom filters in a `filter_plugins` directory relative to the executing playbook.
++
+. First, lets create the `filter_plugins` directory within the `filter-lab` folder we are already in
++
+[source,sh]
+----
+mkdir filter_plugins
+----
++
+Change into the `filter_plugins` directory:
++
+[source,sh]
+----
+cd filter_plugins
+----
++
+. Create a new file called `trademark.py` with the following content:
++
+[source,python]
+----
+class FilterModule(object):
+    def filters(self):
+        return {
+            'trademark': self.format_trademark
+        }
+ 
+    def format_trademark(self, input_text):
+        return input_text + u"\u2122"
+----
++
+The actual formatting logic occurs in the `format_trademark` method. The unicode value for the trademark symbol (™) is utilized, otherwise an error would occur. Within the return statement in the `filters` method, the dictionary key `trademark` represents the name of the filter that end users can ultimately use. The dictionary value signifies the method to invoke.
++
+. With the filter plugin now created, change back into the `filter-lab` folder.
++
+. Now, create a playbook called `custom-filter.yml` in the `lab03` directory that makes use of this new filter. We will set a custom fact containing _Ansible_ as the value of the variable `trademark_string`. Within the debug module, we will make use of the newly created filter plugin to format the variable with the trademark symbol.
++
+[source,bash]
+----
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Custom Fact
+      set_fact:
+        trademark_string: "Ansible"
+    - name: Print Trademark
+      debug:
+        msg: "{{ trademark_string | trademark }}"
+----
++
+. Execute the playbook
++
+.Sample Output
+[source,sh]
+----
+PLAY [localhost] ***************************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Custom Fact] *************************************************************************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [Print Trademark] *********************************************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ansible"
+}
+
+PLAY RECAP *********************************************************************************************************************************************************************************************************************************
+localhost                  : ok=3    changed=0    unreachable=0    failed=0
+----
+
+Notice how the trademark symbol appears appended to the Ansible text. This validates that the custom filter plugin is being executed successfully.
