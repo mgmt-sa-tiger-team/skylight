@@ -166,3 +166,6 @@
 
 - include_tasks: myrtille.yml
 - include_tasks: git_lab.yml
+  when: git_lab
+- include_tasks: adv_lab.yml
+  when: advanced_lab
