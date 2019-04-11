@@ -68,10 +68,11 @@ print "  <div data-role='main' class='ui-content'>
 Username=ansibleworkshop\\" . $student['username'] . "<br />
 Password=" . $student['password'] . "<br />
 <br />
-Workstation:<br />
+<b>Workstation</b>:<br />
 " . $student['ip'] . "<br />
-<br />
-Webconnect:<br />
+<br /><br />
+Please use your laptop's Remote Desktop Client to connect to the above IP.  If that fails, then use the link below for a HTML5 RDP client.  It is slower and may provide a subpar experience.<br /><br />
+<b>Webconnect</b>:<br />
  <a href='https://" . $student['ip'] . "/rdp' target=rdp>https://" . $student['ip'] . "/rdp</a>
 </p>";
 
