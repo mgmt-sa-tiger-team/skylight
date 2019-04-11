@@ -49,7 +49,7 @@ In the Explorer accordion you should have a 'student#' section where you previou
 
 image::images/3-vscode-create-folders.png[title="Student Playbooks",width=1000]
 
-Create a folder called *iis_advanced* and a file called `site.yml`
+=== Step 2: Create a folder called *iis_advanced* and a file called `site.yml`
 
 Hover over the 'student#' section and click on the 'New Folder' button
 
@@ -61,10 +61,10 @@ Type site.yml and hit enter.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::images/3-vscode-create-folders.png[title="Empty site.yml",width=1000]
+image::images/5-vscode-create-folders.png[title="Empty site.yml",width=400]
 
 
-=== Step 2:
+=== Step 3:
 
 Add a play definition and some variables to your playbook.  These include addtional packages your playbook will install on your web servers, plus some web server specific configurations.
 
@@ -85,7 +85,7 @@ Add a play definition and some variables to your playbook.  These include addtio
 ----
 
 
-=== Step 3:
+=== Step 4:
 
 Add a new task called *install IIS*.
 
