@@ -148,7 +148,7 @@ Click on INVENTORIES from the left hand panel.  You will see the preconfigured I
 
 You will now be viewing the Inventory.  From here you can add Hosts, Groups, or even add Variables specific to this Inventory.
 
-image::images/inventory="Edit Inventory",width=1000]
+image::images/inventory_host_edit.png[title="Edit Inventory",width=1000]
 
 We will be viewing the hosts, so click on the *HOSTS* button.
 
