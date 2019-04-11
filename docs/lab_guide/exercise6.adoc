@@ -230,21 +230,38 @@ will automatically refresh from git and launch our new role.
 
 === Step 1:
 
+Before we can modify our Job Template, you must first go resync your Project again.  So do that now.  
+
+=== Step 2:
+
 Select TEMPLATES
 [NOTE]
 Alternatively, if you haven't navigated away from the job templates creation page, you can scroll down to see all existing job templates
 
-=== Step 2:
+=== Step 3:
 
 Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
 
-=== Step 3:
+=== Step 4:
 
 When prompted, enter your desired test message
 
 If successful, your standard output should look similar to the figure below.  Note that most of the tasks return OK because we've previously configured the servers and services are already running.
 
 image::images/6-results.png[title="Role site.yml stdout",width=1000]
+
+Once your job is sucessful, navigate again to your websites to verify they are still working (replace # with your student number)
+
+[source,bash]
+----
+http://s#-win1.ansibleworkshop.com:8080
+----
+and
+[source,bash]
+----
+http://s#-win1.ansibleworkshop.com:8081
+----
+
 
 
 == Section 5: Review
