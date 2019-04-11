@@ -68,7 +68,7 @@ Your playbook is done! But remember we still need to commit the changes to sourc
 
 Click `File` -> `Save All` to save the files you've written
 
-image::images/7-win_update-playbook.png[title="site.yml part 2"]
+image::images/7-win_update-playbook.png[title="site.yml", width=900]
 
 Click on the Source Code icon, type in a commit message such as 'Adding windows update playbook', and click the check box above.
 
