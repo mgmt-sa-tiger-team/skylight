@@ -402,3 +402,15 @@ Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the 
 When prompted, enter your desired test message
 
 After it launches, you should be redirected and can watch the output of the job in realtime. 
+
+Once your job is sucessful, navigate to your new websites (replace # with your student number)
+
+[source,bash]
+----
+http://s#-win1.ansibleworkshop.com:8080
+----
+and
+[source,bash]
+----
+http://s#-win1.ansibleworkshop.com:8081
+----
