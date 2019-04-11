@@ -15,7 +15,7 @@ simply need to do one or two things quickly and often, to many remote nodes.
 
 === Step 1:
 
-To start, we will need to goto our Inventory.  So click *INVENTORY* on the left panel, and then click on the name of our Inventory *Ansible Workshop Inventory*.
+To start, we will need to goto our Inventory.  So click *INVENTORIES* on the left panel, and then click on the name of our Inventory *Ansible Workshop Inventory*.
 Now that you are on the Inventory Details page, we will need to go select our Host.  So click *HOSTS*.
 
 Next to each host is a checkbox.  Check the box next to each host you want to run an Ad-Hoc Command on.  You will then see the Run Commands button become enabled.  Click it now.
