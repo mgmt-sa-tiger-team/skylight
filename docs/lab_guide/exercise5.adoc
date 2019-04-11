@@ -314,13 +314,18 @@ Now let's take a second look to make sure everything looks the way you intended.
 
 
 
-
-
 == Section 5: Create your Job Template
 
+=== Step 1:
+
+Before we can create our Job Template, you must first go resync your Project again.  So do that now.  
+____
+``*NOTE*: You must do this anytime you create a new 'base' playbook file that you will be selecting via a Job Template.  The new file must be synced to Tower before it will become available in the Job Template playbook dropdown.``
+____
+
+=== Step 2:
 To test this playbook, we need to create a new Job Template to run this playbook.  So goto 'Template' and click 'Add' again.
 
-=== Step 1:
 Complete the form using the following values
 
 |===
@@ -342,11 +347,11 @@ image::images/5-create-template.png[title="Create Job Template",width=1000]
 
 
 
-=== Step 2:
+=== Step 3:
 
 Click SAVE image:images/at_save.png[Save] and then select ADD SURVEY image:images/at_add_survey.png[Add]
 
-=== Step 3:
+=== Step 4:
 
 Complete the survey form with following values
 
@@ -364,15 +369,15 @@ image::images/6-survey.png[title="Survey Form",width=1000]
 
 
 
-=== Step 4:
+=== Step 5:
 
 Select ADD image:images/at_add.png[Add,35,25]
 
-=== Step 5:
+=== Step 6:
 
 Select SAVE image:images/at_save.png[Add,35,25]
 
-=== Step 6:
+=== Step 7:
 
 Back on the main Job Template page, select SAVE image:images/at_save.png[Add,35,25] again.
 
