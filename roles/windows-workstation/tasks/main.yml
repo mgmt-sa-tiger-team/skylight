@@ -38,6 +38,14 @@
       directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
       icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
 
+  - name: Create an shortcut to Gitlab site
+    win_shortcut:
+      src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
+      dest: '%UserProfile%\Desktop\GitLab.lnk'
+      args: --new-window https://gitlab.{{ dns_domain_name }}/
+      directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
+      icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
+
   - name: Create an shortcut to Ansible Docs site
     win_shortcut:
       src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
