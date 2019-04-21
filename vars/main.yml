@@ -59,7 +59,7 @@ gitlab_ssl_certificate: "/etc/gitlab/ssl/gitlab.crt"
 gitlab_ssl_certificate_key: "/etc/gitlab/ssl/gitlab.key"
 # SSL Self-signed Certificate Configuration
 gitlab_create_self_signed_cert: "true"
-gitlab_self_signed_cert_subj: "/C=US/ST=North Carolina/L=Raleigh/O=Ansible/CN=gitlab"
+gitlab_self_signed_cert_subj: "/C=US/ST=North Carolina/L=Raleigh/O=Ansible/CN=gitlab.{{ dns_domain_name }}"
 # LDAP Configuration
 gitlab_ldap_enabled: "true"
 gitlab_ldap_host: "windc.{{ dns_domain_name }}"
