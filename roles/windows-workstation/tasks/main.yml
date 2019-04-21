@@ -52,7 +52,7 @@
   - name: Allow insecure git repos for self signed certificates
     win_command: git config --global http.sslVerify "false"
 
-  - name: Set git user 
+  - name: Set git user
     win_command: git config --global user.name "{{ user }}"
 
   - name: Set git user email
