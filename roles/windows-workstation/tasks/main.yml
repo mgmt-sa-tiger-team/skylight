@@ -38,7 +38,7 @@
       directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
       icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
 
-  - name: Create an shortcut to the user's Gitlab site repository
+  - name: Create an shortcut to the user's Gitlab ansible-playbooks repository
     win_shortcut:
       src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
       dest: '%UserProfile%\Desktop\GitLab.lnk'
