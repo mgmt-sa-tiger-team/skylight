@@ -628,11 +628,11 @@
 
 # Add new dns entries to make the url pretty
 - block:
-  - name: "Docs | Create DNS entry for {{ site_prefix }}.{{ ec2_route53_zone }}"
+  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ ec2_route53_zone }}"
     route53:
       state: present
       zone: "{{ ec2_route53_zone }}"
-      record: "{{ site_prefix }}.{{ ec2_route53_zone }}"
+      record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
       type: A
       ttl: 7200
       value: "{{ item.public_ip }}"

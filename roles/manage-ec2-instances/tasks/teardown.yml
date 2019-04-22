@@ -83,11 +83,11 @@
     - "{{ ec2_docs_instances }}"
   when: item.instances.0 is defined
 
-- name: "Delete DNS entry for {{ site_prefix }}.{{ ec2_route53_zone }}"
+- name: "Delete DNS entry for {{ name_prefix }}.{{ ec2_route53_zone }}"
   route53:
     state: absent
     zone: "{{ ec2_route53_zone }}"
-    record: "{{ site_prefix }}.{{ ec2_route53_zone }}"
+    record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
     type: A
     value: "{{ item.public_ip }}"
     wait: yes
