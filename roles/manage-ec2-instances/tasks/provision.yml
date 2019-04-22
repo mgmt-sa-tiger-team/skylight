@@ -626,6 +626,20 @@
   with_items: "{{ ec2workstation_password.results }}"
   when: ec2workstation_password is defined
 
+# Add new dns entries to make the url pretty
+- block:
+  - name: "Docs | Create DNS entry for {{ site_prefix }}.{{ ec2_route53_zone }}"
+    route53:
+      state: present
+      zone: "{{ ec2_route53_zone }}"
+      record: "{{ site_prefix }}.{{ ec2_route53_zone }}"
+      type: A
+      ttl: 7200
+      value: "{{ item.public_ip }}"
+      wait: yes
+    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+  when: ec2_route53_zone is defined
+
 ################### Create Inventories ###################
 
 - name: Generate instructor inventory
