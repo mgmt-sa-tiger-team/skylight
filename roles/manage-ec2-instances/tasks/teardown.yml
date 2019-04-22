@@ -83,6 +83,17 @@
     - "{{ ec2_docs_instances }}"
   when: item.instances.0 is defined
 
+- name: "Delete DNS entry for {{ site_prefix }}.{{ ec2_route53_zone }}"
+  route53:
+    state: absent
+    zone: "{{ ec2_route53_zone }}"
+    record: "{{ site_prefix }}.{{ ec2_route53_zone }}"
+    type: A
+    value: "{{ item.public_ip }}"
+    wait: yes
+  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+  when: ec2_route53_zone is defined
+
 # ----------------------- Destroy DC Instances -----------------------
 - name: Get ec2 DC instance information
   ec2_instance_facts:
