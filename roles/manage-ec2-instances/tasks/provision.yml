@@ -634,7 +634,7 @@
       zone: "{{ ec2_route53_zone }}"
       record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
       type: A
-      ttl: 7200
+      ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
     with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
