@@ -2,20 +2,16 @@ Welcome to the Skylight Workshop!
 
 Here are the PUBLIC FACING links to important sites:
 
-{% if ec2_route53_zone is defined %}
 Student Login
-
-  {% if ec2_route53_zone is defined %}http://{{ name_prefix }}.{{ ec2_route53_zone }}/users/
-  http://{{ hostvars['docs'].ansible_host }}/users/
+  {% if ec2_route53_zone is defined %}http://{{ name_prefix }}.{{ ec2_route53_zone }}/users/{% else %}http://{{ hostvars['docs'].ansible_host }}/users/{% endif %}
+  
 
 Lab Slide Deck
+  {% if ec2_route53_zone is defined %}http://{{ name_prefix }}.{{ ec2_route53_zone }}/decks/{% else %}http://{{ hostvars['docs'].ansible_host }}/decks/{% endif %}
 
-  {% if ec2_route53_zone is defined %}http://{{ name_prefix }}.{{ ec2_route53_zone }}/decks/{% endif %}
-  http://{{ hostvars['docs'].ansible_host }}/decks/
 
 Administration
+  {% if ec2_route53_zone is defined %}http://{{ name_prefix }}.{{ ec2_route53_zone }}/users/list.php{% else %}http://{{ hostvars['docs'].ansible_host }}/users/list.php{% endif %}
 
-  {% if ec2_route53_zone is defined %}http://{{ name_prefix }}.{{ ec2_route53_zone }}/users/list.php{% endif %}
-  http://{{ hostvars['docs'].ansible_host }}/users/list.php
 
 Additionally, you can view the inventories which were generated on the fly.
