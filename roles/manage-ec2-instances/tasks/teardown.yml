@@ -82,7 +82,7 @@
     type: A
     value: "{{ item.public_ip }}"
     wait: yes
-  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+  with_items: "{{ ec2_docs_instances.results | map(attribute='tagged_instances') | list }}"
   when: ec2_route53_zone is defined and item.instances.0 is defined
 
 - name: Terminate Docs Instances
