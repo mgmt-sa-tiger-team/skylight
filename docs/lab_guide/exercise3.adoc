@@ -37,13 +37,9 @@ you develop your Ansible skills.  That said, our playbook today is very basic an
 Instead, we are going to create a very simple directory structure for our playbook, and add just a couple of files.
 
 
-*Step 1:* Open Visual Studio Code and Clone an empty git repository
+*Step 1:*
 
-When you open Visual Studio Code, a 'Welcome' screen will load.  Choose `Chrome` when prompted for a default browser (and don't import anything).  You can close the browser for now.
-
-[NOTE]
-Internet Explorer has some issues with Ansible Tower and is unsupported.  Due to this we will use Chrome in these examples.
-
+Open Visual Studio Code
 
 For this lab, we have already created a clone of your Git repo for you.  It is located in your Documents folder, the full path will look like this (with the # replaced with your student number)
 'C:\Users\student#\Documents\student#'
