@@ -192,4 +192,4 @@ The authentication settings are particularly important and you will need to revi
 
 === End Result
 
-At this point, we are doing with our basic configuration of Ansible Tower.  In exercise 2, we will now run a few Ad-Hoc commands against these hosts.
+At this point, we are done with our basic configuration of Ansible Tower.  In exercise 2, we will now run a few Ad-Hoc commands against these hosts.
