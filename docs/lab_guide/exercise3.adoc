@@ -14,7 +14,7 @@ include::header.adoc[]
 
 Let's begin by writing our first
 ansible *playbook*.  The playbook is where you list the steps you would like to automate into a repeatable set of *plays* and *tasks*.
-To begin we will setup our directory structure for storing our playbooks. This directory structure with sync with a
+To begin we will setup our directory structure for storing our playbooks. This directory structure will sync with a
 *source control management* (SCM) system to version our playbooks. We will be using *git* as out SCM.
 
 A playbook can have multiple plays and a play
