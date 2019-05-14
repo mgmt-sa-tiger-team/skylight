@@ -1,0 +1,7 @@
+.Labs
+* link:01_conditionals_lab.html[Lab 01 - Controlling your Playbooks with Conditionals]
+* link:02_jinja_lab.html[Lab 02 - Understand templating with Jinja]
+* link:03_filtering_lab.html[Lab 03 - Add advanced capabilities to your playbooks with Filtering]
+//* link:04_vault_lab.html[Lab 04 - Secure sensitive data with Ansible Vault]
+//* link:05_containers_lab.html[Lab 05 - Managing Containers With Ansible]
+//* link:06_api_lab.html[Lab 04 - Connect your automation with API endpoints]

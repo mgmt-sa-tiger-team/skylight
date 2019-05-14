@@ -38,6 +38,14 @@
       directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
       icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
 
+  - name: Create an shortcut to the user's Gitlab ansible-playbooks repository
+    win_shortcut:
+      src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
+      dest: '%UserProfile%\Desktop\GitLab.lnk'
+      args: --new-window https://gitlab.{{ dns_domain_name }}/{{ user_prefix }}{{ user | regex_replace('[^0-9]', '') }}/{{ user_prefix }}{{ user | regex_replace('[^0-9]', '') }}
+      directory: '%ProgramFiles(x86)%\Google\Chrome\Application'
+      icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
+
   - name: Create an shortcut to Ansible Docs site
     win_shortcut:
       src: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe'
@@ -52,7 +60,7 @@
   - name: Allow insecure git repos for self signed certificates
     win_command: git config --global http.sslVerify "false"
 
-  - name: Set git user 
+  - name: Set git user
     win_command: git config --global user.name "{{ user }}"
 
   - name: Set git user email
@@ -165,3 +173,7 @@
   become_method: runas
 
 - include_tasks: myrtille.yml
+- include_tasks: git_lab.yml
+  when: git_lab
+- include_tasks: adv_lab.yml
+  when: advanced_lab

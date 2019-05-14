@@ -1,15 +1,6 @@
 include::header.adoc[]
 
 
-== Today's Agenda
-
-* Arrivals, Introductions
-* Workshop Setup
-* Ansible Labs
-* Ansible Tower Labs
-* Use Cases
-
-
 === Before We Get Started
 
 You will need a system which has an RDP client in order to interact with the lab.

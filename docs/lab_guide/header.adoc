@@ -17,5 +17,5 @@
 * link:exercise4.html[Exercise 4 - Creating and Running a Job Template]
 * link:exercise5.html[Exercise 5 - Using Variables, Loops, and Handlers]
 * link:exercise6.html[Exercise 6 - Roles: Making your playbooks reusable]
-
+* link:exercise7.html[Exercise 7 - Using Ansible for Windows Patching]
 * link:wrapup.html[Wrap UP]

@@ -1,5 +1,5 @@
 ---
-- name: Disable firewall for Domain, Public and Private profiles
+- name: Disable firewall for Domain, Public, and Private profiles
   win_firewall:
     state: disabled
     profiles:
@@ -33,48 +33,15 @@
 #  win_reboot:
 #  when: wincertfeature.reboot_required
 
-- name: Install DNS
-  win_feature:
-    name: DNS
-    state: present
-    include_management_tools: True
-  register: windnsfeature
-
-- name: Reboot if needed
-  win_reboot:
-  when: windnsfeature.reboot_required
-
 - name: Create DNS Domain
   win_domain:
     dns_domain_name: "{{ dns_domain_name }}"
     safe_mode_password: "{{ ansible_password }}"
   register: windomain
 
-# Every AMI I have tested has an issue, once you create the DNS Domain, all auth services stop.
-# You can RDP in, but you can't WinRM.  So we just restart it through AWS itself
-- name: If EC2, reboot the VM manually (ya it sucks)
-  ec2:
-    instance_tags:
-        Name: "{{ name_prefix }}-windc"
-    region: "{{ ec2_region }}"
-    state: restarted
-  when:
-    - instance_loc == 'ec2'
-    - windomain.reboot_required
-  delegate_to: localhost
-
-- name: If EC2, wait for it to come back up
-  wait_for_connection:
-    delay: 20
-    timeout: 300
-  when:
-    - instance_loc == 'ec2'
-    - windomain.reboot_required
-
 - name: Reboot if needed
   win_reboot:
   when:
-    - instance_loc != 'ec2'
     - windomain.reboot_required
 
 - name: Wait for Active Directory Web Services port
@@ -175,4 +142,3 @@
   win_dns_searchsuffix:
     suffixes:
       - "{{ dns_domain_name }}"
-

@@ -8,7 +8,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-dc"
-    template: "{{ vCenterCloneSourceWindows }}"
+    template: "{{ vmware_windc_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -27,6 +27,7 @@
       timezone: 20
       password: "{{ domain_admin_password }}"
       runonce:
+      - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
       - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
@@ -49,12 +50,15 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-gitlab"
-    template: "{{ vCenterCloneSourceLinux }}"
+    template: "{{ vmware_gitlab_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
     wait_for_ip_address: true
     validate_certs: false
+    hardware:
+      memory_mb: 4096
+      num_cpus: 2
     networks:
     - name: "{{ vCenterPortGroup }}"
       type: dhcp
@@ -74,7 +78,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-docs"
-    template: "{{ vCenterCloneSourceLinux }}"
+    template: "{{ vmware_docs_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -102,7 +106,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-tower"
-    template: "{{ vCenterCloneSourceLinux }}"
+    template: "{{ vmware_tower_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotLinux | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -130,7 +134,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-win1"
-    template: "{{ vCenterCloneSourceWindows }}"
+    template: "{{ vmware_windows_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -149,6 +153,7 @@
       timezone: 20
       password: "{{ domain_admin_password }}"
       runonce:
+      - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
       - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
@@ -170,7 +175,7 @@
     cluster: "{{ vCenterCluster }}"
     folder: "{{ vCenterFolder }}"
     name: "{{ name_prefix }}-s{{ item }}-work"
-    template: "{{ vCenterCloneSourceWindows }}"
+    template: "{{ vmware_windows_workstation_template }}"
     snapshot_src: "{{ VCenterCloneSnapshotWindows | default(omit, True) }}"
     linked_clone: "{{ VCenterLinkedClone | default(omit, True) }}"
     state: poweredon
@@ -191,6 +196,7 @@
       timezone: 20
       password: "{{ domain_admin_password }}"
       runonce:
+      - powershell.exe -command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"
       - powershell.exe -command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile C:\ConfigureRemotingForAnsible.ps1"
       - powershell.exe -ExecutionPolicy Unrestricted -File C:\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
       - powershell.exe -command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
@@ -249,16 +255,7 @@
   with_items:
     - "{{ workstation_jobs.results }}"
 
-################### Wait for Instances to completely come up ###################
-
-- name: DomainController | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 5986
-    delay: 1
-    timeout: 600
-    state: started
-  with_items: "{{ dc_instances.results | map(attribute='instance') | list }}"
+################### Add hosts ######################
 
 - name: DomainController | Add new instance to host group
   add_host:
@@ -274,15 +271,6 @@
     groups: windows_domain_controllers
   with_items: "{{ dc_instances.results | map(attribute='instance') | list }}"
 
-- name: GitLab | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ gitlab_instances.results | map(attribute='instance') | list }}"
-
 - name: GitLab | Add new instance to host group
   add_host:
     hostname: "gitlab"
@@ -293,15 +281,6 @@
     ansible_password: "{{ root_password }}"
     groups: gitlab
   with_items: "{{ gitlab_instances.results | map(attribute='instance') | list }}"
-
-- name: Docs | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ docs_instances.results | map(attribute='instance') | list }}"
 
 - name: Docs | Add new instance to host group
   add_host:
@@ -315,15 +294,6 @@
     groups: docs
   with_items: "{{ docs_instances.results | map(attribute='instance') | list }}"
 
-- name: Tower | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
-
 - name: Tower | Add new instance to host group
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
@@ -333,24 +303,15 @@
     ansible_user: "{{ root_user }}"
     ansible_password: "{{ root_password }}"
     tower_license: "{{ tower_license }}"
-    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
     groups: tower
   with_items: "{{ tower_instances.results | map(attribute='instance') | list }}"
-
-- name: Windows | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 5986
-    delay: 1
-    timeout: 600
-    state: started
-  with_items: "{{ windows_instances.results | map(attribute='instance') | list }}"
 
 - name: Windows | Add new instance to host group
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     ansible_host: "{{ item.ipv4  }}"
-    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
     private_ip: "{{ item.ipv4 }}"
     ansible_port: 5986
     ansible_user: "Administrator"
@@ -361,21 +322,12 @@
     groups: windows
   with_items: "{{ windows_instances.results | map(attribute='instance') | list }}"
 
-- name: Workstation | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ipv4 }}"
-    port: 5986
-    delay: 1
-    timeout: 600
-    state: started
-  with_items: "{{ workstation_instances.results | map(attribute='instance') | list }}"
-
 - name: Workstation | Add new instance to host group
   add_host:
     hostname: "{{ item.hw_name | replace(name_prefix + '-', '') }}"
     private_ip: "{{ item.ipv4 }}"
     ansible_host: "{{ item.ipv4 }}"
-    student: "{{ item.hw_name | regex_replace('[^0-9]', '') }}"
+    student: "{{ item.hw_name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
     ansible_port: 5986
     ansible_user: "Administrator"
     ansible_password: "{{ domain_admin_password }}"
@@ -385,6 +337,38 @@
     ansible_winrm_server_cert_validation: "ignore"
     groups: windows_workstations
   with_items: "{{ workstation_instances.results | map(attribute='instance') | list }}"
+
+################### Wait for Instances ###################
+
+- name: Tower | Wait for SSH to come up  
+  wait_for_connection:  
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['tower'] }}"  
+
+- name: GitLab | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['gitlab'] }}"  
+
+- name: Docs | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['docs'] }}"  
+
+- name: DomainController | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_domain_controllers'] }}"  
+
+- name: Windows | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows'] }}" 
+
+- name: Workstation | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_workstations'] }}" 
 
 ################### Inventory ###################
 

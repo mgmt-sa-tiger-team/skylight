@@ -31,13 +31,12 @@ Each student's personal lab is equipped with the following:
 * (1) Windows Endpoint nodes (to execute ansible playbooks upon).
 ** Windows 2012/2016
 * Ansible Engine 2.7
-* Ansible Tower 3.2
+* Ansible Tower 3.4
 
 == Testing your environment
 
 Log into your workstation instance with an RDP client using the details provided by your instructor.  You will see a few things pre-installed for use today:
 
-* Firefox
 * Chrome
 * Visual Studio Code (Editor for creating playbooks)
 * Git (Source Code Control)

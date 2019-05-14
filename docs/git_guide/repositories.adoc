@@ -1,0 +1,79 @@
+include::header.adoc[]
+
+= Repositories
+
+
+The contents of a project in Git are stored in a repository. A repository is the virtual storage of a typical directory on a file system that contains versioned artifacts.
+
+# Create a new repository
+
+The `git init` command is used to create a Git repository from an existing directory. Several repositories will be utilized throughout this workshop. 
+
+Create a new directory called `repos` in your home directory that will contain all of the repositories. 
+
+----
+mkdir repos
+----
+
+The first repository will provide an overview of the most common commands that are used to manage git repositories and will be called `hellogit`. Create the new folder underneath the newly created _repos_ directory created previously and then navigate to this directory:
+
+----
+mkdir repos\hellogit
+cd repos\hellogit
+----
+
+Create a new repository using the `git init` command:
+
+----
+git init
+Initialized empty Git repository in repos\hellogit\.git\
+----
+
+When a new repository is created, Git creates a directory called `.git`. You can verify this by listing all files and folders (including hidden) in the directory.  To do this type `tree .git /F` as seen in the example below.
+
+----
+tree .git /F
+.
+`-- .git
+    |-- HEAD
+    |-- branches
+    |-- config
+    |-- description
+    |-- hooks
+    |   |-- applypatch-msg.sample
+    |   |-- commit-msg.sample
+    |   |-- post-update.sample
+    |   |-- pre-applypatch.sample
+    |   |-- pre-commit.sample
+    |   |-- pre-push.sample
+    |   |-- pre-rebase.sample
+    |   |-- prepare-commit-msg.sample
+    |   `-- update.sample
+    |-- info
+    |   `-- exclude
+    |-- objects
+    |   |-- info
+    |   `-- pack
+    `-- refs
+        |-- heads
+        `-- tags
+
+10 directories, 13 files
+----
+
+More information on the `.git` directory layout can be found link:https://git-scm.com/docs/gitrepository-layout[here]
+
+== Git Status
+
+With an understanding of the basic structure of a git repository, you can view the status at any time using the `git status` command:
+
+----
+git status
+# On branch master
+#
+# Initial commit
+#
+nothing to commit (create/copy files and use "git add" to track)
+---- 
+
+To learn about making changes to the repository and versioning artifacts, proceed to the next exercise, link:committing.html[Committing Code].

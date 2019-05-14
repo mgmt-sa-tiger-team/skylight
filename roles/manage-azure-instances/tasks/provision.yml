@@ -377,62 +377,6 @@
     auto_upgrade_minor_version: true
   with_items: "{{ windows_instances.results }}"
 
-################### Wait for Instances ###################
-
-- name: Tower | Wait for SSH to come up  
-  wait_for:  
-    host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    port: 22  
-    delay: 1  
-    timeout: 320  
-    state: started  
-  with_items: "{{ tower_instances.results }}"  
-
-- name: GitLab | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ gitlab_instances.results }}"  
-
-- name: Docs | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ docs_instances.results }}"  
-
-- name: DomainController | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    port: 5985
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ dc_instances.results }}"  
-
-- name: Windows | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    port: 5985
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ windows_instances.results }}"
-
-- name: Workstation | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    port: 5985
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ workstation_instances.results }}"
-
 ################### Add Hosts ###################
 
 - name: Tower | Add new instance to host group  
@@ -514,6 +458,38 @@
     student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
     groups: windows_workstations
   with_items: "{{ workstation_instances.results }}"  
+
+################### Wait for Instances ###################
+
+- name: Tower | Wait for SSH to come up  
+  wait_for_connection:  
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['tower'] }}"  
+
+- name: GitLab | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['gitlab'] }}"  
+
+- name: Docs | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['docs'] }}"  
+
+- name: DomainController | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_domain_controllers'] }}"  
+
+- name: Windows | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows'] }}" 
+
+- name: Workstation | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_workstations'] }}" 
 
 ################### Create Inventories ###################
 

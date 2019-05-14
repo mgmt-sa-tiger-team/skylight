@@ -15,23 +15,23 @@ To begin, we are going to create a new playbook. We will be repeating the steps 
 
 
 === Step 1:
-Within Visual Studio Code, create a new directory in your git repo and create a site.yml file.
+Within Visual Studio Code, we will now create a new directory in your git repo and create a new playbook file.
 
 In the Explorer accordion you should have a 'student#' section where you previously made iis_basic.
 
-image::images/3-vscode-create-folders.png[title="Student Playbooks",width=1000]
+image::images/7-current-folders.png[title="Student Playbooks",width=400]
 
 Hover over the 'student#' section and click on the 'New Folder' button
 
 Type `win_updates` and hit enter.  Then click on that folder so it is selected.
 
-Hover over the 'student#' section again and click on the 'New File' button.
+Now click on the `win_updates` folder and click on the 'New File' button.
 
 Type `site.yml` and hit enter.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::images/3-vscode-create-folders.png[title="Empty site.yml",width=1000]
+image::images/7-create-win_updates.png[title="Empty site.yml",width=600]
 
 
 == Section 2: Write your Playbook
@@ -44,18 +44,12 @@ Typically you would have even more tasks to accomplish the entire update process
 ----
 ---
 - hosts: Windows
-  name: This is a play within a playbook
+  name: This is my Windows patching playbook
   tasks:
     - name: Install Windows Updates
       win_updates:
         category_names: "{{ categories }}"
-      register: update_result
-
-    - name: Reboot if any installed Updates require it
-      win_reboot:
-        shutdown_timeout_sec: 3600
-        reboot_timeout_sec: 3600
-      when: update_result.reboot_required and reboot_server
+        reboot: '{{ reboot_server | default(yes) }}'
 ----
 
 [NOTE]
@@ -63,8 +57,7 @@ Typically you would have even more tasks to accomplish the entire update process
 *What are we doing?*
 
 
-- `win_updates:` This module is used for checking or installing updates.  We tell it to only install updates from specific categories using a variable.
-- `win_reboot:` The `win_updates` module will return a flag telling us if any update needed us to reboot.  We will also use a survey variable to stop us from rebooting even if needed.
+- `win_updates:` This module is used for checking or installing updates.  We tell it to only install updates from specific categories using a variable. `reboot` attribute will automatically reboot the remote host if it is required and continue to install updates after the reboot.  We will also use a survey variable to stop us from rebooting even if needed. If the reboot_server value is not specified we will set the reboot attribute to yes.
 ====
 
 
@@ -75,15 +68,15 @@ Your playbook is done! But remember we still need to commit the changes to sourc
 
 Click `File` -> `Save All` to save the files you've written
 
-image::images/5-vscode-iis-yaml-2.png[title="site.yml part 2"]
+image::images/7-win_update-playbook.png[title="site.yml", width=900]
 
 Click on the Source Code icon, type in a commit message such as 'Adding windows update playbook', and click the check box above.
 
-image::images/5-commit.png[title="Commit site.yml"]
+image::images/7-win_update-commit.png[title="Commit site.yml",width=400]
 
 Sync to gitlab by clicking the arrows on the lower left blue bar.  When prompted, click `OK` to push and pull commits.
 
-image::images/5-push.png[title="Push to Gitlab.yml"]
+image::images/7-push.png[title="Push to Gitlab.yml"]
 
 It should take 5-30 seconds to finish the commit.  The blue bar should stop rotating and indicate 0 problems...
 
@@ -112,7 +105,7 @@ a|
 |===
 
 
-image::images/5-create-template.png[title="Create Job Template",width=1000]
+image::images/7-win_update-template.png[title="Create Job Template",width=1000]
 
 
 
@@ -132,25 +125,28 @@ Complete the survey form with following values
 |ANSWER TYPE|Multi Choice (Multi Select)
 |MULTIPLE CHOICE OPTIONS
 a|
-- Application
-- Connectors
-- CriticalUpdates
-- DefinitionUpdates
-- DeveloperKits
-- FeaturePacks
-- Guidance
-- SecurityUpdates
-- ServicePacks
-- Tools
-- UpdateRollups
-- Updates
+Application +
+Connectors +
+CriticalUpdates +
+DefinitionUpdates +
+DeveloperKits +
+FeaturePacks +
+Guidance +
+SecurityUpdates +
+ServicePacks +
+Tools +
+UpdateRollups +
+Updates
 |DEFAULT ANSWER
 a|
-- CriticalUpdates
-- SecurityUpdates
+CriticalUpdates +
+SecurityUpdates
 |===
+image::images/7-category-survey.png[title="Category Survey Form",width=500]
 
-Now add another field.
+
+Once complete, click the ADD image:images/at_add.png[Add,35,25] button.  You will see your new field off to the right.
+Now add another field by filling out the form on the left again.
 
 |===
 |PROMPT|Reboot after install?
@@ -159,13 +155,12 @@ Now add another field.
 |ANSWER TYPE|Multi Choice (Single Select)
 |MULTIPLE CHOICE OPTIONS
 a|
-- Yes
-- No
+Yes +
+No
 |DEFAULT ANSWER|Yes
 |===
 
-image::images/6-survey.png[title="Survey Form",width=1000]
-
+image::images/7-reboot-survey.png[title="Reboot Survey Form",width=500]
 
 
 === Step 4:

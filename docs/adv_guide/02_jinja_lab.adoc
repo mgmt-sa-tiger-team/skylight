@@ -1,0 +1,265 @@
+:scrollbar:
+:data-uri:
+:linkattrs:
+:labname: Ansible Templating
+:show_solution: false
+:source-highlighter: highlight.js
+:source-language: yaml
+
+include::header.adoc[]
+
+== {labname} Lab
+
+Managing configurations of multiple servers and environments are one of the significant uses of Ansible. But these configuration files may vary for each remote servers or each cluster. But apart from some few parameters, all other settings will be same.
+
+Creating static files for each of these configurations is not an efficient solution. And It will take a lot more time and every time a new cluster is added you will have to add more files. So if there is an efficient way to manage these dynamic values it would be beneficial. This is where Ansible template modules come into play.
+
+A template in Ansible is a file which contains all your configuration parameters, but the dynamic values are given as variables. During the playbook execution, depending on the conditions like which cluster you are using, the variables will be replaced with the relevant values.
+
+You can do much more than replacing the variables though, with the help of Jinj2 templating engine. You can have conditional statements, loops, write macros, filters for transforming the data, do arithmetic calculations, etc.
+
+The template files will usually have the .j2 extension, which denotes the Jinja2 templating engine used.
+
+The variables in a template file will be denoted by the double curly braces, `‘{{ variables }}’`.
+
+.Goals
+* How to use the `template` module
+* How to build more complex templates using loops
+* How to ensure unwanted comments aren't rendered
+
+:numbered:
+
+== Lab Setup
+. Create a folder for this lab, let's call it lab02
++
+[source,sh]
+----
+mkdir lab02
+
+or use Visual Code Studio to create it
+----
+you should see something similar to the example above, if you do you are now ready to start the lab.
+
+== Basic Templating with Ansible
+At the bare minimum, you need to have two parameters when using the Ansible `template` module.
+
+`src`: the source of the template file. This can be relative or absolute path.
+
+`dest`: the destination path on the remote server
+
+In this first exercise, we will be using the template module to add values to a Jinja2 template. The template module will replace and defined variables with the appropriate values.  Let's see this in action.
+
+=== Creating our Jinja2 template and playbook
+
+. Create a new file called `my_template.j2`:
++
+. Enter the following lines into your editor:
++
+[source,bash]
+----
+{{ variable_to_be_replaced }}
+This line won't be changed
+Variable given as inline - {{ inline_variable }} - :)
+----
++
+. Save the template and create a playbook called `01_basic_template.yml`:
++
+. Enter the following lines into your editor:
++
+[source,bash]
+----
+- name: This playbook creates a file from a template
+  hosts: all
+  gather_facts: false
+  vars:
+    variable_to_be_replaced: 'Hello world'
+    inline_variable: 'hello again'
+  tasks:
+    - name: Ansible Template Example
+      win_template:
+        src: ./my_template.j2
+        dest: C:\my_file.txt
+----
++
+. Save the playbook and run it:
++
+.Sample Output
+[source,sh]
+----
+PLAY [This playbook creates a file from a template] ****************************************
+
+TASK [Ansible Template Example] ************************************************
+changed: [node-1]
+
+PLAY RECAP *********************************************************************
+node-1                  : ok=1    changed=1    unreachable=0    failed=0
+----
++
+The playbook ran, but to validate the results, let's take a look at the generated file that the template module created.
+. Run an adhoc command to check the contents of your new file.  Use the win_shell module to execute this command
++
+[source,sh]
+----
+type C:\my_file.txt
+----
++
+.Contents of my_file.txt
+[source,sh]
+----
+Hello world
+This line won\'t be changed
+Variable given as inline - hello again - :)
+----
+Observe that the template module has replace the variables with the values we set in our playbook.
+
+=== Things to try
+* Experiment with changing the values and re-running the playbooks to see what happens
+* Change up the template to add more variables and make it more useful
+** Remember to add the variables to your playbook too so that there are values.
+
+== Using a loop structure inside Ansible template
+One of the main program expression we usually use is the ‘for’ loop. It can be used to iteratively go through the values of a list, dictionary etc.
+
+It is possible to use this in ansible templates also using the Jinja2 format.
+
+In the next exercise, we will build a template that will loop through the value 0 to 2 using the python range function. On each iteration, a line with the variable is printed.
+
+=== Creating our Jinja2 template and playbook
+
+. Create a new file called `my_template02.j2`:
++
+. Enter the following lines into your editor:
++
+[source,bash]
+----
+Ansible template for loop example
+{% for i in range(3)%}
+  This is the {{ i }}th variable
+{% endfor %}
+----
++
+. Save the template and create a playbook called `02_template_loop.yml`:
++
+. Enter the following lines into your editor:
++
+[source,bash]
+----
+- name: this playbook creates a file from a template
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Ansible Template Example
+      win_template:
+        src: ./my_template02.j2
+        dest: C:\my_file02.txt
+----
++
+. Save the playbook and run it:
++
+.Sample Output
+[source,sh]
+----
+PLAY [this playbook creates a template] ****************************************
+
+TASK [Ansible Template Example] ************************************************
+changed: [node-1]
+
+PLAY RECAP *********************************************************************
+node-1                  : ok=1    changed=1    unreachable=0    failed=0
+----
+The playbook ran, but to validate the results, let's take a look at the generated file that the template module created.
+. Check the contents of your new file using an adhoc command like before.
++
+[source,sh]
+----
+type C:\my_file02.txt
+----
++
+.Contents of my_file02.txt
+[source,sh]
+----
+Ansible template for loop example
+  This is the 0th variable
+  This is the 1th variable
+  This is the 2th variable
+----
+By tinkering around with the filters and features that are provided by Jinja2 we can begin to see that our templates can be much more than static documents that simply replace variables.
+
+=== Things to try
+* How would you get it to increase or shrink the number of variables displayed?
+* The variables currently print one on each line, see if you can figure out how to get it to display them all on one line.
+** http://jinja.pocoo.org/docs/2.9/templates/#whitespace-control[Jinja2 Documentation]
+
+== Using list variables in Ansible templates
+There are sometimes situations where you need to parse a list of information and do something with it in a template. In the exercise below we will build a playbook that looping through a variable that contains a list of data. We will provide that list in our playbook and then create a for loop structure. Note that, after each iteration, a new line is also added. So the three list items will be in three lines.
+
+=== Creating our Jinja2 template and playbook
+
+. Create a new file called `my_template03.j2`:
++
+. Enter the following lines into your editor:
++
+[source,bash]
+----
+This is an example of template module loop with a list.
+{% for item in list1 %}
+  {{ item }}
+{% endfor %}
+----
++
+. Save the template and create a playbook called `03_loop_variable.yml`:
++
+. Enter the following lines into your editor:
++
+[source,bash]
+----
+- name: This playbook creates a file from a template
+  hosts: all
+  gather_facts: false
+
+  vars:
+    list1: ['pen','pineapple','apple','pen']
+
+  tasks:
+    - name: Ansible Template Loop Example
+      win_template:
+        src: ./my_template03.j2
+        dest: C:\my_file03.txt
+
+----
++
+. Save the playbook and run it:
++
+The playbook ran, but to validate the results, let's take a look at the generated file that the template module created.
+. Check the contents of your new file using an adhoc command again.
++
+.Contents of my_file03.txt
+[source,sh]
+----
+This is an example of template module loop with a list.
+ pen
+ pineapple
+ apple
+ pen
+----
+
+=== Things to try
+* Change the content of the list variable
+* Change list1 variable to a different name
+
+== Ansible template comment example
+It's always good practice to use comments when building your playbooks, this comes in the form of the `name` parameter.  Comments are good, and you should be as verbose as you can so that others understand the intent of the playbook. It's worht noting that you can also add comments in your template file. However, sometimes you don’t want your comments to appear in the rendered file. You can prevent your comments from being included in the rendered file by wrapping your comments in Jinja2 style comments.  To do this simply enclose the comments within {# … #}.
+
+.Example
+[source,bash]
+----
+{# this is a comment that will not get rendered #}
+This is an example of template module loop with a list.
+{% for item in list1 %}
+  {{ item }}
+{% endfor %}
+----
+
+=== Things to try
+* Try adding a comment to one of the previous exercises and observe the results

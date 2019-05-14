@@ -1,0 +1,27 @@
+= Git Workshop
+
+Hands on exercise on [Git](https://git-scm.com) fundamentals.
+
+== Exercises
+
+The following exercises are part of this module
+
+include::header.adoc[]
+
+
+== Glossary of Terms
+
+*Push* - To send code to the git code Repository
+
+*Commit* - Saves code locally in preparation for push (commit does not save to the repository server)
+
+*Repository/Repo* - Server or servers that the code is saved on for multiple users to use.
+
+*Branch* - A way to separate out new features from the master codebase so you can test without effecting production. Many developers have 2-3 branches Dev, Staging, Production
+
+*Master Branch* - This is generally the stable or production branch that people will pull from. Some people change this to be named production
+
+*Merging* - Merging in git is a process where changes to the current branch are integrated from another branch. For example if code in Staging has been tested and is ready to go into production you would use merge to do this.
+
+*Init* - Initializes new repos
+

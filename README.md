@@ -16,9 +16,20 @@ The client pre-requisite to use this workshop is simply to have an RDP client wh
 
 ## Usage
 
-This workshop requires Ansible 2.6 and pywinrm.
+### Basic Requirements
+Requirements for running the provisioner will vary based upon your environment and where you are provisioning to.  The basic requirements are the following
 
-In addition to this, for AWS you will need Boto 1.7 for communicating.  
+* Ansible >= 2.6
+* Various Python Modules
+  * pywinrm
+  * boto >= 1.7 and boto3 (for AWS Provisioning)
+  * ansible[azure] (for Azure Provisioning)
+  * requests
+  * requests-credssp
+  * sshpass (use brew to install if OSX)
+* Ansible Tower License
+
+### AWS
 
 You will need to setup your AWS configuration and Credentials.  Note that a standard AWS account is limited to 20 ec2 instances, so update your quota in advance.  Also note that each student gets 3 machines.  Make certain your VPC is large enough.  
 
@@ -37,6 +48,8 @@ output = table
 aws_access_key_id = <your ec2 access key>
 aws_secret_access_key = <your ec2 secret key>
 ```
+
+### General Config
 
 Beyond that, the main thing that needs to be edited is the *vars/main.yml* file which contains the configuration details specific to your environment.  You should instead copy this file to *vars/custom.yml* and it will use that in place of the main.yml file.  It will check for the custom.yml file first, and use main.yml if its not found.  This ensure your settings are not overridden if you update git, and are not committed to git (this file is ignored).
 

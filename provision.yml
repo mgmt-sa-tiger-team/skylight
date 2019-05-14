@@ -107,3 +107,7 @@
         msg:
           - Student Login  - http://{{ hostvars['docs'].ansible_host }}/users/
           - Lab Slide Deck - http://{{ hostvars['docs'].ansible_host }}/decks/
+    - name: Build workshop information
+      template:
+        src: "{{ playbook_dir }}/roles/docs_setup/templates/workshop.txt.j2"
+        dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/workshop.txt"

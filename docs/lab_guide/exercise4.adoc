@@ -90,7 +90,7 @@ Back on the main Job Template page, select SAVE image:images/at_save.png[Add,35,
 
 == Running a Job Template
 
-Now that you've sucessfully creating your Job Template, you are ready to launch it.
+Now that you've sucessfully created your Job Template, you are ready to launch it.
 Once you do, you will be redirected to a job screen which is refreshing in realtime
 showing you the status of the job.
 
