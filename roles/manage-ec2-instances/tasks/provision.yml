@@ -632,6 +632,7 @@
 
 # Add new dns entries to make the url pretty
 - block:
+
   - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
     route53:
       state: present
@@ -641,7 +642,8 @@
       ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
-    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+    with_items: "{{ docs_instances.results }}"
+
   - name: "Workstation | Create DNS entries for student workstations"
     route53:
       state: present
@@ -651,7 +653,8 @@
       ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
-    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
+    with_items: "{{ workstation_instances.results }}"
+
   when: public_dns_zone is defined
 
 ################### Create Inventories ###################
@@ -666,3 +669,8 @@
     src: instances.txt.j2
     dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
   with_sequence: count="{{ user_count }}"
+
+- name: Configure external tower if needed
+  include: external_tower.yml
+  when: skylight_external_tower
+
