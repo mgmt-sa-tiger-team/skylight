@@ -628,17 +628,17 @@
 
 # Add new dns entries to make the url pretty
 - block:
-  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ ec2_route53_zone }}"
+  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
     route53:
       state: present
-      zone: "{{ ec2_route53_zone }}"
-      record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
+      zone: "{{ public_dns_zone }}"
+      record: "{{ name_prefix }}.{{ public_dns_zone }}"
       type: A
       ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
     with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-  when: ec2_route53_zone is defined
+  when: public_dns_zone is defined
 
 ################### Create Inventories ###################
 

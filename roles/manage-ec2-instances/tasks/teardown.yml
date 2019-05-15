@@ -74,16 +74,16 @@
       "tag:Name": "{{ name_prefix }}-docs"
   register: ec2_docs_instances
 
-- name: "Delete DNS entry for {{ name_prefix }}.{{ ec2_route53_zone }}"
+- name: "Delete DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
   route53:
     state: absent
-    zone: "{{ ec2_route53_zone }}"
-    record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
+    zone: "{{ public_dns_zone }}"
+    record: "{{ name_prefix }}.{{ public_dns_zone }}"
     type: A
     value: "{{ item.public_ip }}"
     wait: yes
   with_items: "{{ ec2_docs_instances.instances | map(attribute='instance_id') | list }}"
-  when: ec2_route53_zone is defined and item.instances.0 is defined
+  when: public_dns_zone is defined and item.instances.0 is defined
 
 - name: Terminate Docs Instances
   ec2:
