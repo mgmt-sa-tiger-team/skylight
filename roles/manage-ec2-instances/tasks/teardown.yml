@@ -150,7 +150,7 @@
     - "{{ ec2_workstation_instances.results }}"
   when: item.instances.0 is defined and item.instances.0.instance_id is defined
 
-- name: "Workstation | Create DNS entries for student workstations"
+- name: "Workstation | Delete DNS entries for student workstations"
   route53:
     state: absent
     zone: "{{ public_dns_zone }}"
@@ -159,7 +159,8 @@
     ttl: 600
     value: "{{ item.public_ip }}"
     wait: yes
-  with_items: "{{ ec2_workstation_instances.results | map(attribute='tagged_instances') | list }}"
+  with_items: "{{ ec2_workstation_instances.results }}"
+  ignore_errors: yes
 
 ################### Remove Security Groups ###################
 
