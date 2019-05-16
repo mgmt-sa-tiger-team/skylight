@@ -12,8 +12,8 @@
   debug: msg="https://gitlab.{{ dns_domain_name }}/{{user_prefix}}{{item}}/ansible-playbooks"
   with_sequence: count="{{ user_count }}"
 
-#- name: GitLab Post | Set root user password 
-#  shell: > 
+#- name: GitLab Post | Set root user password
+#  shell: >
 #    echo "user = User.where(id: 1).first
 #    user.password = '{{ domain_admin_password }}'
 #    user.password_confirmation = '{{ domain_admin_password }}'
@@ -48,8 +48,8 @@
     minutes: 2
 
 ### Gitlab workaround
-### Users are not populated from AD until login from Web UI 
-### I haven't found an automated workaround... 
+### Users are not populated from AD until login from Web UI
+### I haven't found an automated workaround...
 
 - block:
 
