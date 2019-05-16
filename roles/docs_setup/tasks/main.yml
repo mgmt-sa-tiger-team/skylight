@@ -78,7 +78,7 @@
     state: directory
 
 - name: Copy users file to server
-  copy:
+  template:
     src: templates/index.php.j2
     dest: /usr/share/nginx/html/users/index.php
 
