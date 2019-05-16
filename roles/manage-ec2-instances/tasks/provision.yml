@@ -637,23 +637,23 @@
     route53:
       state: present
       zone: "{{ public_dns_zone }}"
-      record: "{{ item.tags.full_name }}"
+      record: "{{ item.tags.long_name }}"
       type: A
       ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
-    with_items: "{{ docs_instances.results }}"
+    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
 
   - name: "Workstation | Create DNS entries for student workstations"
     route53:
       state: present
       zone: "{{ public_dns_zone }}"
-      record: "{{ item.tags.full_name }}"
+      record: "{{ item.tags.long_name }}"
       type: A
       ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
-    with_items: "{{ workstation_instances.results }}"
+    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
 
   when: public_dns_zone is defined
 
