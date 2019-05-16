@@ -363,6 +363,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'gitlab'
+      long_name: "gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_gitlab_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -392,6 +393,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'docs'
+      long_name: "docs.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_docs_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -670,7 +672,7 @@
     dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
   with_sequence: count="{{ user_count }}"
 
-- name: Configure external tower if needed
-  include: external_tower.yml
-  when: skylight_external_tower
+# - name: Configure external tower if needed
+#   include: external_tower.yml
+#   when: skylight_external_tower
 
