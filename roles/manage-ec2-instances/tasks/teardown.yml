@@ -151,7 +151,7 @@
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
       "tag:Name": "{{ name_prefix + '-s' + item + '-work'}}"
-  with_sequence: count={{user_count}}
+  with_sequence: count="{{ user_count }}"
   register: ec2_workstation_instances
 
 - name: Terminate Workstation Instances
