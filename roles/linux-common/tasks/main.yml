@@ -21,7 +21,7 @@
     dest: "{{ item }}"
     block: |
       DNS1={{ dns_server }}
-      DOMAIN="{{dns_domain_name}} ec2.internal"
+      DOMAIN="{{ dns_domain_name }} ec2.internal"
       PEERDNS=no
   register: dnschange
   with_items: "{{ eths.stdout_lines }}"
