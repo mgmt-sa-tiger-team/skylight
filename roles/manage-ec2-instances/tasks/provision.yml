@@ -639,6 +639,17 @@
     route53:
       state: present
       zone: "{{ public_dns_zone }}"
+      record: "{{ name_prefix }}.{{ public_dns_zone }}"
+      type: A
+      ttl: 600
+      value: "{{ item.public_ip }}"
+      wait: yes
+    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+
+  - name: "Docs | Create DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
+    route53:
+      state: present
+      zone: "{{ public_dns_zone }}"
       record: "{{ item.tags.long_name }}"
       type: A
       ttl: 600
