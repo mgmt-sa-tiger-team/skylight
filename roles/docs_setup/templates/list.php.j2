@@ -57,7 +57,7 @@ display_footer ();
 
 function check_progress($user) {
         exec('rm -fr /tmp/student' . $user);
-        $c = "cd /tmp; git -c http.sslVerify=false clone 'https://student" . $user . ":{{ users_password }}@gitlab.ansibleworkshop.com/student" . $user . "/student" . $user . ".git' 2>&1";
+        $c = "cd /tmp; git -c http.sslVerify=false clone 'https://student" . $user . ":{{ users_password }}@gitlab.{{ dns_domain_name }}/student" . $user . "/student" . $user . ".git' 2>&1";
         exec($c, $out, $ret);
         $p = 0;
         if (file_exists('/tmp/student' .$user . '/iis_basic/remove_iis.yml')) {
