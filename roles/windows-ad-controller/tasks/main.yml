@@ -123,7 +123,7 @@
 - name: Add windows AD users
   win_domain_user:
     name: "{{ user_prefix }}{{ item }}"
-    upn: "{{ user_prefix}}{{ item }}@{{ dns_domain_name }}"
+    upn: "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}"
     state: present
     enabled: yes
     account_locked: no
@@ -135,7 +135,7 @@
     firstname: "{{ user_prefix }}"
     surname: "{{ item }}"
     company: AnsibleByRedHat
-    email: "{{user_prefix}}{{ item }}@{{ dns_domain_name }}"
+    email: "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}"
   with_sequence: count="{{ user_count }}"
 
 - name: Set DNS search string to {{ dns_domain_name }}

@@ -9,7 +9,7 @@
     name: pyapi-gitlab
 
 - name: GitLab Post | Repos to create
-  debug: msg="https://gitlab.{{ dns_domain_name }}/{{user_prefix}}{{item}}/ansible-playbooks"
+  debug: msg="https://gitlab.{{ dns_domain_name }}/{{ user_prefix }}{{ item }}/ansible-playbooks"
   with_sequence: count="{{ user_count }}"
 
 #- name: GitLab Post | Set root user password
