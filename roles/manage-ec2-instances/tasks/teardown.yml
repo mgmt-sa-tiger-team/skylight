@@ -110,6 +110,18 @@
   when: public_dns_zone is defined and item.instances.0 is defined
   ignore_errors: yes
 
+- name: "Delete Docs DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
+  route53:
+    state: absent
+    zone: "{{ public_dns_zone }}"
+    record: "{{ item.tags.long_name }}"
+    type: A
+    value: "{{ item.public_ip }}"
+    wait: yes
+  with_items: "{{ ec2_docs_instances }}"
+  when: public_dns_zone is defined and item.instances.0 is defined
+  ignore_errors: yes
+
 - name: Terminate Docs Instances
   ec2:
     region: "{{ ec2_region }}"
