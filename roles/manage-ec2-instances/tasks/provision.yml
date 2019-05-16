@@ -646,6 +646,17 @@
       wait: yes
     with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
 
+  - name: "GitLab | Create DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
+    route53:
+      state: present
+      zone: "{{ public_dns_zone }}"
+      record: "{{ item.tags.long_name }}"
+      type: A
+      ttl: 600
+      value: "{{ item.public_ip }}"
+      wait: yes
+    with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
+
   - name: "Workstation | Create DNS entries for student workstations"
     route53:
       state: present
