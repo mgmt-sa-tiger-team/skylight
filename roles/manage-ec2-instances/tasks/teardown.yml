@@ -15,7 +15,7 @@
   ec2_vpc_route_table_facts:
     region: "{{ ec2_region }}"
     filters:
-      vpc_id: "{{ec2_vpc_id}}"
+      vpc_id: "{{ ec2_vpc_id }}"
   register: route_table_facts
   when: vpc_net_facts.vpcs|length > 0
 
