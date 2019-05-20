@@ -1,6 +1,7 @@
 ---
 - name: find ami id for rhel 7
   ec2_ami_facts:
+    owners: 309956199498
     filters:
       name: "{{ ec2_image_names['rhel7'] }}"
     region: "{{ ec2_region }}"
