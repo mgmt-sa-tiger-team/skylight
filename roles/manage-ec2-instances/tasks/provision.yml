@@ -647,7 +647,7 @@
     src: instructor_inventory.j2
     dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/instructor_inventory.txt"
 
-- name: Generate student inventories
+- name: Generate student inventories 2
   template:
     src: instances.txt.j2
     dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
