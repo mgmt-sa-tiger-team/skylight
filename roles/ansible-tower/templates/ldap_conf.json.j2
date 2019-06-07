@@ -30,7 +30,7 @@
     },
     "AUTH_LDAP_ORGANIZATION_MAP": {
         "Default": {
-            "admins": "CN=Ansible Users,CN=Users,DC=ansibleworkshop,DC=com",
+            "admins": "CN=Ansible Users,CN=Users,{{ ldap_basedn }}",
             "remove_admins": true
         }
     },
