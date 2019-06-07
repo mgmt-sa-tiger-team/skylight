@@ -15,7 +15,7 @@
   ec2_vpc_route_table_facts:
     region: "{{ ec2_region }}"
     filters:
-      vpc_id: "{{ec2_vpc_id}}"
+      vpc_id: "{{ ec2_vpc_id }}"
   register: route_table_facts
   when: vpc_net_facts.vpcs|length > 0
 
@@ -56,6 +56,18 @@
       "tag:Name": "{{ name_prefix }}-gitlab"
   register: ec2_gitlab_instances
 
+- name: "Delete GitLab DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
+  route53:
+    state: absent
+    zone: "{{ public_dns_zone }}"
+    record: "{{ item.tags.long_name }}"
+    type: A
+    value: "{{ item.public_ip }}"
+    wait: yes
+  with_items: "{{ ec2_gitlab_instances }}"
+  when: public_dns_zone is defined and item.instances.0 is defined
+  ignore_errors: yes
+
 - name: Terminate Gitlab Instances
   ec2:
     region: "{{ ec2_region }}"
@@ -74,6 +86,30 @@
       "tag:Name": "{{ name_prefix }}-docs"
   register: ec2_docs_instances
 
+- name: "Delete Docs DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
+  route53:
+    state: absent
+    zone: "{{ public_dns_zone }}"
+    record: "{{ item.tags.long_name }}"
+    type: A
+    value: "{{ item.public_ip }}"
+    wait: yes
+  with_items: "{{ ec2_docs_instances }}"
+  when: public_dns_zone is defined and item.instances.0 is defined
+  ignore_errors: yes
+
+- name: "Delete Docs DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
+  route53:
+    state: absent
+    zone: "{{ public_dns_zone }}"
+    record: "{{ item.tags.long_name }}"
+    type: A
+    value: "{{ item.public_ip }}"
+    wait: yes
+  with_items: "{{ ec2_docs_instances }}"
+  when: public_dns_zone is defined and item.instances.0 is defined
+  ignore_errors: yes
+
 - name: Terminate Docs Instances
   ec2:
     region: "{{ ec2_region }}"
@@ -82,17 +118,6 @@
   with_items:
     - "{{ ec2_docs_instances }}"
   when: item.instances.0 is defined
-
-- name: "Delete DNS entry for {{ name_prefix }}.{{ ec2_route53_zone }}"
-  route53:
-    state: absent
-    zone: "{{ ec2_route53_zone }}"
-    record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
-    type: A
-    value: "{{ item.public_ip }}"
-    wait: yes
-  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-  when: ec2_route53_zone is defined
 
 # ----------------------- Destroy DC Instances -----------------------
 - name: Get ec2 DC instance information
@@ -138,7 +163,7 @@
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
       "tag:Name": "{{ name_prefix + '-s' + item + '-work'}}"
-  with_sequence: count={{user_count}}
+  with_sequence: count="{{ user_count }}"
   register: ec2_workstation_instances
 
 - name: Terminate Workstation Instances
@@ -149,6 +174,19 @@
   with_items:
     - "{{ ec2_workstation_instances.results }}"
   when: item.instances.0 is defined and item.instances.0.instance_id is defined
+
+- name: "Workstation | Delete DNS entries for student workstations"
+  route53:
+    state: absent
+    zone: "{{ public_dns_zone }}"
+    record: "{{ item.tags.full_name }}"
+    type: A
+    ttl: 600
+    value: "{{ item.public_ip }}"
+    wait: yes
+  with_items: "{{ ec2_workstation_instances.results }}"
+  when: public_dns_zone is defined and item.instances.0 is defined and item.instances.0.instance_id is defined
+  ignore_errors: yes
 
 ################### Remove Security Groups ###################
 

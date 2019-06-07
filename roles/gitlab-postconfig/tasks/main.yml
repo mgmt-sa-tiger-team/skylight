@@ -4,16 +4,16 @@
     name: python-pip
     state: present
 
-- name: GitLab Post | Install pyapi-gitlab 
+- name: GitLab Post | Install pyapi-gitlab
   pip:
     name: pyapi-gitlab
 
 - name: GitLab Post | Repos to create
-  debug: msg="https://gitlab.{{ dns_domain_name }}/{{user_prefix}}{{item}}/ansible-playbooks"
+  debug: msg="https://gitlab.{{ dns_domain_name }}/{{ user_prefix }}{{ item }}/ansible-playbooks"
   with_sequence: count="{{ user_count }}"
 
-#- name: GitLab Post | Set root user password 
-#  shell: > 
+#- name: GitLab Post | Set root user password
+#  shell: >
 #    echo "user = User.where(id: 1).first
 #    user.password = '{{ domain_admin_password }}'
 #    user.password_confirmation = '{{ domain_admin_password }}'
@@ -26,30 +26,30 @@
 #    " | gitlab-rails console production
 
 - name: GitLab Post | copy root password script to host
-  template: 
+  template:
     src: set_root_pw.sh.j2
     dest: /root/set_root_pw.sh
     owner: root
     group: root
     mode: 0700
 
-- name: GitLab Post | Execute set root password 
+- name: GitLab Post | Execute set root password
   command: ./set_root_pw.sh
-  args: 
+  args:
     chdir: /root
 
-- name: GitLab Post | Remove set root password script 
+- name: GitLab Post | Remove set root password script
   file:
     path: /root/set_root_pw.sh
     state: absent
 
 - name: sleep 2 minute to allow root to initialize after password set
-  pause: 
+  pause:
     minutes: 2
 
 ### Gitlab workaround
-### Users are not populated from AD until login from Web UI 
-### I haven't found an automated workaround... 
+### Users are not populated from AD until login from Web UI
+### I haven't found an automated workaround...
 
 - name: GitLab Post | Create local users
   gitlab_user:

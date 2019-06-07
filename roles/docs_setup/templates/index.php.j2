@@ -65,15 +65,17 @@ print "  <div data-role='main' class='ui-content'>
     <div data-role='collapsible' data-collapsed='false'>
       <h1>" . $student['username'] . "</h1>
       <p>
-Username=ansibleworkshop\\" . $student['username'] . "<br />
+Username={{ dns_domain_name_short }}\\" . $student['username'] . "<br />
 Password=" . $student['password'] . "<br />
 <br />
 <b>Workstation</b>:<br />
 " . $student['ip'] . "<br />
+" . $student['fqdn'] . "<br />
 <br /><br />
 Please use your laptop's Remote Desktop Client to connect to the above IP.  If that fails, then use the link below for a HTML5 RDP client.  It is slower and may provide a subpar experience.<br /><br />
 <b>Webconnect</b>:<br />
- <a href='https://" . $student['ip'] . "/rdp' target=rdp>https://" . $student['ip'] . "/rdp</a>
+<a href='https://" . $student['ip'] . "/rdp/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['ip'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . $student['password'] . "&connect=Connect%21' target=rdp>https://" . $student['ip'] . "/rdp</a><br />
+<a href='https://" . $student['fqdn'] . "/rdp/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['fqdn'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . $student['password'] . "&connect=Connect%21' target=rdp>https://" . $student['fqdn'] . "/rdp</a><br />
 </p>";
 
 
@@ -81,7 +83,7 @@ display_footer ();
 
 
 
-function isValidEmail($email){ 
+function isValidEmail($email){
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 

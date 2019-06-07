@@ -78,7 +78,7 @@
     state: directory
 
 - name: Copy users file to server
-  copy:
+  template:
     src: templates/index.php.j2
     dest: /usr/share/nginx/html/users/index.php
 
@@ -111,7 +111,7 @@
     src: templates/workshop.sql.j2
     dest: /tmp/workshop.sql
   register: workshopsql
-  
+
 - name: Import SQL file into workshop database
   mysql_db:
     state: import

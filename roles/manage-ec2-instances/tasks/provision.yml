@@ -237,7 +237,8 @@
       Info: "Username that provisioned this-> {{ skylight_user }}"
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
-      short_name: 'windc'
+      short_name: "{{ 's' + item + '-windc' }}"
+      long_name: "{{ 's' + item + '-windc' }}.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_windc_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -269,6 +270,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-win1' }}"
+      long_name: "{{ 's' + item + '-win1' }}.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_windows_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -300,6 +302,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-work' }}"
+      long_name: "{{ 's' + item + '-work' }}.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_windows_workstation_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -330,6 +333,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-tower' }}"
+      long_name: "{{ 's' + item + '-tower' }}.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_tower_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -359,6 +363,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'gitlab'
+      long_name: "gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_gitlab_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -388,6 +393,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'docs'
+      long_name: "docs.{{ name_prefix }}.{{ public_dns_zone }}"
     image: "{{ ec2_ami_ids[ec2_docs_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -628,17 +634,52 @@
 
 # Add new dns entries to make the url pretty
 - block:
-  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ ec2_route53_zone }}"
+
+  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
     route53:
       state: present
-      zone: "{{ ec2_route53_zone }}"
-      record: "{{ name_prefix }}.{{ ec2_route53_zone }}"
+      zone: "{{ public_dns_zone }}"
+      record: "{{ name_prefix }}.{{ public_dns_zone }}"
       type: A
-      ttl: 7200
+      ttl: 600
       value: "{{ item.public_ip }}"
       wait: yes
     with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-  when: ec2_route53_zone is defined
+
+  - name: "Docs | Create DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
+    route53:
+      state: present
+      zone: "{{ public_dns_zone }}"
+      record: "{{ item.tags.long_name }}"
+      type: A
+      ttl: 600
+      value: "{{ item.public_ip }}"
+      wait: yes
+    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+
+  - name: "GitLab | Create DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
+    route53:
+      state: present
+      zone: "{{ public_dns_zone }}"
+      record: "{{ item.tags.long_name }}"
+      type: A
+      ttl: 600
+      value: "{{ item.public_ip }}"
+      wait: yes
+    with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
+
+  - name: "Workstation | Create DNS entries for student workstations"
+    route53:
+      state: present
+      zone: "{{ public_dns_zone }}"
+      record: "{{ item.tags.long_name }}"
+      type: A
+      ttl: 600
+      value: "{{ item.public_ip }}"
+      wait: yes
+    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
+
+  when: public_dns_zone is defined
 
 ################### Create Inventories ###################
 
@@ -652,3 +693,8 @@
     src: instances.txt.j2
     dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
   with_sequence: count="{{ user_count }}"
+
+# - name: Configure external tower if needed
+#   include: external_tower.yml
+#   when: skylight_external_tower
+
