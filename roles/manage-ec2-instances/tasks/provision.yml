@@ -238,7 +238,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-windc' }}"
-      long_name: "{{ 's' + item + '-windc' }}.{{ name_prefix }}.{{ public_dns_zone }}"
+      long_name: "{{ 's' + item + '-windc' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
     image: "{{ ec2_ami_ids[ec2_windc_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -270,7 +270,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-win1' }}"
-      long_name: "{{ 's' + item + '-win1' }}.{{ name_prefix }}.{{ public_dns_zone }}"
+      long_name: "{{ 's' + item + '-win1' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
     image: "{{ ec2_ami_ids[ec2_windows_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -302,7 +302,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-work' }}"
-      long_name: "{{ 's' + item + '-work' }}.{{ name_prefix }}.{{ public_dns_zone }}"
+      long_name: "{{ 's' + item + '-work' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
     image: "{{ ec2_ami_ids[ec2_windows_workstation_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -333,7 +333,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: "{{ 's' + item + '-tower' }}"
-      long_name: "{{ 's' + item + '-tower' }}.{{ name_prefix }}.{{ public_dns_zone }}"
+      long_name: "{{ 's' + item + '-tower' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
     image: "{{ ec2_ami_ids[ec2_tower_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -363,7 +363,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'gitlab'
-      long_name: "gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
+      long_name: "gitlab.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
     image: "{{ ec2_ami_ids[ec2_gitlab_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
@@ -393,7 +393,7 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
       short_name: 'docs'
-      long_name: "docs.{{ name_prefix }}.{{ public_dns_zone }}"
+      long_name: "docs.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
     image: "{{ ec2_ami_ids[ec2_docs_instance_ami_type] }}"
     wait: true
     region: "{{ ec2_region }}"
