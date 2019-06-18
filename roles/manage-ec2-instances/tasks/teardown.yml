@@ -179,7 +179,7 @@
   route53:
     state: absent
     zone: "{{ public_dns_zone }}"
-    record: "{{ item.tags.full_name }}"
+    record: "{{ item.tags.long_name }}"
     type: A
     ttl: 600
     value: "{{ item.public_ip }}"
