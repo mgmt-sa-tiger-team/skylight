@@ -4,7 +4,7 @@
     name: python-pip
     state: present
 
-- name: GitLab Post | Install pyapi-gitlab 
+- name: GitLab Post | Install pyapi-gitlab
   pip:
     name: pyapi-gitlab
 
@@ -26,56 +26,127 @@
 #    " | gitlab-rails console production
 
 - name: GitLab Post | copy root password script to host
-  template: 
+  template:
     src: set_root_pw.sh.j2
     dest: /root/set_root_pw.sh
     owner: root
     group: root
     mode: 0700
 
-- name: GitLab Post | Execute set root password 
+- name: GitLab Post | Execute set root password
   command: ./set_root_pw.sh
-  args: 
+  args:
     chdir: /root
 
-- name: GitLab Post | Remove set root password script 
+- name: GitLab Post | Remove set root password script
   file:
     path: /root/set_root_pw.sh
     state: absent
 
 - name: sleep 2 minute to allow root to initialize after password set
-  pause: 
+  pause:
     minutes: 2
 
 ### Gitlab workaround
 ### Users are not populated from AD until login from Web UI 
 ### I haven't found an automated workaround... 
 
-- name: GitLab Post | Create local users
-  gitlab_user:
-    server_url: https://gitlab.{{ dns_domain_name }}
-    validate_certs: False
-    login_user: root
-    login_password: "{{ domain_admin_password }}"
-    name: "{{ user_prefix }}{{ item }}"
-    username: "{{ user_prefix }}{{ item }}"
-    password: "{{ users_password }}"
-    email: "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}"
-    confirm: False
-    state: present
-  with_sequence: count="{{ user_count }}"
+- block:
 
-- name: GitLab Post | Create Projects in GitLab
-  gitlab_project:
-    server_url: https://gitlab.{{ dns_domain_name }}
-    validate_certs: False
-    login_user: root
-    login_password: "{{ domain_admin_password }}"
-    name: "{{ user_prefix }}{{ item }}"
-    group: "{{ user_prefix }}{{ item }}"
-    issues_enabled: False
-    wiki_enabled: False
-    snippets_enabled: False
-    state: present
-  with_sequence: count="{{ user_count }}"
-  ignore_errors: true
+    - name: GitLab Post | Create local users
+      gitlab_user:
+        server_url: https://gitlab.{{ dns_domain_name }}
+        validate_certs: False
+        login_user: root
+        login_password: "{{ domain_admin_password }}"
+        name: "{{ user_prefix }}{{ item }}"
+        username: "{{ user_prefix }}{{ item }}"
+        password: "{{ users_password }}"
+        email: "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}"
+        confirm: False
+        state: present
+      with_sequence: count="{{ user_count }}"
+
+    - name: GitLab Post | Create Projects in GitLab
+      gitlab_project:
+        server_url: https://gitlab.{{ dns_domain_name }}
+        validate_certs: False
+        login_user: root
+        login_password: "{{ domain_admin_password }}"
+        name: "{{ user_prefix }}{{ item }}"
+        group: "{{ user_prefix }}{{ item }}"
+        issues_enabled: False
+        wiki_enabled: False
+        snippets_enabled: False
+        state: present
+      with_sequence: count="{{ user_count }}"
+      ignore_errors: true
+
+  when: ansible_version.full is version_compare('2.8', '<')
+
+# There seems to be an issue with using basic auth when using ansible 2.8
+- block:
+
+    - name: GitLab Post | Obtain Access Token
+      uri:
+        url: https://gitlab.{{ dns_domain_name }}/oauth/token
+        method: POST
+        validate_certs: no
+        status_code: 200
+        body_format: json
+        headers:
+          Content-Type: application/json
+        body: >
+          {
+            "grant_type": "password",
+            "username": "root",
+            "password": "{{ domain_admin_password }}"
+          }
+      register: gitlab_access_token
+
+    - name: GitLab Post | Create local users via API
+      uri:
+        url: https://gitlab.{{ dns_domain_name }}/api/v4/users
+        method: POST
+        validate_certs: no
+        status_code:
+          - 200
+          - 201
+          - 409
+        body_format: json
+        headers:
+          Content-Type: application/json
+          Authorization: Bearer {{ gitlab_access_token.json.access_token }}
+        body: >
+          {
+            "username": "{{ user_prefix }}{{ item }}",
+            "password": "{{ users_password }}",
+            "name": "{{ user_prefix }}{{ item }}",
+            "email": "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}"
+          }
+      with_sequence: count="{{ user_count }}"
+
+    - name: GitLab Post | Create Projects via API
+      uri:
+        url: https://gitlab.{{ dns_domain_name }}/api/v4/projects
+        method: POST
+        validate_certs: no
+        status_code:
+          - 200
+          - 201
+          - 409
+        body_format: json
+        headers:
+          Content-Type: application/json
+          Authorization: Bearer {{ gitlab_access_token.json.access_token }}
+        body: >
+          {
+            "name": "{{ user_prefix }}{{ item }}",
+            "group": "{{ user_prefix }}{{ item }}",
+            "issues_enabled": false,
+            "wiki_enabled": false,
+            "snippets_enabled": false
+          }
+      with_sequence: count="{{ user_count }}"
+
+  when: ansible_version.full is version_compare('2.8', '>=')
