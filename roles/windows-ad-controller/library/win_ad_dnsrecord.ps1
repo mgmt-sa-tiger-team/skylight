@@ -47,7 +47,7 @@ if ($state -eq 'present' -and $ipaddr -eq "") {
 }
 
 try {
-    $exists = Get-DnsServerResourceRecord -ZoneName $zone -Name $hostname
+    $exists = Get-DnsServerResourceRecord -ZoneName $zone -Name $hostname -ErrorAction SilentlyContinue
     if ($state -eq 'present') {
         if ($exists) {
             $ip = $exists.RecordData.IPv4Address.IPAddressToString
