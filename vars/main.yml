@@ -73,7 +73,9 @@ gitlab_ldap_base: "{{ ldap_basedn }}"
 gitlab_time_zone: "UTC"
 gitlab_backup_keep_time: "604800"
 gitlab_download_validate_certs: yes
-gitlab_version: "10.0.6-ce.0.el7"
+# install latest version of gitlab when using ansible 2.8
+# enable gitlab_version below when using ansible < 2.8
+# gitlab_version: "10.0.6-ce.0.el7"
 # Email configuration.
 gitlab_email_enabled: "false"
 gitlab_smtp_enable: "false"

@@ -1,40 +1,32 @@
 ---
 language: python
-python: "2.7"
+services: docker
 
 env:
-  - SITE=test.yml
-
-before_install:
-  - sudo apt-get update -qq
+  global:
+    - ROLE_NAME: gitlab
+  matrix:
+    - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: ubuntu1804
+    - MOLECULE_DISTRO: debian9
+    - MOLECULE_DISTRO: centos7
+      MOLECULE_PLAYBOOK: playbook-version.yml
+    - MOLECULE_DISTRO: ubuntu1804
+      MOLECULE_PLAYBOOK: playbook-version.yml
 
 install:
-  # Install Ansible.
-  - pip install ansible
+  # Install test dependencies.
+  - pip install molecule docker
 
-  # Add ansible.cfg to pick up roles path.
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+before_script:
+  # Use actual Ansible Galaxy role name for the project directory.
+  - cd ../
+  - mv ansible-role-$ROLE_NAME geerlingguy.$ROLE_NAME
+  - cd geerlingguy.$ROLE_NAME
 
 script:
-  # Check the role/playbook's syntax.
-  - "ansible-playbook -i tests/inventory tests/$SITE --syntax-check"
+  # Run tests.
+  - molecule test
 
-  # Run the role/playbook with ansible-playbook.
-  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
-
-  # Travis CI's environment requires one _extra_ run for true idempotence :-/.
-  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
-
-  # Run the role/playbook again, checking to make sure it's idempotent.
-  - >
-    ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
-
-  # Make sure GitLab is running.
-  - >
-    curl --insecure -s -o /dev/null -w "%{http_code}" https://localhost/users/password/new
-    | grep -q '200'
-    && (echo 'Status code 200 test: pass' && exit 0)
-    || (echo 'Status code 200 test: fail' && exit 1)
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

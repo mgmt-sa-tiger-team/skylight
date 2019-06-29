@@ -12,25 +12,35 @@
 
 # Install GitLab and its dependencies.
 - name: Install GitLab dependencies.
-  package: name={{ item }} state=installed
+  package: name={{ item }} state=present
   with_items:
     - openssh-server
     - postfix
     - curl
+    - openssl
+    - tzdata
 
 - name: Download GitLab repository installation script.
   get_url:
     url: "{{ gitlab_repository_installation_script_url }}"
     dest: /tmp/gitlab_install_repository.sh
-  when: (gitlab_file.stat.exists == false)
+    validate_certs: "{{ gitlab_download_validate_certs }}"
+  when: not gitlab_file.stat.exists
 
-- name: Install GitLab repository
+- name: Install GitLab repository.
   command: bash /tmp/gitlab_install_repository.sh
-  when: (gitlab_file.stat.exists == false)
+  when: not gitlab_file.stat.exists
+
+- name: Define the Gitlab package name.
+  set_fact:
+    gitlab_package_name: "{{ gitlab_edition }}{{ gitlab_package_version_separator }}{{ gitlab_version }}"
+  when: gitlab_version != ''
 
 - name: Install GitLab
-  package: name={{ gitlab_edition }}-{{ gitlab_version }} state=installed
-  when: (gitlab_file.stat.exists == false)
+  package:
+    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
+    state: present
+  when: not gitlab_file.stat.exists
 
 # Start and configure GitLab. Sometimes the first run fails, but after that,
 # restarts fix problems, so ignore failures on this run.
@@ -51,13 +61,14 @@
 
 - name: Create self-signed certificate.
   command: >
-    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}" -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
+    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}"
+    -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
     creates={{ gitlab_ssl_certificate }}
   when: gitlab_create_self_signed_cert
 
 - name: Copy GitLab configuration file.
   template:
-    src: gitlab.rb.j2
+    src: "{{ gitlab_config_template }}"
     dest: /etc/gitlab/gitlab.rb
     owner: root
     group: root
