@@ -120,6 +120,7 @@
   when: workshopsql.changed
 
 - include_tasks: git_lab.yml
-  when: git_lab
+  when: git_lab | bool
+
 - include_tasks: adv_lab.yml
-  when: advanced_lab
+  when: advanced_lab | bool
