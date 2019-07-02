@@ -16,16 +16,16 @@
       - vim
       - git
       - sshpass
-      - ansible-2.6.6
+      - ansible
       - nano
       - bind-utils
       - python-pip
     state: present
 
-- name: Install devel branch
-  pip:
-    name: git+https://github.com/ansible/ansible.git@devel#egg=ansible
-  when: ansible_devel
+#- name: Install devel branch
+#  pip:
+#    name: git+https://github.com/ansible/ansible.git@devel#egg=ansible
+#  when: ansible_devel | bool
 
 - name: Create /etc/ansible directory
   file:

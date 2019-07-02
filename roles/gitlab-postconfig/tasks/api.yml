@@ -62,6 +62,7 @@
       - 200
       - 201
       - 409
+      - 400
     body_format: json
     headers:
       Content-Type: application/json
