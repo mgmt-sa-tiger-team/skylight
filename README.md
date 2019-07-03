@@ -98,7 +98,7 @@ or if you are using separate var files for each workshop:
 ansible-playbook provision.yml -e @vars/myworkshop.yml
 ```
 
-It takes roughly one hour to provision an environment for a single student.  For multi student accounts, it is recommended you set the number of forks (in `ansible.cfg`) to the number of students.  The main reason is that it instructs Ansible to run all of theTower installations in parallel.
+It takes roughly one hour to provision an environment for a single student.  For multi student accounts, it is recommended you set the number of forks (in `ansible.cfg`) to the number of students.  The main reason is that it instructs Ansible to run all of the Tower installations in parallel.
 
 ```
 [defaults]
