@@ -98,16 +98,26 @@ or if you are using separate var files for each workshop:
 ansible-playbook provision.yml -e @vars/myworkshop.yml
 ```
 
-It takes roughly one hour to provision an environment for a single student.  For multi student accounts, it is recommended you set the number of forks to the number of students.  The main reason is so the Tower installations to run all in parallel.
+It takes roughly one hour to provision an environment for a single student.  For multi student accounts, it is recommended you set the number of forks (in `ansible.cfg`) to the number of students.  The main reason is that it instructs Ansible to run all of theTower installations in parallel.
 
-All inventories will be placed in a folder named `workshop` in your local directory executing the playbook.  There are `student#-instances.txt` for each student there.  Also, there is an `instructor-inventory.txt`.  The student inventory is also placed on their tower host as `/etc/ansible/hosts`.
+```
+[defaults]
+...
+forks = 100
+```
 
+### Workshops Directory
+All inventories will be placed in a folder named `workshops/ansible` in your local directory executing the playbook. The folder contains the following files:
+- A `student#-instances.txt` file for each student defines the configuration for the three student systems.
+  - The student inventory is also placed on their Tower host as `/etc/ansible/hosts`.
+- The `instructor-inventory.txt` defines the inventory for the entire workshop.
+- The `skylight-ansible-private.pem` private allows you to connect to the instances over SSH.
 
 ## Connecting to the environment
 
 The workshop has people connect through RDP to the workstation for their lab and then interact with other systems from there.  However, all systems are accessible publicly at the moment, so there is nothing stopping you from connecting directly.  
 
-A "documents" server is created for the lab environment.  Once you run the provisioner, it will display information on how to reach this server.  The server itself hosts three items.
+A `documents` server is created for the lab environment.  Once you run the provisioner, it will display information on how to reach this server.  The server itself hosts three items.
 The lab guide is available at:
 ```
 http://<IPADDRESS>/
@@ -137,6 +147,11 @@ It takes roughly five minutes for this playbook to run.
 
 ```
 ansible-playbook teardown.yml
+```
+
+If you deployed more than one workshop, you can specify the one you would like to tear down by passing the environment file to the Ansible command:
+```
+ansible-playbook teardown.yml -e vars/AnsibleAutomatesDallas.yml
 ```
 
 ## Troubleshooting
