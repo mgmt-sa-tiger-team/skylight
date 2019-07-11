@@ -60,7 +60,7 @@ For each workshop it is recommended that you utilize the custom.yml to maintain 
 
 ```
 ## Example extra vars file 
-instance_loc: aws
+instance_loc: ec2
 name_prefix: "skylight"
 user_count: 1
 towerversion: 3.2.7
