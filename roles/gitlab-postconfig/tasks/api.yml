@@ -35,7 +35,8 @@
         "username": "{{ user_prefix }}{{ item }}",
         "password": "{{ users_password }}",
         "name": "{{ user_prefix }}{{ item }}",
-        "email": "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}"
+        "email": "{{ user_prefix }}{{ item }}@{{ dns_domain_name }}",
+        "skip_confirmation": true
       }
   with_sequence: count="{{ user_count }}"
 
