@@ -15,7 +15,7 @@ To begin, we are going to create a new playbook. We will be repeating the steps 
 
 
 === Step 1:
-Within Visual Studio Code, we will now create a new directory in your git repo and create a new playbook file.
+Within Visual Studio Code, we will now create a new directory in your git repository and create a new playbook file.
 
 In the Explorer accordion you should have a 'student#' section where you previously made iis_basic.
 
@@ -85,7 +85,7 @@ It should take 5-30 seconds to finish the commit.  The blue bar should stop rota
 
 Now, back in Tower, you will need to resync your Project so that the new files show up.
 
-Next we need to create a new Job Template to run this playbook.  So goto 'Template' and click 'Add' again.
+Next we need to create a new Job Template to run this playbook.  So go to 'Template', click 'Add' and select `Job Template` to create a new job template.
 
 === Step 1:
 Complete the form using the following values
@@ -122,7 +122,7 @@ Complete the survey form with following values
 |PROMPT|Categories
 |DESCRIPTION|Which Categories to install?
 |ANSWER VARIABLE NAME|categories
-|ANSWER TYPE|Multi Choice (Multi Select)
+|ANSWER TYPE|Multiple Choice (multiple select)
 |MULTIPLE CHOICE OPTIONS
 a|
 Application +
@@ -141,6 +141,8 @@ Updates
 a|
 CriticalUpdates +
 SecurityUpdates
+|REQUIRED|Selected
+
 |===
 image::images/7-category-survey.png[title="Category Survey Form",width=500]
 
@@ -152,12 +154,13 @@ Now add another field by filling out the form on the left again.
 |PROMPT|Reboot after install?
 |DESCRIPTION|If the server needs to reboot, then do so after install
 |ANSWER VARIABLE NAME|reboot_server
-|ANSWER TYPE|Multi Choice (Single Select)
+|ANSWER TYPE|Multiple Choice (single select)
 |MULTIPLE CHOICE OPTIONS
 a|
 Yes +
 No
 |DEFAULT ANSWER|Yes
+|REQUIRED|Selected
 |===
 
 image::images/7-reboot-survey.png[title="Reboot Survey Form",width=500]
@@ -193,6 +196,7 @@ Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the 
 
 === Step 3:
 
-When prompted, enter your desired test message
+When prompted, enter select the update categories.
+Answer `Yes` to the _Reboot after install?_ prompt and click *NEXT*.
 
-After it launches, you should be redirected and can watch the output of the job in realtime.
+After the job launches, you should be redirected and can watch the output of the job in realtime.

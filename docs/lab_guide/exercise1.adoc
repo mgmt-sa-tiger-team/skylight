@@ -2,7 +2,7 @@ include::header.adoc[]
 
 = Exercise 1 - Configuring Ansible Tower
 
-In this exercise, we are going to configure Tower so that we can run a playbook.
+In this exercise, we are going to configure Ansible Tower so that we can run a playbook.
 
 == Configuring Ansible Tower
 
@@ -35,13 +35,13 @@ including machine, network, and various cloud providers.  In this workshop, we a
 
 === Step 1:
 
-Select CREDENTIALS from the left hand panel under resources     
+Select CREDENTIALS from the left hand panel under resources   
 
 image:images/credentials.png[Cred,200,400]
 
 === Step 2:
 
-Click on the image:images/add.png[Add,35,25] icon and add new credential     
+Click on the image:images/add.png[Add,35,25] icon and add new credential   
 
 === Step 3:
 
@@ -76,7 +76,7 @@ Our first credential was to access our Windows machines.  We need another to acc
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
-Make sure you select SAVE!
+Select SAVE     image:images/at_save.png[Save,35,25] +
 
 image::images/credential_git.png[title="Add SCM Credential",width=1000]
 
@@ -115,7 +115,7 @@ a|
 
 - [ ] Clean
 - [ ] Delete on Update
-- [*] Update on Launch
+- [*] Update Revision on Launch
 |===
 
 
@@ -155,7 +155,7 @@ We will be viewing the hosts, so click on the *HOSTS* button.
 === Step 3:
 
 In the Hosts view, we can see every host associated with with this inventory.  You will also see which groups a host is associated with.
-Hosts can be associated with multiple groups.  These groups can later then be used to narrow down to the exact hosts we will later run our playbooks on.
+Hosts can be associated with multiple groups. These groups can later then be used to narrow down to the exact hosts we will later run our playbooks on.
 
 image::images/inventory_host.png[title="Hosts View",width=1000]
 
@@ -167,21 +167,21 @@ If you click on the Host's name or on the Edit Button image:images/at_edit.png[E
 image::images/inventory_host_edit.png[title="Host Edit",width=1000]
 
 
-Today we have already setup various variables to tell Ansible that this host is a Windows machine.  You do not have to define these variables as a Host variable here, 
-they could also be Group variables or reside directly in your Template or Playbook.  We will place them here for simplicities sake.
+Today we have already setup various variables to tell Ansible that this host is a Windows machine.  You do not have to define these variables as a Host variable here, they could also be Group variables or reside directly in your Template or Playbook.
+We will place them here for simplicities sake.
 By default Ansible will attempt to use SSH to connect to any Host, so for Windows we need to tell it utilize a different connection method.
-
-*ansible_connection: winrm*
-
-In our example we tell Ansible to connect to the WinRM SSL Port 5986.  The nonSSL port runs on 5985 but is unecrypted.
 
 *ansible_port: 5986*
 
 We also tell Ansible to ignore the WinRM cert, since our lab doesn't have a proper certificate store setup.
 
+*ansible_connection: winrm*
+
+In our example we tell Ansible to connect to the WinRM SSL Port 5986.  The non-SSL port runs on 5985 but is unencrypted.
+
 *ansible_winrm_server_cert_validation: ignore*
 
-Windows also has various authentication methods that we can utlize to connect.  Here we tell Ansible to use the *CredSSP* Transport Method to authenticate to our Windows host.
+Windows also has various authentication methods that we can utilize to connect.  Here we tell Ansible to use the *CredSSP* Transport Method to authenticate to our Windows host.
 
 *ansible_winrm_transport: credssp*
 

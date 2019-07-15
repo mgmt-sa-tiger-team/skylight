@@ -16,4 +16,4 @@ What do you think? How can we help you understand Ansible Tower better?
 
 Thank you for your time and participation!
 
-image::redhat.svg[]
+image::images/new-red-hat-logo.jpg[]
