@@ -47,6 +47,9 @@
     enabled: yes
     gpgcheck: no
 
+- name: Enable optional repos
+  command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+
 - name: Install packages
   package:
     name:

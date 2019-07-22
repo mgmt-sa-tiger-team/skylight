@@ -42,7 +42,8 @@ ptr_zone_cidr: "10.0.1.0/24"
 git_lab: false
 advanced_lab: false
 
-
+# Enable nginx-ssl
+nginx_ssl: true
 
 ##########################################################
 ###################### GITLAB INFO #######################
@@ -112,6 +113,15 @@ ec2_windows_workstation_instance_type: "t3.medium"   # t2.small was slowwwwww...
 ec2_windows_workstation_instance_ami_type: win2016_full # See the ec2_image_names variable for lookup
 ec2_windows_instance_type: "t3.small"   # Small = 1 vCPU / 2GB
 ec2_windows_instance_ami_type: win2019_core # See the ec2_image_names variable for lookup
+
+
+# letsencrypt config
+certbot_admin_email: register@{{ public_dns_zone | default ('') }}
+certbot_create_if_missing: yes
+certbot_create_standalone_stop_services: []
+certbot_certs:
+  - domains:
+    - "{{ name_prefix }}.{{ public_dns_zone | default ('') }}"
 
 ##########################################################
 ###################### VMWARE INFO #######################

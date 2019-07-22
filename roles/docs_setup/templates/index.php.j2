@@ -74,8 +74,9 @@ Password=" . $student['password'] . "<br />
 <br /><br />
 Please use your laptop's Remote Desktop Client to connect to the above IP.  If that fails, then use the link below for a HTML5 RDP client.  It is slower and may provide a subpar experience.<br /><br />
 <b>Webconnect</b>:<br />
-<a href='https://" . $student['ip'] . "/rdp/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['ip'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . $student['password'] . "&connect=Connect%21' target=rdp>https://" . $student['ip'] . "/rdp</a><br />
-<a href='https://" . $student['fqdn'] . "/rdp/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['fqdn'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . $student['password'] . "&connect=Connect%21' target=rdp>https://" . $student['fqdn'] . "/rdp</a><br />
+<a href='https://" . $student['ip'] . "/" . $student['username'] . "/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['ip'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . urlencode($student['password']) . "&connect=Connect%21' target=rdp>https://" . $student['ip'] . "/" . $student['username'] . "</a><br />
+{% if public_dns_zone is defined and nginx_ssl %}<a href='https://{{ name_prefix }}.{{ public_dns_zone }}/" . $student['username'] . "/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['ip'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . urlencode($student['password']) . "&connect=Connect%21' target=rdp>https://{{ name_prefix }}.{{ public_dns_zone }}/" . $student['username'] . "</a><br />{% endif %}
+<a href='https://" . $student['fqdn'] . "/" . $student['username'] . "/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['fqdn'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . urlencode($student['password']) . "&connect=Connect%21' target=rdp>https://" . $student['fqdn'] . "/" . $student['username'] . "</a><br />
 </p>";
 
 
