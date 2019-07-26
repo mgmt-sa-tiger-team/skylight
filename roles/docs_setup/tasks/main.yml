@@ -12,6 +12,7 @@
       - php-pdo
       - python-pip
       - git
+      - rsync
     state: present
     enablerepo: remi-php72
   notify: restart nginx
@@ -26,7 +27,8 @@
     - php-fpm
   notify: restart nginx
 
-- file:
+- name: Set permissions on the PHP Session directory
+  file:
     path: /var/lib/php/session/
     owner: nginx
     group: nginx
@@ -51,7 +53,7 @@
   when: ansible_distribution == 'CentOS'
 
 - name: Copy lab guides to server
-  copy:
+  synchronize:
     src: docs/lab_guide/
     dest: /usr/share/nginx/html/
   register: copycontent
@@ -93,7 +95,7 @@
     state: directory
 
 - name: Copy deck to server
-  copy:
+  synchronize:
     src: docs/decks/
     dest: /usr/share/nginx/html/decks/
 
