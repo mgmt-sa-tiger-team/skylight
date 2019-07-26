@@ -37,6 +37,12 @@
     - stat_result.stat.exists
     - tower_license is undefined
 
+- name: Verify Tower License expiration
+  assert:
+    that:
+      - tower_license.license_date|int > (lookup('pipe','date +%s')|int)
+    fail_msg: "Your Tower License is expired"
+
 - name: Check Domain Admin Password Complexity
   assert:
     that:
@@ -45,7 +51,6 @@
       - domain_admin_password | regex_search('[a-z]')
       - domain_admin_password | regex_search('[0-9]')
     fail_msg: "domain_admin_password does not need password complexity requirements (8+ Chars, Lower Case, Upper Case, Number)"
-
 
 - name: Check Users Password Complexity
   assert:
