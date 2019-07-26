@@ -169,19 +169,21 @@ image::images/inventory_host_edit.png[title="Host Edit",width=1000]
 
 Today we have already setup various variables to tell Ansible that this host is a Windows machine.  You do not have to define these variables as a Host variable here, they could also be Group variables or reside directly in your Template or Playbook.
 We will place them here for simplicities sake.
-By default Ansible will attempt to use SSH to connect to any Host, so for Windows we need to tell it utilize a different connection method.
+
+By default Ansible will attempt to use SSH to connect to any Host, so for Windows we need to tell it utilize a different connection method, in this case, link:https://docs.ansible.com/ansible/latest/user_guide/windows_winrm.html[WinRM].
+
+*ansible_connection: winrm*
+
+We also instruct Ansible to connect to the WinRM SSL port 5986 (the non-SSL port runs on 5985 but is unencrypted).
 
 *ansible_port: 5986*
 
 We also tell Ansible to ignore the WinRM cert, since our lab doesn't have a proper certificate store setup.
 
-*ansible_connection: winrm*
-
-In our example we tell Ansible to connect to the WinRM SSL Port 5986.  The non-SSL port runs on 5985 but is unencrypted.
-
 *ansible_winrm_server_cert_validation: ignore*
 
-Windows also has various authentication methods that we can utilize to connect.  Here we tell Ansible to use the *CredSSP* Transport Method to authenticate to our Windows host.
+Windows also has various authentication methods that we can utilize to connect. 
+Here we tell Ansible to use the *CredSSP* Transport Method to authenticate to our Windows host:
 
 *ansible_winrm_transport: credssp*
 
