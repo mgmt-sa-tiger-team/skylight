@@ -60,7 +60,7 @@ For each workshop it is recommended that you utilize the custom.yml to maintain 
 
 ```
 ## Example extra vars file 
-instance_loc: aws
+instance_loc: ec2
 name_prefix: "skylight"
 user_count: 1
 towerversion: 3.2.7
@@ -98,7 +98,7 @@ or if you are using separate var files for each workshop:
 ansible-playbook provision.yml -e @vars/myworkshop.yml
 ```
 
-It takes roughly one hour to provision an environment for a single student.  For multi student accounts, it is recommended you set the number of forks (in `ansible.cfg`) to the number of students.  The main reason is that it instructs Ansible to run all of theTower installations in parallel.
+It takes roughly one hour to provision an environment for a single student.  For multi student accounts, it is recommended you set the number of forks (in `ansible.cfg`) to the number of students.  The main reason is that it instructs Ansible to run all of the Tower installations in parallel.
 
 ```
 [defaults]
@@ -203,3 +203,9 @@ The following describes some of the common issues when deploying the environment
   ```
 
 - **Missing WinRM Module**: If the installation of the Windows environment fails, make sure that you use the right version of the `python-winrm` package, which exists for both Python 2 and Python 3 versions. In Fedora, the `python-winrm` packages provides WinRM for Python 2 whereas `python3-winrm` provides WinRM for Python 3.
+
+- **Breaking on a fork**: When deploying on MacOS Mojave, some will experience an error `TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+objc[43678]: +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
+`
+In most situations, this can be fixed by setting this environment variable in your shell before running the playbook:
+`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
