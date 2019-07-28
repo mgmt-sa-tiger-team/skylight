@@ -159,6 +159,16 @@ ansible-playbook teardown.yml -e vars/AnsibleAutomatesDallas.yml
 The following describes some of the common issues when deploying the environment.
 
 - **Missing variables**: if the `provision.yml` complains about missing variables, make sure to **copy** the `main.yml` to `custom.yml` instead of overriding the values of some of the variables in the file.
+
+- **DNS issues between hosts**: If there are DNS issues between servers, it could be related to a misconfiguration of the Windows Domain controller. Settings are managed by the following three variables in the main configuration file:
+  ```
+  # Used by Active Directory and windows client provision
+  dns_domain_name: "ansibleworkshop.com"
+  dns_domain_name_short: "ansibleworkshop"
+  ldap_basedn: "DC=ansibleworkshop,DC=com"
+  ```
+  If you decide to use another domain, make sure to update the **three** variables. The DN must match the DNS domain name. If the domain is not the same in the three variables, the domain controller will fail to properly resolve server DNS names in the environment.
+
 - **Connection times out**: the installer sometimes times out during the execution of some of the tasks (this is indicated by a message of `Control master terminated unexpectedly. Shared connection closed`).  
   This would mostly happen during the `run the tower installer` task of the `ansible-tower` role and the `Copy lab guides to server` task of the `docs_setup` role.
   To trace the execution time for all of the tasks that the playbook invokes, update the `ansible.cfg` to add some callback plugins before deploying the environment.
@@ -191,10 +201,10 @@ The following describes some of the common issues when deploying the environment
     ServerAliveInterval 10
     ServerAliveCountMax 2
   ```
-- **Mising WinRM Module**: If the installation of the Windows environment fails, make sure that you use the right version of the `python-winrm` package, which exists for both Python 2 and Python 3 versions. In Fedora, the `python-winrm` packages provides WinRM for Python 2 whereas `python3-winrm` provides WinRM for Python 3.
+
+- **Missing WinRM Module**: If the installation of the Windows environment fails, make sure that you use the right version of the `python-winrm` package, which exists for both Python 2 and Python 3 versions. In Fedora, the `python-winrm` packages provides WinRM for Python 2 whereas `python3-winrm` provides WinRM for Python 3.
 
 - **Breaking on a fork**: When deploying on MacOS Mojave, some will experience an error `TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
-objc[43678]: +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called.
 objc[43678]: +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
 `
 In most situations, this can be fixed by setting this environment variable in your shell before running the playbook:

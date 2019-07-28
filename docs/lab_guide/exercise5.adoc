@@ -88,6 +88,7 @@ Add a play definition and some variables to your playbook.  These include addtio
 === Step 4:
 
 Add a new task called *install IIS*.
+After writing the playbook, click `File` > `Save` to save your changes.
 
 [source,bash]
 ----
@@ -167,7 +168,7 @@ You should now have an editor open in the right pane that can be used for creati
 image::images/5-vscode-template.png[title="index.html template",width=1000]
 
 === Step 2:
-Add to your playbook, `site.yml`, opening your firewall ports and writing the template.  Use single quotes for win_template in order to not escape the forward slash.
+Edit back your playbook, `site.yml`, by opening your firewall ports and writing the template.  Use single quotes for `win_template` in order to not escape the forward slash.
 
 [source,bash]
 ----
@@ -203,6 +204,9 @@ used in Ansible to transform data inside a template expression, i.e. filters.
 == Section 3: Defining and Using Handlers
 
 There are any number of reasons we often need to restart a service/process including the deployment of a configuration file, installing a new package, etc.  There are really two parts to this Section; adding a handler to the playbook and calling the handler after the a task.  We will start with the former.
+
+The `handlers` block should start after a one-level indentation, that is, two spaces.
+It should align with the `tasks` block.
 
 === Step 1:
 Define a handler.
@@ -319,12 +323,12 @@ Now let's take a second look to make sure everything looks the way you intended.
 === Step 1:
 
 Before we can create our Job Template, you must first go resync your Project again.  So do that now.  
-____
-``*NOTE*: You must do this anytime you create a new 'base' playbook file that you will be selecting via a Job Template.  The new file must be synced to Tower before it will become available in the Job Template playbook dropdown.``
-____
+
+[NOTE]
+You must do this anytime you create a new 'base' playbook file that you will be selecting via a Job Template.  The new file must be synced to Tower before it will become available in the Job Template playbook dropdown.
 
 === Step 2:
-To test this playbook, we need to create a new Job Template to run this playbook.  So goto 'Template' and click 'Add' again.
+To test this playbook, we need to create a new Job Template to run this playbook.  So go to 'Template' and click 'Add' and select `Job Template` to create a second job template.
 
 Complete the form using the following values
 
@@ -361,7 +365,7 @@ Complete the survey form with following values
 |ANSWER VARIABLE NAME|iis_test_message
 |ANSWER TYPE|Text
 |MINIMUM/MAXIMUM LENGTH| Use the defaults
-|DEFAULT ANSWER| Be creative, keep it clean, we're all professionals here
+|DEFAULT ANSWER| _Be creative, keep it clean, we're all professionals here_
 |===
 
 
@@ -401,9 +405,9 @@ Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the 
 
 When prompted, enter your desired test message
 
-After it launches, you should be redirected and can watch the output of the job in realtime. 
+After it launches, you should be redirected and can watch the output of the job in real time. 
 
-Once your job is sucessful, navigate to your new websites (replace # with your student number)
+Once your job is successful, navigate to your new websites (replace # with your student number)
 
 [source,bash]
 ----
