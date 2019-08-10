@@ -42,6 +42,16 @@
     that:
       - tower_license.license_date|int > (lookup('pipe','date +%s')|int)
     fail_msg: "Your Tower License is expired"
+  when:
+    - tower_license.license_date is defined
+
+- name: Verify Tower License expiration
+  assert:
+    that:
+      - (tower_license | from_json)['license_date']|int > (lookup('pipe','date +%s')|int)
+    fail_msg: "Your Tower License is expired"
+  when:
+    - tower_license.license_date is undefined
 
 - name: Check Domain Admin Password Complexity
   assert:
