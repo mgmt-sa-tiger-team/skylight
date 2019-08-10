@@ -10,7 +10,7 @@ Job templates are useful to execute the same job many times.
 == Syncing your Project
 
 Before you can create a job template with a new playbook, you must first sync your Project so that Tower knows about it.
-To do this, click on *PROJECTS* and then click the cloud icon next to your project.  Once this is complete, you can create the job template.
+To do this, click on *Projects* and then click the cloud icon next to your project.  Once this is complete, you can create the job template.
 
 image::images/4-project-sync.png[title="Project Sync"]
 
@@ -20,11 +20,11 @@ image::images/4-project-sync.png[title="Project Sync"]
 
 === Step 1:
 
-Select TEMPLATES
+Select **Templates**
 
 === Step 2:
 
-Click on ADD image:images/at_add.png[Add,35,25], and select JOB TEMPLATE
+Click on ADD image:images/at_add.png[Add,35,25], and select Job Template
 
 === Step 3:
 
@@ -37,7 +37,7 @@ Complete the form using the following values
 |INVENTORY|Ansible Workshop Inventory
 |PROJECT|Ansible Workshop Project
 |PLAYBOOK|iis-basic/install_iis.yml
-|MACHINE CREDENTIAL|Student Account
+|CREDENTIAL|Type: *Machine*. Name: Student Account
 |LIMIT|Windows
 |OPTIONS
 a|
@@ -64,7 +64,7 @@ Complete the survey form with following values
 |ANSWER VARIABLE NAME|iis_test_message
 |ANSWER TYPE|Text
 |MINIMUM/MAXIMUM LENGTH| Use the defaults
-|DEFAULT ANSWER| Be creative, keep it clean, we're all professionals here
+|DEFAULT ANSWER| _Be creative, keep it clean, we're all professionals here_
 |===
 
 
@@ -90,8 +90,8 @@ Back on the main Job Template page, select SAVE image:images/at_save.png[Add,35,
 
 == Running a Job Template
 
-Now that you've sucessfully created your Job Template, you are ready to launch it.
-Once you do, you will be redirected to a job screen which is refreshing in realtime
+Now that you've successfully created your Job Template, you are ready to launch it.
+Once you do, you will be redirected to a job screen which is refreshing in real time
 showing you the status of the job.
 
 
@@ -142,7 +142,7 @@ image::images/4-job-summary-output.png[title="Play and Task Output"]
 
 === Step 6:
 
-Once your job is sucessful, navigate to your new website (replace # with your student number)
+Once your job is successful, navigate to your new website (replace # with your student number)
 
 [source,bash]
 ----
@@ -160,6 +160,9 @@ image::images/4-website-output.png[title="New Website with Personalized Test Mes
 
 Now that you have IIS Installed, create a new playbook called 'remove_iis.yml' to stop and remove IIS.
 
+**Hint:**  
+First stop the `W3Svc` service using the `win_service` module, then delete the `Web-Server` service using the `win_feature` module.  
+Optionally, use the `win_file` module to delete the index page.
 
 == End Result
 At this point in the workshop, you've experienced the core functionality of Ansible Tower.  But wait... there's more!
