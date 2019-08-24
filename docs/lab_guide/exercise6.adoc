@@ -11,9 +11,9 @@ include::header.adoc[]
 = Exercise 6 - Roles: Making your playbooks reusable
 
 
-While it is possible to write a playbook in one file as we've done throughout this workshop, eventually you'll want to reuse files and start to organize things.
+Although it is possible to write a playbook in one file as we've done throughout this workshop, eventually you'll want to reuse files and start to organize things.
 
-Ansible Roles is the way we do this.  When you create a role, you deconstruct your playbook into parts and those parts sit in a directory structure.  This is considered best practice and will save you a lot of time in the future.
+Ansible Roles are the way we do this.  When you create a role, you deconstruct your playbook into parts and those parts sit in a directory structure.  This is considered best practice and will save you a lot of time in the future.
 
 
 For this exercise, you are going to take the playbook you just wrote and refactor it into a role.
@@ -250,7 +250,7 @@ If successful, your standard output should look similar to the figure below.  No
 
 image::images/6-results.png[title="Role site.yml stdout",width=1000]
 
-Once your job is sucessful, navigate again to your websites to verify they are still working (replace # with your student number)
+Once your job is successful, navigate again to your websites to verify they are still working (replace # with your student number)
 
 [source,bash]
 ----
@@ -266,4 +266,6 @@ http://s#-win1.ansibleworkshop.com:8081
 
 == Section 5: Review
 
-You should now have a completed playbook, `site.yml` with a single role called `iis_simple`.  The advantage of structuring your playbook into roles is that you can now add reusability to your playbooks as well as simplifying changes to variables, tasks, templates, etc.  link:{galaxy_url}[Ansible Galaxy] is a good repository of roles for use or reference.
+You should now have a completed playbook, `site.yml` with a single role called `iis_simple`.  The advantage of structuring your playbook into roles is that you can now add reusability to your playbooks as well as simplifying changes to variables, tasks, templates, etc.
+
+link:{galaxy_url}[Ansible Galaxy] is a good repository of roles for use or reference.

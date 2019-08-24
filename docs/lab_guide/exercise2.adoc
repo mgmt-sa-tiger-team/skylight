@@ -15,7 +15,7 @@ simply need to do one or two things quickly and often, to many remote nodes.
 
 === Step 1:
 
-To start, we will need to goto our Inventory.  So click *INVENTORIES* on the left panel, and then click on the name of our Inventory *Ansible Workshop Inventory*.
+To start, we will need to go to our Inventory.  So click *INVENTORIES* on the left panel, and then click on the name of our Inventory *Ansible Workshop Inventory*.
 Now that you are on the Inventory Details page, we will need to go select our Host.  So click *HOSTS*.
 
 Next to each host is a checkbox.  Check the box next to each host you want to run an Ad-Hoc Command on.  You will then see the Run Commands button become enabled.  Click it now.
@@ -51,7 +51,7 @@ The 2nd part of the job log shows you the actual output from the command.  If yo
 
 image::images/2-win_ping_output.png[title="Win_Ping Log Details",width=1000]
 
-The results returned will be differet depending on which module is used, as they all handle and deal with different data sets depending on the task.
+The results returned will be different depending on which module is used, as they all handle and deal with different data sets depending on the task.
 No matter which module is used, you will always see a color coded STATUS of either SUCCESS, FAILURE, CHANGED, or SKIPPING.
 
 === Step 2:
@@ -65,7 +65,7 @@ Let's fill out the form again, but this time use the `win_shell` module to execu
 |ARGUMENTS|Get-Service
 |MACHINE CREDENTIAL|Student Account
 |===
-Launch that and view the results.  You will see that it returns a direct output of what the Powershell command returned.
+Launch the job and view the results.  You will see that it returns a direct output of what the Powershell command returned.
 This data can be stored to a variable and directly parsed inside your Ansible playbook later on.
 
 And run it one more time with the `Get-Process` Powershell command.
@@ -78,7 +78,7 @@ And run it one more time with the `Get-Process` Powershell command.
 
 === Step 3:
 
-We will now take a look at your windows nodes configuration.  The `setup` module queries the remote host for various data and returns that data as Ansible Facts.
+We will now take a look at your Windows nodes configuration.  The `setup` module queries the remote host for various data and returns that data as Ansible Facts.
 This data is useful to determine things such as OS Versions, Hardware Configuration, and other various data points.
 This can then be used in your playbook for all sorts of reasons such as determining whether a task should even run, or determining what the name of a package should be based upon the OS Version.
 
@@ -86,7 +86,7 @@ This can then be used in your playbook for all sorts of reasons such as determin
 The `setup` module will run automatically at the beginning of every playbook unless told not to.  That way this data is always available to your playbook.
 
 
-Lets go ahead and run the `setup` module to look at the output.  Fill out the *EXECUTE COMMANDS* form again with this info.
+Lets go ahead and run the `setup` module to look at the output.  Fill out the *EXECUTE COMMAND* form again with this info.
 
 |===
 |MODULE |setup
