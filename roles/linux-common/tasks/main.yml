@@ -49,6 +49,7 @@
 
 - name: Enable optional repos
   command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+  when: ansible_distribution == 'RedHat'
 
 - name: Install packages
   package:
