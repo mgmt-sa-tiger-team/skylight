@@ -52,11 +52,50 @@
     state: present
   when: ansible_distribution == 'CentOS'
 
-- name: Copy lab guides to server
-  synchronize:
-    src: docs/lab_guide/
-    dest: /usr/share/nginx/html/
-  register: copycontent
+- name: Create decks directory on server
+  file:
+    path: /usr/share/nginx/html/decks/
+    state: directory
+
+- block:
+    - name: Copy lab guides to server
+      synchronize:
+        src: docs/lab_guide/
+        dest: /usr/share/nginx/html/
+      register: copycontent
+
+    - name: Copy deck to server
+      synchronize:
+        src: docs/decks/
+        dest: /usr/share/nginx/html/decks/
+  rescue:
+    # git clone from repo and local copy
+    - name: get git remote url
+      command: git ls-remote --get-url
+      delegate_to: localhost
+      become: no
+      register: git_project_repo_remote_url
+
+    - name: checkout the project from git
+      git:
+        repo: "{{ git_project_repo_remote_url.stdout }}"
+        dest: /tmp/skylight
+        accept_hostkey: yes
+        clone: yes
+      when: git_project_repo_remote_url.stdout is defined
+
+    - name: local copy lab guides
+      copy:
+        src: /tmp/skylight/docs/lab_guide/
+        dest: /usr/share/nginx/html/
+        remote_src: yes
+      register: copycontent
+
+    - name: local copy decks
+      copy:
+        src: /tmp/skylight/docs/decks/
+        dest: /usr/share/nginx/html/decks/
+        remote_src: yes
 
 - name: Build HTML Docs
   command: asciidoc -d book -v -o {{ item }}.html {{ item }}.adoc
@@ -88,16 +127,6 @@
   template:
     src: templates/list.php.j2
     dest: /usr/share/nginx/html/users/list.php
-
-- name: Create deck directory on server
-  file:
-    path: /usr/share/nginx/html/decks/
-    state: directory
-
-- name: Copy deck to server
-  synchronize:
-    src: docs/decks/
-    dest: /usr/share/nginx/html/decks/
 
 - name: Install PyMySQL
   pip:
