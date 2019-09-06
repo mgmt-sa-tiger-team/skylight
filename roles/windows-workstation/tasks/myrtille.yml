@@ -28,6 +28,14 @@
     - IIS-ISAPIExtensions
     - IIS-ISAPIFilter
     - IIS-ASPNET45
+    - WAS-WindowsActivationService
+    - WAS-ProcessModel
+    - WAS-ConfigurationAPI
+    - NetFx3
+    - WCF-HTTP-Activation45
+    - IIS-NetFxExtensibility
+    - WAS-NetFxEnvironment
+    - WCF-HTTP-Activation
 
 - name: Create temp directory
   win_file:
