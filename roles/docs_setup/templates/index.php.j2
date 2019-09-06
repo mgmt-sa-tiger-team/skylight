@@ -79,8 +79,7 @@ if ($student['fqdn'] == "") {
 } else {
 	print "<a href='https://" . $student['fqdn'] . "/" . $student['username'] . "/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['fqdn'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . urlencode($student['password']) . "&connect=Connect%21' target=rdp>https://" . $student['fqdn'] . "/" . $student['username'] . "</a><br />";
 }
-{% if public_dns_zone is defined and nginx_ssl %}print "<a href='https://{{ name_prefix }}.{{ public_dns_zone }}/" . $student['username'] . "/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['ip'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . urlencode($student['password']) . "&connect=Connect%21' target=rdp>https://{{ name_prefix }}.{{ public_dns_zone }}/" . $student['username'] . "</a><br />"{% endif %}
-print "</p>";
+{% if public_dns_zone is defined and nginx_ssl %}print "<a href='https://{{ name_prefix }}.{{ public_dns_zone }}/" . $student['username'] . "/?__EVENTTARGET=&__EVENTARGUMENT=&server=" . $student['ip'] . "&domain={{ dns_domain_name_short }}&user=" . $student['username'] . "&password=" . urlencode($student['password']) . "&connect=Connect%21' target=rdp>https://{{ name_prefix }}.{{ public_dns_zone }}/" . $student['username'] . "</a><br />";{% endif %}
 
 display_footer ();
 
