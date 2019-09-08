@@ -1,0 +1,28 @@
+---
+# add hosts to groups
+- include_tasks: add_hosts.yml
+
+# wait for instances to come online
+- include_tasks: wait_for_connection.yml
+
+# reset Administrator password on Windows nodes
+- include_tasks: reset_admin_pwd.yml
+  vars:
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+
+# set private addresses on Windows nodes for vmware_desktop provider as vagrant doesn't set this up
+- include_tasks: set_private_ip.yml
+  loop_control:
+    loop_var: server_item
+  vars:
+    private_ip: "{{ hostvars[server_item].private_ip }}"
+  with_items:
+    - "{{ groups['windows_domain_controllers'] }}"
+    - "{{ groups['windows'] }}"
+    - "{{ groups['windows_workstations'] }}"
+
+#- include_tasks: set_private_ip_all.yml
+
+# generate local inventory files
+- include_tasks: generate_inventory.yml

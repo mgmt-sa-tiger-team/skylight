@@ -1,0 +1,19 @@
+---
+- name: Wait for connection on all linux nodes
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups['tower'] }}"
+    - "{{ groups['gitlab'] }}"
+    - "{{ groups['docs'] }}"
+
+- name: Wait for connection on all windows nodes
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  vars:
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+  with_items:
+    - "{{ groups['windows_domain_controllers'] }}"
+    - "{{ groups['windows'] }}"
+    - "{{ groups['windows_workstations'] }}"

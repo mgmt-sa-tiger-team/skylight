@@ -1,0 +1,11 @@
+---
+- name: Generate instructor inventory
+  template:
+    src: instructor_inventory.j2
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/instructor_inventory.txt"
+
+- name: Generate student inventories
+  template:
+    src: instances.txt.j2
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
+  with_sequence: count="{{ user_count }}"

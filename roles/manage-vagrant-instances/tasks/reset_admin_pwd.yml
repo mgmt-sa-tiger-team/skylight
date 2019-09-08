@@ -1,0 +1,27 @@
+---
+- name: Update Administrator pwd
+  win_user:
+    name: Administrator
+    password: "{{ domain_admin_password }}"
+    state: present
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups['windows_domain_controllers'] }}"
+
+- name: Update Administrator pwd
+  win_user:
+    name: Administrator
+    password: "{{ domain_admin_password }}"
+    state: present
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups['windows'] }}"
+
+- name: Update Administrator pwd
+  win_user:
+    name: Administrator
+    password: "{{ domain_admin_password }}"
+    state: present
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups['windows_workstations'] }}"

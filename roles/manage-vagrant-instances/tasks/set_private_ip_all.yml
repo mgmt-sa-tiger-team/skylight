@@ -1,0 +1,37 @@
+---
+- name: Gather hardware information
+  setup:
+    gather_subset:
+      - '!all'
+      - '!any'
+      - hardware
+  delegate_to: "{{ item }}"
+  delegate_facts: yes
+  with_items:
+    - "{{ groups['windows_domain_controllers'] }}"
+    - "{{ groups['windows'] }}"
+    - "{{ groups['windows_workstations'] }}"
+
+- name: Install required module
+  win_psmodule:
+    name: NetworkingDsc
+    state: present
+  delegate_to: "{{ item }}"
+  when: "'VMware' in hostvars[item].ansible_product_name"
+  with_items:
+    - "{{ groups['windows_domain_controllers'] }}"
+    - "{{ groups['windows'] }}"
+    - "{{ groups['windows_workstations'] }}"
+
+- name: Set ip address
+  win_dsc:
+    resource_name: IPAddress
+    IPAddress: "{{ hostvars[item].private_ip }}"
+    InterfaceAlias: 'Ethernet1'
+    AddressFamily: 'IPV4'
+  delegate_to: "{{ item }}"
+  when: "'VMware' in hostvars[item].ansible_product_name"
+  with_items:
+    - "{{ groups['windows_domain_controllers'] }}"
+    - "{{ groups['windows'] }}"
+    - "{{ groups['windows_workstations'] }}"

@@ -1,0 +1,24 @@
+---
+- block:
+    - name: Gather hardware information
+      setup:
+        gather_subset:
+          - '!all'
+          - '!any'
+          - hardware
+
+    - name: Install required module
+      win_psmodule:
+        name: NetworkingDsc
+        state: present
+      when: "'VMware' in hostvars[server_item].ansible_product_name"
+
+    - name: Set ip address
+      win_dsc:
+        resource_name: IPAddress
+        IPAddress: "{{ private_ip }}"
+        InterfaceAlias: 'Ethernet1'
+        AddressFamily: 'IPV4'
+      when: "'VMware' in hostvars[server_item].ansible_product_name"
+  delegate_to: "{{ server_item }}"
+  delegate_facts: yes
