@@ -22,6 +22,10 @@
       - visualstudiocode
       - git
       - googlechrome
+    register: chocolatey_packages_install
+    until: chocolatey_packages_install is success
+    delay: 3
+    retries: 5
 
   - name: Create an shortcut to Docs site
     win_shortcut:
