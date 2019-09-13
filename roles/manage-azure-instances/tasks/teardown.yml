@@ -359,6 +359,7 @@
     name: "{{ azure_storage_account }}"
     account_type: "{{ azure_storage_account_type }}"
     state: absent
+    force_delete_nonempty: yes
   ignore_errors: yes
 
 - name: Azure | Destroy resource group
