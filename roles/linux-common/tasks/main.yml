@@ -54,7 +54,7 @@
   service:
     name: NetworkManager
     state: restarted
-  when: dnschange.changed or etchost.changed
+  when: dnschange.changed or ifcfg.changed
 
 - name: Add EPEL repo
   yum_repository:
