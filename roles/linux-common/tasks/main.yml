@@ -63,6 +63,30 @@
     baseurl: https://dl.fedoraproject.org/pub/epel/7/x86_64/
     enabled: yes
     gpgcheck: no
+  when: ansible_distribution_major_version|int < 8
+
+- name: Add EPEL repo for RHEL7
+  yum_repository:
+    name: epel
+    description: EPEL for Enterprise Linux 8
+    baseurl: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/
+    enabled: yes
+    gpgcheck: no
+  when: ansible_distribution_major_version|int == 8
+
+- name: Enable optional repos for RHEL8
+  command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version|int < 8
+    - instance_loc == 'ec2'
+
+- name: Enable appstream repo (non-ec2)
+  command: yum-config-manager --enable rhel-8-for-x86_64-appstream-rpms
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version|int == 8
+    - instance_loc != 'ec2'
 
 - name: Enable optional repos
   command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
@@ -74,4 +98,3 @@
       - vim
       - bind-utils
     state: present
-
