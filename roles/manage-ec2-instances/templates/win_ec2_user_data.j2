@@ -6,6 +6,11 @@ Get-ScheduledTask *ngen* | Disable-ScheduledTask
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/troubleshooting-windows-instances.html#high-cpu-issue
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v AUOptions /t REG_DWORD /d 1 /f net stop wuauserv net start wuauserv
 
+# Remove policies stopping us from enabling WinRM
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service" /v AllowBasic /f
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service" /v AllowUnencryptedTraffic /f
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service" /v DisableRunAs /f
+
 # Disable Windows Defender Monitoring
 Set-MpPreference -DisableRealtimeMonitoring $true
 
