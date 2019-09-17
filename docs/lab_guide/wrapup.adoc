@@ -16,4 +16,4 @@ What do you think? How can we help you understand Ansible Tower better?
 
 Thank you for your time and participation!
 
-image::images/image::images/redhat.svg[redhat,width=50%]redhat.svg[]
+image::images/redhat.svg[redhat,width=50%]redhat.svg[]

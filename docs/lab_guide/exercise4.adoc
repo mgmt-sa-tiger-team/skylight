@@ -10,7 +10,7 @@ Job templates are useful to execute the same job many times.
 == Syncing your Project
 
 Before you can create a job template with a new playbook, you must first sync your Project so that Tower knows about it.
-To do this, click on *Projects* and then click the cloud icon next to your project.  Once this is complete, you can create the job template.
+To do this, click *Projects* and then click the sync icon next to your project.  Once this is complete, you can create the job template.
 
 image::images/4-project-sync.png[title="Project Sync"]
 
@@ -24,7 +24,7 @@ Select **Templates**
 
 === Step 2:
 
-Click on ADD image:images/at_add.png[Add,35,25], and select Job Template
+Click the image:images/add.png[Add,35,25] icon, and select Job Template
 
 === Step 3:
 
@@ -41,7 +41,7 @@ Complete the form using the following values
 |LIMIT|Windows
 |OPTIONS
 a|
-- [*] Use Fact Cache
+- [*] USE FACT CACHE
 |===
 
 
@@ -69,7 +69,7 @@ Complete the survey form with following values
 
 
 
-image::images/4-survey.png[title="Survey Form",width=1000]
+image::images/4-survey.png[title="Survey Form",width=500]
 
 
 
@@ -103,7 +103,7 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 2:
 
-Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Basic Job Template*
+Click the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Basic Job Template*
 
 === Step 3:
 
@@ -111,15 +111,18 @@ When prompted, enter your desired test message
 
 
 
-image::images/4-survey-prompt.png[title="Survey Prompt",width=1000]
-
+image::images/4-survey-prompt.png[title="Survey Prompt",width=500]
 
 
 === Step 4:
 
-Select LAUNCH image:images/at_survey_launch.png[SurveyL,35,25]
+Select *NEXT* and preview the inputs.
 
 === Step 5:
+
+Select LAUNCH image:images/at_survey_launch.png[SurveyL,35,25]
+
+=== Step 6:
 
 Sit back, watch the magic happen
 
@@ -140,7 +143,7 @@ image::images/4-job-summary-output.png[title="Play and Task Output"]
 
 
 
-=== Step 6:
+=== Step 7:
 
 Once your job is successful, navigate to your new website (replace # with your student number)
 
@@ -154,7 +157,7 @@ If all went well, you should see something like this, but with your own custom m
 
 
 
-image::images/4-website-output.png[title="New Website with Personalized Test Message",width=1000]
+image::images/4-website-output.png[title="New Website with Personalized Test Message",width=500]
 
 == Extra Credit
 

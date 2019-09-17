@@ -47,21 +47,21 @@ Within Visual Studio Code, create a new directory in your git repo and create a 
 
 In the Explorer accordion you should have a 'student#' section where you previously made iis_basic.
 
-image::images/3-vscode-create-folders.png[title="Student Playbooks",width=1000]
+image::images/5-vscode-existing-folders.png[title="Student Playbooks",width=400]
 
 === Step 2: Create a folder called *iis_advanced* and a file called `site.yml`
 
-Hover over the 'student#' section and click on the 'New Folder' button
+Hover over the 'student#' section and click the 'New Folder' button
 
-Type iis_advanced and hit enter.  Then click on that folder so it is selected.
+Type iis_advanced and hit enter.  Then click that folder so it is selected.
 
-Hover over the 'student#' section again and click on the 'New File' button.
+Hover over the 'student#' section again and click the 'New File' button.
 
 Type site.yml and hit enter.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::images/5-vscode-create-folders.png[title="Empty site.yml",width=400]
+image::images/5-vscode-create-folders.png[title="Empty site.yml",width=1000]
 
 
 === Step 3:
@@ -142,11 +142,11 @@ After that, you will define a task to start the IIS service.
 === Step 1:
 Create a `templates` directory in your project directory and create a template as follows:
 
-Ensure your *iis_advanced folder* is highlighted and then hover over the 'student#' section and click on the 'New Folder' button
+Ensure your *iis_advanced folder* is highlighted and then hover over the 'student#' section and click the 'New Folder' button
 
-Type templates and hit enter.  Then click on that folder so it is selected.
+Type templates and hit enter.  Then click that folder so it is selected.
 
-Hover over the 'templates' folder and click on the 'New File' button.
+Hover over the 'templates' folder and click the 'New File' button.
 
 Type index.html.j2 and hit enter.
 
@@ -241,7 +241,7 @@ Click `File` -> `Save All` to save the files you've written
 
 image::images/5-vscode-iis-yaml-2.png[title="site.yml part 2"]
 
-Click on the Source Code icon, type in a commit message such as 'Adding basic playbook', and click the check box above.
+Click the Source Code icon (1), type in a commit message such as 'Adding advanced playbook' (2), and click the check box above (3).
 
 image::images/5-commit.png[title="Commit site.yml"]
 
@@ -343,7 +343,7 @@ Complete the form using the following values
 |LIMIT|Windows
 |OPTIONS
 a|
-- [*] Use Fact Cache
+- [*] USE FACT CACHE
 |===
 
 
@@ -369,7 +369,7 @@ Complete the survey form with following values
 |===
 
 
-image::images/6-survey.png[title="Survey Form",width=1000]
+image::images/5-survey.png[title="Survey Form",width=500]
 
 
 
@@ -399,7 +399,7 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 2:
 
-Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
+Click the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
 
 === Step 3:
 

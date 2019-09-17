@@ -26,13 +26,13 @@ Let's begin with seeing how your iis-basic-playbook will break down into a role.
 
 In Visual Studio Code, navigate to explorer and your `student#` project where you previously made iis_advanced.
 
-image::images/5-create-folder.png[title="iis_advanced",width=1000]
+image::images/6-vscode-existing-folders.png[title="iis_advanced",width=400]
 
 Select the *iis_advanced* folder.
 
 Create a directory called *roles*  by right-clicking on iis_advanced and selecting 'New Folder'
 
-Now right-click on *roles* and create a new folder underneath called `iis_simple`.
+Now right-click *roles* and create a new folder underneath called `iis_simple`.
 
 === Step 2:
 
@@ -61,7 +61,7 @@ In this section, we will separate out the major parts of your playbook including
 
 Make a backup copy of `site.yml`, then create a new `site.yml`.
 
-Navigate to your `iis_advanced` folder, right click on `site.yml`, click `rename`, and call it `site.yml.backup`
+Navigate to your `iis_advanced` folder, right click `site.yml`, click `rename`, and call it `site.yml.backup`
 
 Create a blank new file called `site.yml` in the same folder
 
@@ -192,7 +192,7 @@ Add tasks to your role in `roles\iis_simple\tasks\main.yml`.
 
 Add your index.html template.
 
-Right-click on `roles\iis_simple\templates` and create a new file called `index.html.j2` with the following content:
+Right-click `roles\iis_simple\templates` and create a new file called `index.html.j2` with the following content:
 
 [source,bash]
 ----
@@ -206,18 +206,18 @@ Right-click on `roles\iis_simple\templates` and create a new file called `index.
 </html>
 ----
 
-Now, remember we still have a 'templates' folder at the base level of this playbook, so we will delete that now.  Right Click on it and Select 'Delete'.
+Now, remember we still have a 'templates' folder at the base level of this playbook, so we will delete that now.  Right click it and Select 'Delete'.
 
 === Step 8: Commit
-Click on File -> Save All to ensure all your files are saved.
+Click File -> Save All to ensure all your files are saved.
 
-Click on the Source Code icon as shown below.
+Click the Source Code icon as shown below (1).
 
-Type in a commit message like `Add iis_simple role` and click the check box above.
+Type in a commit message like `Adding iis_simple role` (2) and click the check box above (3).
 
 image::images/6-commit.png[title="Commit iis_simple_role",width=1000]
 
-Click on the `synchronize changes` button on the blue bar at the bottom left (and click `OK`).  This should again return with no problems.
+Click the `synchronize changes` button on the blue bar at the bottom left.  This should again return with no problems.
 
 
 
@@ -240,7 +240,7 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 3:
 
-Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
+Click the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *IIS Advanced* Job Template.
 
 === Step 4:
 
