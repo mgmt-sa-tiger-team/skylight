@@ -6,13 +6,13 @@ ansible_port={{ ssh_port }}
 
 [windows:vars]
 ansible_connection=winrm
-ansible_winrm_transport=basic
+ansible_winrm_transport=credssp
 ansible_winrm_server_cert_validation=ignore
 ansible_port=5986
 
 [windows_workstations:vars]
 ansible_connection=winrm
-ansible_winrm_transport=basic
+ansible_winrm_transport=credssp
 ansible_winrm_server_cert_validation=ignore
 ansible_port=5986
 
