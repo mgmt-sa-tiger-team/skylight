@@ -412,6 +412,7 @@
   register: tower_instances
   until: tower_instances.finished
   retries: 300
+  delay: 10
   with_items: "{{ tower_jobs.results }}"
 
 - name: Wait for gitlab instance creation to complete
@@ -419,6 +420,7 @@
   register: gitlab_instances
   until: gitlab_instances.finished
   retries: 300
+  delay: 10
   with_items: "{{ gitlab_jobs.results }}"
 
 - name: Wait for docs instance creation to complete
@@ -426,6 +428,7 @@
   register: docs_instances
   until: docs_instances.finished
   retries: 300
+  delay: 10
   with_items: "{{ docs_jobs.results }}"
 
 - name: Wait for DC instance creation to complete
@@ -433,6 +436,7 @@
   register: dc_instances
   until: dc_instances.finished
   retries: 300
+  delay: 10
   with_items: "{{ dc_jobs.results }}"
 
 - name: Wait for windows instance creation to complete
@@ -440,6 +444,7 @@
   register: windows_instances
   until: windows_instances.finished
   retries: 300
+  delay: 10
   with_items:
     - "{{ windows1_jobs.results }}"
 #    - "{{ windows2_jobs.results }}"
@@ -449,6 +454,7 @@
   register: workstation_instances
   until: workstation_instances.finished
   retries: 300
+  delay: 10
   with_items: "{{ workstation_jobs.results }}"
 
 
