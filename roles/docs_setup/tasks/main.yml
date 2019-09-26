@@ -78,6 +78,16 @@
       - asciidoc
       - rubygem-asciidoctor
     state: present
+  when:
+    - ansible_distribution_major_version|int < 8
+    - (ansible_distribution == 'CentOS' and instance_loc == 'ec2') or (instance_loc != 'ec2')
+
+- name: Install asciidoc packages (RHEL7)
+  yum:
+    name:
+      - asciidoc
+      - rubygem-asciidoctor
+    state: present
     enablerepo: rhui-REGION-rhel-server-optional
   when:
     - ansible_distribution == 'RedHat'
@@ -89,17 +99,7 @@
     name:
       - asciidoc
     state: present
-  when:
-    - ansible_distribution == 'RedHat'
-    - ansible_distribution_major_version|int == 8
-
-- name: Install asciidoc packages (CentOS)
-  yum:
-    name:
-      - asciidoc
-      - rubygem-asciidoctor
-    state: present
-  when: ansible_distribution == 'CentOS'
+  when: ansible_distribution_major_version|int == 8
 
 - name: Create decks directory on server
   file:
