@@ -176,7 +176,7 @@ This may take as long as 30 seconds to push. After your first push, you may get 
 
 image::images/3-vscode-push-initial-pop-up.png[title="Git Push Origin"]
 
-If you're interested in validating the code is in git, you can connect to GitLab to verify.  Open `Chrome` and connect to `https://gitlab.ansibleworkshop.com`. Click the `LDAP Login` tab and login with your AD user (student#) and password and you should see your repository.
+If you're interested in validating the code is in git, you can connect to GitLab to verify.  Open `Chrome` and connect to `https://gitlab.ansibleworkshop.com`. Click the `LDAP Login` tab and login with your AD user (student#@ansibleworkshop.com) and password and you should see your repository.
 
 You are ready to automate!
 

@@ -52,7 +52,7 @@ Complete the form using the following entries:
 |DESCRIPTION|
 |ORGANIZATION|Default
 |TYPE|Machine
-|USERNAME| <your USER ID - instructor provided (ie. domain_name\student1)>
+|USERNAME| <your USER ID - instructor provided (ie. student1@ansibleworkshop.com)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
@@ -72,7 +72,7 @@ Our first credential was to access our Windows machines.  We need another to acc
 |DESCRIPTION|SCM credential for playbook sync
 |ORGANIZATION|Default
 |TYPE|Source Control
-|USERNAME| <your USER ID - instructor provided (ie. student1)>
+|USERNAME| <your USER ID - instructor provided (ie. student1@ansibleworkshop.com)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
