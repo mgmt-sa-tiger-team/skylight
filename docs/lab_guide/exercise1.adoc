@@ -19,7 +19,7 @@ However, we are only going to focus on a few of the key constructs that are requ
 
 You will find a shortcut on your desktop named "Ansible Tower", click this to open your personal Ansible Tower instance in Chrome.
 
-Your Tower instance has already been pre-configured for LDAP Login, so use your student credentials without the domain name to login.
+Your Tower instance has already been pre-configured for LDAP Login, so use your student credentials to login.
 
 Your Ansible Tower license has already been applied for you, so after logging in you should now see the Dashboard.
 
