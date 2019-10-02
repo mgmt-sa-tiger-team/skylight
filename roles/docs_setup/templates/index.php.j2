@@ -65,7 +65,7 @@ print "  <div data-role='main' class='ui-content'>
     <div data-role='collapsible' data-collapsed='false'>
       <h1>" . $student['username'] . "</h1>
       <p>
-Username={{ dns_domain_name_short }}\\" . $student['username'] . "<br />
+Username=" . $student['username'] . "@{{ dns_domain_name }}<br />
 Password=" . $student['password'] . "<br />
 <br />
 <b>Workstation</b>:<br />
