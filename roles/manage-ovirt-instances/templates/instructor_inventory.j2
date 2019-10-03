@@ -1,0 +1,75 @@
+[all:vars]
+{% if ssh_port is defined %}
+ansible_port={{ ssh_port }}
+{% endif %}
+
+[windows:vars]
+ansible_connection=winrm
+ansible_winrm_transport=credssp
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5986
+
+[windows_workstations:vars]
+ansible_connection=winrm
+ansible_winrm_transport=credssp
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5986
+ansible_become_password={{ users_password }}
+
+[windows_domain_controllers:vars]
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5986
+
+[tower:vars]
+ansible_port=22
+ansible_ssh_user={{ root_user }}
+
+[gitlab:vars]
+ansible_port=22
+ansible_ssh_user={{ root_user }}
+
+[docs:vars]
+ansible_port=22
+ansible_ssh_user={{ root_user }}
+
+
+[instructor]
+{% for host in hostvars %}
+{%   if "windc" in host %}
+{{ host }} ansible_host={{ hostvars[host].ansible_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}" private_ip={{ hostvars[host].private_ip }}
+{%   elif "gitlab" in host %}
+{{ host }} ansible_host={{ hostvars[host].ansible_ssh_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}"
+{%   elif "docs" in host %}
+{{ host }} ansible_host={{ hostvars[host].ansible_ssh_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}"
+{%   endif %}
+{% endfor %}
+
+{% for user in range(1,user_count + 1) %}
+[{{ user_prefix }}{{ user }}]
+{%   for host in hostvars %}
+{%     if "s" + user|string + "-" in host -%}
+{%       if "windc" in host -%}
+{%       elif "gitlab" in host -%}
+{%       elif "docs" in host -%}
+{%       elif "tower" in host %}
+{{ host }} ansible_host={{ hostvars[host].ansible_ssh_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}"
+{%       else %}
+{{ host }} ansible_host={{ hostvars[host].ansible_host }} ansible_user={{ hostvars[host].ansible_user }} ansible_password="{{ hostvars[host].ansible_password }}" student="{{ hostvars[host].student }}"
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endfor %}
+
+{% for group in groups %}
+[{{group}}]
+{%   for entry in groups[group] %}
+{%     for host in hostvars %}
+{%       if entry == host %}
+{{ host }} 
+{%       endif %}
+{%     endfor %}
+{%   endfor %}
+{% endfor %}
+

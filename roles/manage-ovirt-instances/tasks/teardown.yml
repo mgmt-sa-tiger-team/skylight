@@ -1,0 +1,123 @@
+---
+
+# ----------------------- Destroy Tower Instances -----------------------
+- name: Destory Tower Instances
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-s{{ item }}-tower"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: absent
+    wait: yes
+  with_sequence: count={{ user_count }}
+  register: tower_jobs
+  async: 7200
+  poll: 0
+
+# ----------------------- Destroy Gitlab Instances -----------------------
+- name: Destory Gitlab Instances
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-gitlab"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: absent
+    wait: yes
+  with_sequence: count=1
+  register: gitlab_jobs
+  async: 7200
+  poll: 0
+
+# ----------------------- Destroy Docs Instances -----------------------
+- name: Destory Docs Instances
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-docs"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: absent
+    wait: yes
+  with_sequence: count=1
+  register: docs_jobs
+  async: 7200
+  poll: 0
+
+# ----------------------- Destroy DC Instances -----------------------
+- name: Destory DC Instances
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-dc"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: absent
+    wait: yes
+  with_sequence: count=1
+  register: dc_jobs
+  async: 7200
+  poll: 0
+
+# ----------------------- Destroy Windows Instances -----------------------
+- name: Destory Windows Instances
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-s{{ item }}-win1"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: absent
+    wait: yes
+  with_sequence: count={{ user_count }}
+  register: windows1_jobs
+  async: 7200
+  poll: 0
+
+# ----------------------- Destroy Workstation Instances -----------------------
+- name: Destory Workstation Instances
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-s{{ item }}-work"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: absent
+    wait: yes
+  with_sequence: count={{ user_count }}
+  register: workstation_jobs
+  async: 7200
+  poll: 0
+
+###################  Wait for jobs to complete ###################
+
+- name: Wait for DC instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: dc_instances
+  until: dc_instances.finished
+  retries: 300
+  with_items: "{{ dc_jobs.results }}"
+
+- name: Wait for Gitlab instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: gitlab_instances
+  until: gitlab_instances.finished
+  retries: 300
+  with_items: "{{ gitlab_jobs.results }}"
+
+- name: Wait for Docs instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: docs_instances
+  until: docs_instances.finished
+  retries: 300
+  with_items: "{{ docs_jobs.results }}"
+
+- name: Wait for tower instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: tower_instances
+  until: tower_instances.finished
+  retries: 300
+  with_items: "{{ tower_jobs.results }}"
+
+- name: Wait for windows instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: windows_instances
+  until: windows_instances.finished
+  retries: 300
+  with_items: "{{ windows1_jobs.results }}"
+
+- name: Wait for Workstation instance deletion to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: workstation_instances
+  until: workstation_instances.finished
+  retries: 300
+  with_items: "{{ workstation_jobs.results }}"
