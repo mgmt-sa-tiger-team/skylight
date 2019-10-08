@@ -452,62 +452,6 @@
   with_items: "{{ workstation_jobs.results }}"
 
 
-################### Wait for Instances ###################
-
-- name: Tower | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ tower_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: GitLab | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Docs | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: DomainController | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 5986
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ dc_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Windows | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 5986
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ windows_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Workstation | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 5986
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
-
 ################### Get Passwords ###################
 
 - name: DomainController | Obtain windows passwords for instances
@@ -516,7 +460,7 @@
     instance_id: "{{ item.id }}"
     key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     wait: yes
-    wait_timeout: 45
+    wait_timeout: 300
   with_items: "{{ dc_instances.results | map(attribute='tagged_instances') | list }}"
   register: ec2dc_password
   when: dc_instances is defined
@@ -527,7 +471,7 @@
     instance_id: "{{ item.id }}"
     key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     wait: yes
-    wait_timeout: 45
+    wait_timeout: 300
   with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
   register: ec2workstation_password
   when: workstation_instances is defined
@@ -538,7 +482,7 @@
     instance_id: "{{ item.id }}"
     key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     wait: yes
-    wait_timeout: 45
+    wait_timeout: 300
   with_items: "{{ windows_instances.results | map(attribute='tagged_instances') | list }}"
   register: ec2windows_password
   when: windows_instances is defined
@@ -680,6 +624,40 @@
 #    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
 
   when: public_dns_zone is defined
+
+
+################### Wait for Instances ###################
+
+- name: Tower | Wait for SSH to come up  
+  wait_for_connection:  
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['tower'] }}"  
+
+- name: GitLab | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['gitlab'] }}"  
+
+- name: Docs | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['docs'] }}"  
+
+- name: DomainController | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_domain_controllers'] }}"  
+
+- name: Windows | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows'] }}" 
+
+- name: Workstation | Wait for WinRM to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_workstations'] }}" 
+
 
 ################### Create Inventories ###################
 
