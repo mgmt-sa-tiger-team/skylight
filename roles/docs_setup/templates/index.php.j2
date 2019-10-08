@@ -58,8 +58,13 @@ if (!isset($_SESSION['email'])) {
 	$student = db_fetch_assoc_prepare("SELECT * FROM `users` WHERE email = ?", array($_SESSION['email']));
 }
 
+if (isset($_GET['logout']) || $student['email'] != $_SESSION['email']) {
+        session_destroy();
+        header("Location: index.php\n\n");
+        exit;
+}
+
 display_header();
-//print_r($student);
 
 print "  <div data-role='main' class='ui-content'>
     <div data-role='collapsible' data-collapsed='false'>
@@ -165,7 +170,6 @@ function db_fetch_assocs_prepare($query, $data) {
 	$results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 	return $results;
 }
-
 
 function display_header() {
 ?>

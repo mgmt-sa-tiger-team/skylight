@@ -111,12 +111,14 @@
           - Student Login  - http://{{ name_prefix }}.{{ public_dns_zone }}/users/
           - Lab Slide Deck - http://{{ name_prefix }}.{{ public_dns_zone }}/decks/
       when: public_dns_zone is defined
+
     - name: Login Information
       debug:
         msg:
           - Student Login  - http://{{ hostvars['docs'].ansible_host }}/users/
           - Lab Slide Deck - http://{{ hostvars['docs'].ansible_host }}/decks/
       when: public_dns_zone is undefined
+
     - name: Build workshop information
       template:
         src: "{{ playbook_dir }}/roles/docs_setup/templates/workshop.txt.j2"
