@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  gather_facts: False
+  connection: local
+  become: no
+  roles:
+    - ../.

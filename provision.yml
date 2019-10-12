@@ -23,6 +23,7 @@
     - windows-ad-controller
   roles:
     - windows-ad-controller
+    - { role: oatakan.chocolatey_package_localize, when: (local_chocolatey is defined and local_chocolatey|bool) }
 
 - name: Configure Windows Servers
   hosts: windows

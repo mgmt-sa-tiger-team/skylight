@@ -1,0 +1,50 @@
+---
+
+- name: ensure repo directory exists
+  win_file:
+    path: '{{ chocolatey_repo_folder }}'
+    state: directory
+
+- name: ensure share exists
+  win_share:
+    name: '{{ chocolatey_share_name }}'
+    description: '{{ chocolatey_share_description }}'
+    path: '{{ chocolatey_repo_folder }}'
+    list: yes
+    full: '{{ chocolatey_share_full_access }}'
+    read: '{{ chocolatey_share_read_access }}'
+  when: chocolatey_setup_shared_repo|bool
+
+- name: ensure packages exist locally
+  win_get_url:
+    url: https://chocolatey.org/api/v2/package/{{ item.name }}/{{ item.version }}
+    dest: '{{ chocolatey_repo_folder }}\{{ item.name }}.{{ item.version }}.nupkg'
+  loop: "{{ chocolatey_packages | selectattr('url', 'undefined') | list }}"
+  register: chocolatey_packages_1_download
+  until: chocolatey_packages_1_download is success
+  delay: 3
+  retries: 5
+
+- name: ensure packages exist locally with remote binary
+  win_get_url:
+    url: https://chocolatey.org/api/v2/package/{{ item.name }}/{{ item.version }}
+    dest: '{{ chocolatey_repo_folder }}\{{ item.name }}.{{ item.version }}.nupkg'
+  loop: "{{ chocolatey_packages | selectattr('url', 'defined') | list }}"
+  register: chocolatey_packages_2_download
+  until: chocolatey_packages_2_download is success
+  delay: 3
+  retries: 5
+  when: not chocolatey_internalize_packages|bool
+
+- block:
+    - name: install Chocolatey
+      win_chocolatey:
+        name: chocolatey
+        state: present
+
+    - name: internalize packages
+      include_tasks: internalize.yml
+      loop: "{{ chocolatey_packages | selectattr('url', 'defined') | list }}"
+      loop_control:
+        loop_var: package
+  when: chocolatey_internalize_packages|bool

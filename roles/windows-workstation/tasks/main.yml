@@ -14,12 +14,20 @@
       state: disabled
     when: ansible_version.full is version_compare('2.8', '<')
 
-  - name: Install Visual Studio Code, Git, and Putty
+  - name: Add new internal source
+    win_chocolatey_source:
+      name: internal repo
+      state: present
+      source: '\\windc\repo'
+      priority: 1
+    when: local_chocolatey is defined and local_chocolatey|bool
+
+  - name: Install Visual Studio Code, Git, and Google Chrome
     win_chocolatey:
       name: "{{ item }}"
       ignore_checksums: true
     with_items:
-      - visualstudiocode
+      - vscode
       - git
       - googlechrome
     register: chocolatey_packages_install
