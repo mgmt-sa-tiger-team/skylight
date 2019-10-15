@@ -115,7 +115,7 @@ ec2_windc_instance_type: "t3.medium"    # t2.micro fails
 ec2_windc_instance_ami_type: win2019_core # See the ec2_image_names variable for lookup
 ec2_windows_workstation_instance_type: "t3.medium"   # t2.small was slowwwwww...
 # There seems to be an issue using win_chocolatey and win2019_full. See https://github.com/ansible/ansible/issues/47821
-ec2_windows_workstation_instance_ami_type: win2016_full # See the ec2_image_names variable for lookup
+ec2_windows_workstation_instance_ami_type: win2019_full # See the ec2_image_names variable for lookup
 ec2_windows_instance_type: "t3.small"   # Small = 1 vCPU / 2GB
 ec2_windows_instance_ami_type: win2019_core # See the ec2_image_names variable for lookup
 
@@ -202,6 +202,6 @@ azure_rhel_version: "latest"
 
 azure_win_publisher: "MicrosoftWindowsServer"
 azure_win_offer: "WindowsServer"
-azure_win_sku: "2016-Datacenter"
+azure_win_sku: "2019-Datacenter"
 azure_win_version: "latest"
 
