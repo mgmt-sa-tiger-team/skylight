@@ -45,6 +45,10 @@ advanced_lab: false
 # Enable nginx-ssl
 nginx_ssl: true
 
+# Experimental - Windows connection variables
+windows_ansible_connection: winrm # set this to winrm/ssh
+windows_openssh_url: https://github.com/PowerShell/Win32-OpenSSH/releases/download/v8.0.0.0p1-Beta/OpenSSH-Win64.zip
+
 ##########################################################
 ###################### GITLAB INFO #######################
 ##########################################################
