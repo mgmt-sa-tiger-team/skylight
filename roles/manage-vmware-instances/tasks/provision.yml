@@ -36,6 +36,14 @@
       - winrm set winrm/config/service/auth @{Basic="true"}
       - winrm set winrm/config/service @{AllowUnencrypted="true"}
       - powershell.exe -command "New-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters -Name DisabledComponents -PropertyType DWord -Value 0xffffffff"
+      - powershell.exe -Command "Invoke-WebRequest -Uri '{{ windows_openssh_url }}' -OutFile 'C:\Windows\Temp\OpenSSH-Win64.zip'"
+      - powershell.exe -Command "Expand-Archive -LiteralPath 'C:\Windows\Temp\OpenSSH-Win64.zip' -DestinationPath 'C:\Program Files' -ErrorAction SilentlyContinue"
+      - powershell.exe -Command "Rename-Item -Path 'C:\Program Files\OpenSSH-Win64' -NewName 'C:\Program Files\OpenSSH' -ErrorAction SilentlyContinue"
+      - powershell.exe -ExecutionPolicy Bypass -File "C:\Program Files\OpenSSH\install-sshd.ps1"
+      - powershell.exe -Command "New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue"
+      - netsh advfirewall firewall add rule name=sshd dir=in action=allow protocol=TCP localport=22
+      - net start sshd
+      - powershell.exe -Command "Set-Service sshd -StartupType Automatic -ErrorAction SilentlyContinue"
   with_sequence: count=1
   register: dc_jobs
   async: 7200
@@ -161,6 +169,14 @@
       - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
       - winrm set winrm/config/service/auth @{Basic="true"}
       - winrm set winrm/config/service @{AllowUnencrypted="true"}
+      - powershell.exe -Command "Invoke-WebRequest -Uri '{{ windows_openssh_url }}' -OutFile 'C:\Windows\Temp\OpenSSH-Win64.zip'"
+      - powershell.exe -Command "Expand-Archive -LiteralPath 'C:\Windows\Temp\OpenSSH-Win64.zip' -DestinationPath 'C:\Program Files' -ErrorAction SilentlyContinue"
+      - powershell.exe -Command "Rename-Item -Path 'C:\Program Files\OpenSSH-Win64' -NewName 'C:\Program Files\OpenSSH' -ErrorAction SilentlyContinue"
+      - powershell.exe -ExecutionPolicy Bypass -File "C:\Program Files\OpenSSH\install-sshd.ps1"
+      - powershell.exe -Command "New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue"
+      - netsh advfirewall firewall add rule name=sshd dir=in action=allow protocol=TCP localport=22
+      - net start sshd
+      - powershell.exe -Command "Set-Service sshd -StartupType Automatic -ErrorAction SilentlyContinue"
   with_sequence: count={{user_count}}
   register: windows1_jobs
   async: 7200
@@ -204,6 +220,14 @@
       - powershell.exe -command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
       - winrm set winrm/config/service/auth @{Basic="true"}
       - winrm set winrm/config/service @{AllowUnencrypted="true"}
+      - powershell.exe -Command "Invoke-WebRequest -Uri '{{ windows_openssh_url }}' -OutFile 'C:\Windows\Temp\OpenSSH-Win64.zip'"
+      - powershell.exe -Command "Expand-Archive -LiteralPath 'C:\Windows\Temp\OpenSSH-Win64.zip' -DestinationPath 'C:\Program Files' -ErrorAction SilentlyContinue"
+      - powershell.exe -Command "Rename-Item -Path 'C:\Program Files\OpenSSH-Win64' -NewName 'C:\Program Files\OpenSSH' -ErrorAction SilentlyContinue"
+      - powershell.exe -ExecutionPolicy Bypass -File "C:\Program Files\OpenSSH\install-sshd.ps1"
+      - powershell.exe -Command "New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue"
+      - netsh advfirewall firewall add rule name=sshd dir=in action=allow protocol=TCP localport=22
+      - net start sshd
+      - powershell.exe -Command "Set-Service sshd -StartupType Automatic -ErrorAction SilentlyContinue"
   with_sequence: count={{user_count}}
   register: workstation_jobs
   async: 7200
@@ -261,10 +285,11 @@
   add_host:
     hostname: "windc"
     ansible_host: "{{ item.ipv4  }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "Administrator"
     ansible_password: "{{ domain_admin_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     private_ip: "{{ item.ipv4 }}"
     ansible_winrm_transport: "basic"
     ansible_winrm_server_cert_validation: "ignore"
@@ -313,10 +338,11 @@
     ansible_host: "{{ item.ipv4  }}"
     student: "{{ item.hw_name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
     private_ip: "{{ item.ipv4 }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "Administrator"
     ansible_password: "{{ domain_admin_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     ansible_winrm_transport: "basic"
     ansible_winrm_server_cert_validation: "ignore"
     groups: windows
@@ -328,11 +354,12 @@
     private_ip: "{{ item.ipv4 }}"
     ansible_host: "{{ item.ipv4 }}"
     student: "{{ item.hw_name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "Administrator"
     ansible_password: "{{ domain_admin_password }}"
     ansible_become_password: "{{ users_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     ansible_winrm_transport: "basic"
     ansible_winrm_server_cert_validation: "ignore"
     groups: windows_workstations
@@ -355,17 +382,17 @@
   delegate_to: "{{ item }}"
   with_items: "{{ groups['docs'] }}"  
 
-- name: DomainController | Wait for WinRM to come up
+- name: DomainController | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
   with_items: "{{ groups['windows_domain_controllers'] }}"  
 
-- name: Windows | Wait for WinRM to come up
+- name: Windows | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
   with_items: "{{ groups['windows'] }}" 
 
-- name: Workstation | Wait for WinRM to come up
+- name: Workstation | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
   with_items: "{{ groups['windows_workstations'] }}" 
