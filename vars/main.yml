@@ -99,6 +99,7 @@ ec2_region: "us-east-1"
 ec2_image_names:
   rhel7: "RHEL-7.6_HVM_GA*x86_64*"
   rhel8: "RHEL-8.0.0_HVM_GA*x86_64*"
+  centos7: "CentOS Linux 7 x86_64 HVM EBS ENA 1901_01*"
   win2016_core: "Windows_Server-2016-English-Core-Base*"
   win2016_full: "Windows_Server-2016-English-Full-Base*"
   win2019_core: "Windows_Server-2019-English-Core-Base*"
