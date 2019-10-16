@@ -53,7 +53,7 @@
 
 - name: create package
   win_shell: >
-    choco pack -y '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\{{ package.name }}.nuspec'
+    C:\ProgramData\chocolatey\choco pack -y '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\{{ package.name }}.nuspec'
     --out='{{ chocolatey_repo_folder }}'
 
 - name: ensure temp directory is removed
