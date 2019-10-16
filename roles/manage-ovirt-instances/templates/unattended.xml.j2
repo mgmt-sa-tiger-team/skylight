@@ -70,6 +70,56 @@
                     <Order>5</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
+{% if windows_ansible_connection == 'ssh' %}
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Invoke-WebRequest -Uri '{{ windows_openssh_url }}' -OutFile 'C:\Windows\Temp\OpenSSH-Win64.zip'"</CommandLine>
+                    <Description>OpenSSH Install - 1</Description>
+                    <Order>6</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Expand-Archive -LiteralPath 'C:\Windows\Temp\OpenSSH-Win64.zip' -DestinationPath 'C:\Program Files' -ErrorAction SilentlyContinue"</CommandLine>
+                    <Description>OpenSSH Install - 2</Description>
+                    <Order>7</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Rename-Item -Path 'C:\Program Files\OpenSSH-Win64' -NewName 'C:\Program Files\OpenSSH' -ErrorAction SilentlyContinue"</CommandLine>
+                    <Description>OpenSSH Install - 3</Description>
+                    <Order>8</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -ExecutionPolicy Bypass -File "C:\Program Files\OpenSSH\install-sshd.ps1"</CommandLine>
+                    <Description>OpenSSH Install - 4</Description>
+                    <Order>9</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue"</CommandLine>
+                    <Description>OpenSSH Install - 5</Description>
+                    <Order>10</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c "netsh advfirewall firewall add rule name=sshd dir=in action=allow protocol=TCP localport=22"</CommandLine>
+                    <Description>OpenSSH Install - 6</Description>
+                    <Order>11</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c "net start sshd"</CommandLine>
+                    <Description>OpenSSH Install - 7</Description>
+                    <Order>12</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -Command "Set-Service sshd -StartupType Automatic -ErrorAction SilentlyContinue"</CommandLine>
+                    <Description>OpenSSH Install - 8</Description>
+                    <Order>13</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+{% endif %}
             </FirstLogonCommands>
             <ShowWindowsLive>false</ShowWindowsLive>
         </component>
