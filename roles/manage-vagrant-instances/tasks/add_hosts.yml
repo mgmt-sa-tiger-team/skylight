@@ -1,0 +1,78 @@
+---
+- name: DomainController | Add new instance to host group
+  add_host:
+    hostname: "windc"
+    ansible_host: "{{ hostvars['windc'].ansible_host }}"
+    ansible_port: "{{ hostvars['windc'].ansible_port }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "winrm"
+    private_ip: "{{ hostvars['windc'].private_ip }}"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_domain_controllers
+
+- name: GitLab | Add new instance to host group
+  add_host:
+    hostname: "gitlab"
+    ansible_ssh_host: "{{ hostvars['gitlab'].ansible_host }}"
+    ansible_host: "{{ hostvars['gitlab'].ansible_host }}"
+    ansible_port: "{{ hostvars['gitlab'].ansible_port }}"
+    private_ip: "{{ hostvars['gitlab'].private_ip }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: gitlab
+
+- name: Docs | Add new instance to host group
+  add_host:
+    hostname: "docs"
+    ansible_ssh_host: "{{ hostvars['docs'].ansible_host }}"
+    ansible_host: "{{ hostvars['docs'].ansible_host }}"
+    ansible_port: "{{ hostvars['docs'].ansible_port }}"
+    private_ip: "{{ hostvars['docs'].private_ip }}"
+    public_ip: "{{ hostvars['docs'].ansible_host }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: docs
+
+- name: Tower | Add new instance to host group
+  add_host:
+    hostname: "{{ hostvars['s1-tower'].inventory_hostname | replace(name_prefix + '-', '') }}"
+    ansible_ssh_host: "{{ hostvars['s1-tower'].ansible_host }}"
+    ansible_host: "{{ hostvars['s1-tower'].ansible_host }}"
+    ansible_port: "{{ hostvars['s1-tower'].ansible_port }}"
+    private_ip: "{{ hostvars['s1-tower'].private_ip }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    tower_license: "{{ tower_license }}"
+    student: "{{ hostvars['s1-tower'].inventory_hostname | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    groups: tower
+
+- name: Windows | Add new instance to host group
+  add_host:
+    hostname: "{{ hostvars['s1-win1'].inventory_hostname | replace(name_prefix + '-', '') }}"
+    ansible_host: "{{ hostvars['s1-win1'].ansible_host }}"
+    student: "{{ hostvars['s1-win1'].inventory_hostname | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    private_ip: "{{ hostvars['s1-win1'].private_ip }}"
+    ansible_port: "{{ hostvars['s1-win1'].ansible_port }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "winrm"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows
+
+- name: Workstation | Add new instance to host group
+  add_host:
+    hostname: "{{ hostvars['s1-work'].inventory_hostname | replace(name_prefix + '-', '') }}"
+    private_ip: "{{ hostvars['s1-work'].private_ip }}"
+    ansible_host: "{{ hostvars['s1-work'].ansible_host }}"
+    student: "{{ hostvars['s1-work'].inventory_hostname | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    ansible_port: "{{ hostvars['s1-work'].ansible_port }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_become_password: "{{ users_password }}"
+    ansible_connection: "winrm"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_workstations

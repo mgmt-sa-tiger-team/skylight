@@ -56,17 +56,17 @@
       "tag:Name": "{{ name_prefix }}-gitlab"
   register: ec2_gitlab_instances
 
-- name: "Delete GitLab DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
-  route53:
-    state: absent
-    zone: "{{ public_dns_zone }}"
-    record: "{{ item.tags.long_name }}"
-    type: A
-    value: "{{ item.public_ip }}"
-    wait: yes
-  with_items: "{{ ec2_gitlab_instances }}"
-  when: public_dns_zone is defined and item.instances.0 is defined
-  ignore_errors: yes
+#- name: "Delete GitLab DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
+#  route53:
+#    state: absent
+#    zone: "{{ public_dns_zone }}"
+#    record: "{{ item.tags.long_name }}"
+#    type: A
+#    value: "{{ item.public_ip }}"
+#    wait: yes
+#  with_items: "{{ ec2_gitlab_instances }}"
+#  when: public_dns_zone is defined and item.instances.0 is defined
+#  ignore_errors: yes
 
 - name: Terminate Gitlab Instances
   ec2:
@@ -86,41 +86,31 @@
       "tag:Name": "{{ name_prefix }}-docs"
   register: ec2_docs_instances
 
-- name: "Delete Docs DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
-  route53:
-    state: absent
-    zone: "{{ public_dns_zone }}"
-    record: "{{ item.tags.long_name }}"
-    type: A
-    value: "{{ item.public_ip }}"
-    wait: yes
-  with_items: "{{ ec2_docs_instances }}"
-  when: public_dns_zone is defined and item.instances.0 is defined
-  ignore_errors: yes
+#- name: "Delete Docs DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
+#  route53:
+#    state: absent
+#    zone: "{{ public_dns_zone }}"
+#    record: "{{ name_prefix }}.{{ public_dns_zone }}"
+#    type: A
+#    value: "{{ item.public_ip }}"
+#    wait: yes
+#  with_items:
+#    - "{{ ec2_docs_instances }}"
+#  when: public_dns_zone is defined and item.instances.0 is defined
+#  ignore_errors: yes
 
-- name: "Delete Docs DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
-  route53:
-    state: absent
-    zone: "{{ public_dns_zone }}"
-    record: "{{ item.tags.long_name }}"
-    type: A
-    value: "{{ item.public_ip }}"
-    wait: yes
-  with_items: "{{ ec2_docs_instances }}"
-  when: public_dns_zone is defined and item.instances.0 is defined
-  ignore_errors: yes
-
-- name: "Delete Docs DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
-  route53:
-    state: absent
-    zone: "{{ public_dns_zone }}"
-    record: "{{ item.tags.long_name }}"
-    type: A
-    value: "{{ item.public_ip }}"
-    wait: yes
-  with_items: "{{ ec2_docs_instances }}"
-  when: public_dns_zone is defined and item.instances.0 is defined
-  ignore_errors: yes
+#- name: "Delete Docs DNS entry for docs.{{ item.tags.long_name }}"
+#  route53:
+#    state: absent
+#    zone: "{{ public_dns_zone }}"
+#    record: "{{ item.tags.long_name }}"
+#    type: A
+#    value: "{{ item.public_ip }}"
+#    wait: yes
+#  with_items:
+#    - "{{ ec2_docs_instances }}"
+#  when: public_dns_zone is defined and item.instances.0 is defined
+#  ignore_errors: yes
 
 - name: Terminate Docs Instances
   ec2:
@@ -187,17 +177,37 @@
     - "{{ ec2_workstation_instances.results }}"
   when: item.instances.0 is defined and item.instances.0.instance_id is defined
 
-- name: "Workstation | Delete DNS entries for student workstations"
+#- name: "Workstation | Delete DNS entries for student workstations"
+#  route53:
+#    state: absent
+#    zone: "{{ public_dns_zone }}"
+#    record: "{{ item.tags.long_name }}"
+#    type: A
+#    ttl: 600
+#    value: "{{ item.public_ip }}"
+#    wait: yes
+#  with_items: "{{ ec2_workstation_instances.results }}"
+#  when: public_dns_zone is defined and item.instances.0 is defined and item.instances.0.instance_id is defined
+#  ignore_errors: yes
+
+- name: Get route53 dns information
+  route53:
+    state: get
+    zone: "{{ public_dns_zone }}"
+    record: "{{ name_prefix }}.{{ public_dns_zone }}"
+    type: A
+  register: route53_dns_record
+  when: public_dns_zone is defined
+
+- name: Delete route53 dns alias
   route53:
     state: absent
     zone: "{{ public_dns_zone }}"
-    record: "{{ item.tags.long_name }}"
-    type: A
-    ttl: 600
-    value: "{{ item.public_ip }}"
-    wait: yes
-  with_items: "{{ ec2_workstation_instances.results }}"
-  when: public_dns_zone is defined and item.instances.0 is defined and item.instances.0.instance_id is defined
+    record: "{{ route53_dns_record.set.record }}"
+    ttl: "{{ route53_dns_record.set.ttl }}"
+    type: "{{ route53_dns_record.set.type }}"
+    value: "{{ route53_dns_record.set.value }}"
+  when: public_dns_zone is defined and route53_dns_record.set is defined
   ignore_errors: yes
 
 ################### Remove Security Groups ###################

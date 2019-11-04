@@ -44,7 +44,7 @@ Open Visual Studio Code
 For this lab, we have already created a clone of your Git repository for you.  It is located in your Documents folder, the full path will look like this (with the # replaced with your student number)
 'C:\Users\student#\Documents\student#'
 
-To access it, in Visual Code click on 'File' and then 'Open Folder'.  It should default to your documents folder, so select your student folder and press the 'Select Folder' button.
+To access it, in Visual Code click *File > Open Folder*.  It should default to your documents folder, so select your student folder and click the *Select Folder* button.
 
 At this point in the Explorer sidebar you should have a 'student#' section with only a README file in it.
 
@@ -52,8 +52,8 @@ image::images/3-vscode-open-folder.png[title="Student Playbooks Repo",width=1000
 
 *Step 2:* Create a directory called *iis_basic* and a file called `install_iis.yml`
 
-Hover over the 'student#' section and click on the 'New Folder' button. Create a folder called `iis_basic`.  Then click on that folder so it is selected.
-Right click on the new folder you've created and create a file called `install_iis.yml`.
+Hover over the 'student#' section and click the 'New Folder' button. Create a folder called `iis_basic`.  Then click that folder so it is selected.
+Right click the new folder you've created and create a file called `install_iis.yml`.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
@@ -156,16 +156,14 @@ Now that you've completed writing your playbook, it would be a shame not to keep
 And that should do it.  You should now have a fully written playbook called `install_iis.yml`.
 
 But wait!!! We haven't committed our changes from our *local* copy to *git*.
-Click on the Source Code icon as shown below (It is the middle on the far left of the page that has the blue circle with # 1 in it)
+Click the Source Code icon as shown below (It is the middle on the far left of the page that has the blue circle with # 1 in it)
+
+image::images/3-vscode-click-commit.png[title="Git Commit",width=1000]
 
 Type in a commit message such as 'Adding install_iis.yml' in the text box at the top of the sidebar. Click the check box above to commit.
 This message is intended to describe the changes you made so that others (including yourself) better understand what is changing when comparing versions.
 
 image::images/3-vscode-commit.png[title="Git Commit install_iis.yml",width=1000]
-
-This will prompt to ask if you want to stage the changes.  Click on `Always` and you won't be prompted again.
-
-image::images/3-vscode-commit-always.png[title="Stage Commits Always"]
 
 Now you need to push the committed changes to your repository.
 
@@ -174,7 +172,11 @@ On the bottom left blue bar, click the section that contains the circular arrows
 image::images/3-vscode-push.png[title="Git Push Origin"]
 
 
-This may take as long as 30 seconds to push.  If you're interested in validating the code is in git, you can connect to GitLab to verify.  Open `Chrome` and connect to `https://gitlab.ansibleworkshop.com`. Click the `LDAP Login` tab and login with your AD user (student#) and password and you should see your repository.
+This may take as long as 30 seconds to push. After your first push, you may get a pop-up message asking if you would like to periodically run git fetch. Because you're the only one working on the git repo, you can click *Yes* or *No*.
+
+image::images/3-vscode-push-initial-pop-up.png[title="Git Push Origin"]
+
+If you're interested in validating the code is in git, you can connect to GitLab to verify.  Open `Chrome` and connect to `https://gitlab.ansibleworkshop.com`. Click the `LDAP Login` tab and login with your AD user (student#@ansibleworkshop.com) and password and you should see your repository.
 
 You are ready to automate!
 

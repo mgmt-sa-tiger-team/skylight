@@ -18,18 +18,6 @@
     location: "{{ azure_location }}"
     state: present
 
-# Create a storage account
-- name: Azure | Create a storage account
-  azure_rm_storageaccount:
-    client_id: "{{ azure_client_id }}"
-    secret: "{{ azure_secret }}"
-    subscription_id: "{{ azure_subscription_id }}"
-    tenant: "{{ azure_tenant }}"
-    resource_group: "{{ azure_resource_group }}"
-    name: "{{ azure_storage_account }}"
-    account_type: "{{ azure_storage_account_type }}"
-    state: present
-
 # Create a virtual network
 - name: Azure | Create virtual network
   azure_rm_virtualnetwork:
@@ -67,7 +55,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix }}-dc"
     vm_size: "{{ azure_windc_instance_type }}"
-    storage_account_name: "{{ azure_storage_account }}"
+    managed_disk_type: "{{ azure_storage_account_type }}"
     admin_username: "{{ azure_admin_user }}"
     admin_password: "{{ azure_admin_pass }}"
     started: True
@@ -76,6 +64,7 @@
     public_ip_allocation_method: Dynamic
     virtual_network_name: "{{ azure_virtual_network }}"
     open_ports:
+      - 22    # SSH
       - 5986  # WinRM secure
       - 5985
       - 3389  # RDP
@@ -102,7 +91,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-s' + item + '-w1'}}"
     vm_size: "{{ azure_windows_instance_type }}"
-    storage_account_name: "{{ azure_storage_account }}"
+    managed_disk_type: "{{ azure_storage_account_type }}"
     admin_username: "{{ azure_admin_user }}"
     admin_password: "{{ azure_admin_pass }}"
     started: True
@@ -112,6 +101,7 @@
     virtual_network_name: "{{ azure_virtual_network }}"
     subnet_name: "{{ azure_virtual_subnet }}"
     open_ports:
+      - 22    # SSH
       - 80
       - 8080
       - 443 
@@ -143,7 +133,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-s' + item + '-wk'}}"
     vm_size: "{{ azure_windows_workstation_instance_type }}"
-    storage_account_name: "{{ azure_storage_account }}"
+    managed_disk_type: "{{ azure_storage_account_type }}"
     admin_username: "{{ azure_admin_user }}"
     admin_password: "{{ azure_admin_pass }}"
     started: True
@@ -153,6 +143,7 @@
     virtual_network_name: "{{ azure_virtual_network }}"
     subnet_name: "{{ azure_virtual_subnet }}"
     open_ports:
+      - 22    # SSH
       - 5986  # WinRM secure
       - 5985  # WinRM
       - 3389  # RDP
@@ -181,7 +172,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-s' + item + '-tower'}}"
     vm_size: "{{ azure_tower_instance_type }}"
-    storage_account_name: "{{ azure_storage_account }}"
+    managed_disk_type: "{{ azure_storage_account_type }}"
     admin_username: "{{ azure_admin_user }}"
     admin_password: "{{ azure_admin_pass }}"
     started: True
@@ -218,7 +209,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-gitlab'}}"
     vm_size: "{{ azure_gitlab_instance_type }}"
-    storage_account_name: "{{ azure_storage_account }}"
+    managed_disk_type: "{{ azure_storage_account_type }}"
     admin_username: "{{ azure_admin_user }}"
     admin_password: "{{ azure_admin_pass }}"
     started: True
@@ -254,7 +245,7 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ name_prefix + '-docs'}}"
     vm_size: "{{ azure_gitlab_instance_type }}"
-    storage_account_name: "{{ azure_storage_account }}"
+    managed_disk_type: "{{ azure_storage_account_type }}"
     admin_username: "{{ azure_admin_user }}"
     admin_password: "{{ azure_admin_pass }}"
     started: True
@@ -341,9 +332,11 @@
     publisher: Microsoft.Compute
     virtual_machine_extension_type: CustomScriptExtension
     type_handler_version: 1.9
-    settings: '{"commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File CustomScript.ps1 -ForceNewSSLCert -EnableCredSSP", "fileUris": ["https://raw.githubusercontent.com/mgmt-sa-tiger-team/skylight/master/roles/manage-azure-instances/templates/CustomScript.ps1"]}'
+    settings: {"commandToExecute": "powershell.exe -ExecutionPolicy ByPass -EncodedCommand {{ lookup('template', 'custom_script.ps1.j2') | b64encode(encoding='utf-16-le') }}"}
     auto_upgrade_minor_version: true
   with_items: "{{ dc_instances.results }}"
+  async: 7200
+  poll: 0
 
 - name: Workstation create VM Extension
   azure_rm_virtualmachine_extension:
@@ -357,10 +350,12 @@
     publisher: Microsoft.Compute
     virtual_machine_extension_type: CustomScriptExtension
     type_handler_version: 1.9
-    settings: '{"commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File CustomScript.ps1 -ForceNewSSLCert -EnableCredSSP", "fileUris": ["https://raw.githubusercontent.com/mgmt-sa-tiger-team/skylight/master/roles/manage-azure-instances/templates/CustomScript.ps1"]}'
+    settings: {"commandToExecute": "powershell.exe -ExecutionPolicy ByPass -EncodedCommand {{ lookup('template', 'custom_script.ps1.j2') | b64encode(encoding='utf-16-le') }}"}
     auto_upgrade_minor_version: true
   with_items: "{{ workstation_instances.results }}"
-  
+  async: 7200
+  poll: 0
+
 - name: Windows create VM Extension
   azure_rm_virtualmachine_extension:
     client_id: "{{ azure_client_id }}"
@@ -373,9 +368,11 @@
     publisher: Microsoft.Compute
     virtual_machine_extension_type: CustomScriptExtension
     type_handler_version: 1.9
-    settings: '{"commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File CustomScript.ps1 -ForceNewSSLCert -EnableCredSSP", "fileUris": ["https://raw.githubusercontent.com/mgmt-sa-tiger-team/skylight/master/roles/manage-azure-instances/templates/CustomScript.ps1"]}'
+    settings: {"commandToExecute": "powershell.exe -ExecutionPolicy ByPass -EncodedCommand {{ lookup('template', 'custom_script.ps1.j2') | b64encode(encoding='utf-16-le') }}"}
     auto_upgrade_minor_version: true
   with_items: "{{ windows_instances.results }}"
+  async: 7200
+  poll: 0
 
 ################### Add Hosts ###################
 
@@ -418,10 +415,11 @@
   add_host:
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     private_ip: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
     ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
@@ -433,10 +431,11 @@
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     private_ip:  "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
     student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
@@ -448,11 +447,12 @@
     hostname: "{{ item.invocation.module_args.tags.DNSName }}"
     ansible_host: "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.publicIPAddress.properties.ipAddress }}"
     private_ip:  "{{ item.ansible_facts.azure_vm.properties.networkProfile.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "{{ azure_admin_user }}"
     ansible_password: "{{ azure_admin_pass }}"
     ansible_become_password: "{{ users_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     ansible_winrm_transport: "credssp"
     ansible_winrm_server_cert_validation: "ignore"
     student: "{{ item.invocation.module_args.tags.Student | regex_replace('[^0-9]', '') }}"
@@ -476,17 +476,17 @@
   delegate_to: "{{ item }}"
   with_items: "{{ groups['docs'] }}"  
 
-- name: DomainController | Wait for WinRM to come up
+- name: DomainController | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
   with_items: "{{ groups['windows_domain_controllers'] }}"  
 
-- name: Windows | Wait for WinRM to come up
+- name: Windows | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
   with_items: "{{ groups['windows'] }}" 
 
-- name: Workstation | Wait for WinRM to come up
+- name: Workstation | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
   with_items: "{{ groups['windows_workstations'] }}" 

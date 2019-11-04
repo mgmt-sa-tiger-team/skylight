@@ -6,4 +6,4 @@
         reboot: yes
         reboot_timeout: 3600
       register: update_result
-      until: update_result.found_update_count == 0 or update_result.failed_update_count == update_result.found_update_count
+      until: update_result.found_update_count == 0

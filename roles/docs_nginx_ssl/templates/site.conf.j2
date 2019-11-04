@@ -1,0 +1,45 @@
+#Point http requests to https
+server {
+    listen 0.0.0.0:80;
+    server_name {{ name_prefix }}.{{ public_dns_zone }};
+    server_tokens off;
+    return 301 https://$host$request_uri;
+}
+
+# the secure nginx server instance
+server {
+    listen 443 ssl;
+    ssl_certificate     /etc/letsencrypt/live/{{ name_prefix | lower }}.{{ public_dns_zone }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ name_prefix | lower }}.{{ public_dns_zone }}/privkey.pem;
+    ssl_protocols       TLSv1.1 TLSv1.2;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    server_name {{ name_prefix }}.{{ public_dns_zone }};
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.php index.html index.htm;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME /usr/share/nginx/html/$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+{% if groups.windows_workstations is defined %}
+{% for vm in groups.windows_workstations %}
+    location /student{{ hostvars[vm].student|string }}/ {
+        proxy_pass https://{{ hostvars[vm].ansible_host }}/student{{ hostvars[vm].student|string }}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+{% endfor %}
+{% endif %}
+}

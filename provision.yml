@@ -91,7 +91,10 @@
     - docs
   roles:
     - linux-common
-    - docs_nginx
+    - { role: geerlingguy.repo-epel, when: (public_dns_zone is defined and nginx_ssl | bool) }
+    - { role: geerlingguy.certbot, when: (public_dns_zone is defined and nginx_ssl | bool) }
+    - { role: docs_nginx_ssl, when: (public_dns_zone is defined and nginx_ssl | bool) }
+    - { role: docs_nginx, when: (public_dns_zone is undefined or not nginx_ssl | bool) }
     - docs_setup
 
 - name: Display Login Information
@@ -105,8 +108,17 @@
     - name: Login Information
       debug:
         msg:
+          - Student Login  - http://{{ name_prefix }}.{{ public_dns_zone }}/users/
+          - Lab Slide Deck - http://{{ name_prefix }}.{{ public_dns_zone }}/decks/
+      when: public_dns_zone is defined
+
+    - name: Login Information
+      debug:
+        msg:
           - Student Login  - http://{{ hostvars['docs'].ansible_host }}/users/
           - Lab Slide Deck - http://{{ hostvars['docs'].ansible_host }}/decks/
+      when: public_dns_zone is undefined
+
     - name: Build workshop information
       template:
         src: "{{ playbook_dir }}/roles/docs_setup/templates/workshop.txt.j2"

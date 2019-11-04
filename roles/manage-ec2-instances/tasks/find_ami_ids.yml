@@ -7,6 +7,22 @@
     region: "{{ ec2_region }}"
   register: rhel7_ami_find
 
+- name: find ami id for rhel 8
+  ec2_ami_facts:
+    owners: 309956199498
+    filters:
+      name: "{{ ec2_image_names['rhel8'] }}"
+    region: "{{ ec2_region }}"
+  register: rhel8_ami_find
+
+- name: find ami id for centos 7
+  ec2_ami_facts:
+    owners: aws-marketplace
+    filters:
+      name: "{{ ec2_image_names['centos7'] }}"
+    region: "{{ ec2_region }}"
+  register: centos7_ami_find
+
 - name: find ami for windows 2016 core
   ec2_ami_facts:
     filters:
@@ -39,6 +55,8 @@
   set_fact:
     ec2_ami_ids:
       rhel7: "{{ rhel7_ami_find.images[-1].image_id | default('') }}"
+      rhel8: "{{ rhel8_ami_find.images[-1].image_id | default('') }}"
+      centos7: "{{ centos7_ami_find.images[-1].image_id | default('') }}"
       win2016_core: "{{ win2016_core_ami_find.images[-1].image_id | default('') }}"
       win2016_full: "{{ win2016_full_ami_find.images[-1].image_id | default('') }}"
       win2019_core: "{{ win2019_core_ami_find.images[-1].image_id | default('') }}"

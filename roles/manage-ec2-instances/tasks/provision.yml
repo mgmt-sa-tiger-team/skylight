@@ -177,6 +177,10 @@
       Students: "{{ user_count }}"
     rules:
       - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "0.0.0.0/0"
+      - proto: tcp
         from_port: 5986
         to_port: 5986
         cidr_ip: "0.0.0.0/0"
@@ -199,6 +203,10 @@
       Skylight: "This was provisioned through the skylight provisioner"
       Students: "{{ user_count }}"
     rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "0.0.0.0/0"
       - proto: tcp
         from_port: 80
         to_port: 80
@@ -452,62 +460,6 @@
   with_items: "{{ workstation_jobs.results }}"
 
 
-################### Wait for Instances ###################
-
-- name: Tower | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ tower_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: GitLab | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Docs | Wait for SSH to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 22
-    delay: 1
-    timeout: 320
-    state: started
-  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: DomainController | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 5986
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ dc_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Windows | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 5986
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ windows_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Workstation | Wait for WinRM to come up
-  wait_for:
-    host: "{{ item.public_ip }}"
-    port: 5986
-    delay: 1
-    timeout: 1800
-    state: started
-  with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
-
 ################### Get Passwords ###################
 
 - name: DomainController | Obtain windows passwords for instances
@@ -516,7 +468,7 @@
     instance_id: "{{ item.id }}"
     key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     wait: yes
-    wait_timeout: 45
+    wait_timeout: 300
   with_items: "{{ dc_instances.results | map(attribute='tagged_instances') | list }}"
   register: ec2dc_password
   when: dc_instances is defined
@@ -527,7 +479,7 @@
     instance_id: "{{ item.id }}"
     key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     wait: yes
-    wait_timeout: 45
+    wait_timeout: 300
   with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
   register: ec2workstation_password
   when: workstation_instances is defined
@@ -538,7 +490,7 @@
     instance_id: "{{ item.id }}"
     key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     wait: yes
-    wait_timeout: 45
+    wait_timeout: 300
   with_items: "{{ windows_instances.results | map(attribute='tagged_instances') | list }}"
   register: ec2windows_password
   when: windows_instances is defined
@@ -581,10 +533,11 @@
   add_host:
     hostname: "windc"
     ansible_host: "{{ item.item.public_ip }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "Administrator"
     ansible_password: "{{ item.win_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     private_ip: "{{ item.item.private_ip }}"
     ansible_winrm_transport: "ntlm"
     ansible_winrm_server_cert_validation: "ignore"
@@ -599,11 +552,12 @@
     hostname: "s{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}-win1"
     ansible_host: "{{ item.item.public_ip }}"
     private_ip: "{{ item.item.private_ip }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "Administrator"
     ansible_password: "{{ item.win_password }}"
     ansible_become_password: "{{ domain_admin_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     ansible_winrm_transport: "ntlm"
     ansible_winrm_server_cert_validation: "ignore"
     ansible_winrm_operation_timeout_sec: 120
@@ -618,11 +572,12 @@
     hostname: "s{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}-work"
     ansible_host: "{{ item.item.public_ip }}"
     private_ip: "{{ item.item.private_ip }}"
-    ansible_port: 5986
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
     ansible_user: "Administrator"
     ansible_password: "{{ item.win_password }}"
     ansible_become_password: "{{ users_password }}"
-    ansible_connection: "winrm"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
     ansible_winrm_transport: "ntlm"
     ansible_winrm_server_cert_validation: "ignore"
     ansible_winrm_operation_timeout_sec: 120
@@ -646,51 +601,74 @@
       wait: yes
     with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
 
-  - name: "Docs | Create DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
-    route53:
-      state: present
-      zone: "{{ public_dns_zone }}"
-      record: "{{ name_prefix }}.{{ public_dns_zone }}"
-      type: A
-      ttl: 600
-      value: "{{ item.public_ip }}"
-      wait: yes
-    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-
-  - name: "Docs | Create DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
-    route53:
-      state: present
-      zone: "{{ public_dns_zone }}"
-      record: "{{ item.tags.long_name }}"
-      type: A
-      ttl: 600
-      value: "{{ item.public_ip }}"
-      wait: yes
-    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-
-  - name: "GitLab | Create DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
-    route53:
-      state: present
-      zone: "{{ public_dns_zone }}"
-      record: "{{ item.tags.long_name }}"
-      type: A
-      ttl: 600
-      value: "{{ item.public_ip }}"
-      wait: yes
-    with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
-
-  - name: "Workstation | Create DNS entries for student workstations"
-    route53:
-      state: present
-      zone: "{{ public_dns_zone }}"
-      record: "{{ item.tags.long_name }}"
-      type: A
-      ttl: 600
-      value: "{{ item.public_ip }}"
-      wait: yes
-    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
+#  - name: "Docs | Create DNS entry for docs.{{ item.tags.long_name }}"
+#    route53:
+#      state: present
+#      zone: "{{ public_dns_zone }}"
+#      record: "{{ item.tags.long_name }}"
+#      type: A
+#      ttl: 600
+#      value: "{{ item.public_ip }}"
+#      wait: yes
+#    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+#
+#  - name: "GitLab | Create DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
+#    route53:
+#      state: present
+#      zone: "{{ public_dns_zone }}"
+#      record: "{{ item.tags.long_name }}"
+#      type: A
+#      ttl: 600
+#      value: "{{ item.public_ip }}"
+#      wait: yes
+#    with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
+#
+#  - name: "Workstation | Create DNS entries for student workstations"
+#    route53:
+#      state: present
+#      zone: "{{ public_dns_zone }}"
+#      record: "{{ item.tags.long_name }}"
+#      type: A
+#      ttl: 600
+#      value: "{{ item.public_ip }}"
+#      wait: yes
+#    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
 
   when: public_dns_zone is defined
+
+
+################### Wait for Instances ###################
+
+- name: Tower | Wait for SSH to come up  
+  wait_for_connection:  
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['tower'] }}"  
+
+- name: GitLab | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['gitlab'] }}"  
+
+- name: Docs | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['docs'] }}"  
+
+- name: DomainController | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_domain_controllers'] }}"  
+
+- name: Windows | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows'] }}" 
+
+- name: Workstation | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_workstations'] }}" 
+
 
 ################### Create Inventories ###################
 

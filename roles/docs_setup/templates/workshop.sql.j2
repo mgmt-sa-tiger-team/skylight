@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `fqdn` varchar(128) DEFAULT '',
   `username` varchar(128) DEFAULT '',
   `password` varchar(128) DEFAULT '',
+  `grade` varchar(6) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

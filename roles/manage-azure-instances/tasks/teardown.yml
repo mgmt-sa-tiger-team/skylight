@@ -349,18 +349,6 @@
     state: absent
   ignore_errors: yes
 
-- name: Azure | Destroy storage account
-  azure_rm_storageaccount:
-    client_id: "{{ azure_client_id }}"
-    secret: "{{ azure_secret }}"
-    subscription_id: "{{ azure_subscription_id }}"
-    tenant: "{{ azure_tenant }}"    
-    resource_group: "{{ azure_resource_group }}"
-    name: "{{ azure_storage_account }}"
-    account_type: "{{ azure_storage_account_type }}"
-    state: absent
-  ignore_errors: yes
-
 - name: Azure | Destroy resource group
   azure_rm_resourcegroup:
     client_id: "{{ azure_client_id }}"

@@ -19,19 +19,19 @@ Within Visual Studio Code, we will now create a new directory in your git reposi
 
 In the Explorer accordion you should have a 'student#' section where you previously made iis_basic.
 
-image::images/7-current-folders.png[title="Student Playbooks",width=400]
+image::images/7-vscode-existing-folders.png[title="Student Playbooks",width=400]
 
-Hover over the 'student#' section and click on the 'New Folder' button
+Hover over the 'student#' section and click the 'New Folder' button
 
-Type `win_updates` and hit enter.  Then click on that folder so it is selected.
+Type `win_updates` and hit enter.  Then click that folder so it is selected.
 
-Now click on the `win_updates` folder and click on the 'New File' button.
+Now click the `win_updates` folder and click the 'New File' button.
 
 Type `site.yml` and hit enter.
 
 You should now have an editor open in the right pane that can be used for creating your playbook.
 
-image::images/7-create-win_updates.png[title="Empty site.yml",width=600]
+image::images/7-create-win_updates.png[title="Empty site.yml",width=400]
 
 
 == Section 2: Write your Playbook
@@ -48,7 +48,7 @@ Typically you would have even more tasks to accomplish the entire update process
   tasks:
     - name: Install Windows Updates
       win_updates:
-        category_names: "{{ categories }}"
+        category_names: "{{ categories | default(omit) }}"
         reboot: '{{ reboot_server | default(yes) }}'
 ----
 
@@ -68,13 +68,13 @@ Your playbook is done! But remember we still need to commit the changes to sourc
 
 Click `File` -> `Save All` to save the files you've written
 
-image::images/7-win_update-playbook.png[title="site.yml", width=900]
+image::images/7-win_update-playbook.png[title="site.yml", width=1000]
 
-Click on the Source Code icon, type in a commit message such as 'Adding windows update playbook', and click the check box above.
+Click the Source Code icon (1), type in a commit message such as 'Adding windows update playbook' (2), and click the check box above (3).
 
-image::images/7-win_update-commit.png[title="Commit site.yml",width=400]
+image::images/7-win_update-commit.png[title="Commit site.yml",width=1000]
 
-Sync to gitlab by clicking the arrows on the lower left blue bar.  When prompted, click `OK` to push and pull commits.
+Sync to gitlab by clicking the arrows on the lower left blue bar.
 
 image::images/7-push.png[title="Push to Gitlab.yml"]
 
@@ -192,7 +192,7 @@ Alternatively, if you haven't navigated away from the job templates creation pag
 
 === Step 2:
 
-Click on the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *Windows Updates* Job Template.
+Click the rocketship icon image:images/at_launch_icon.png[Add,35,25] for the *Windows Updates* Job Template.
 
 === Step 3:
 

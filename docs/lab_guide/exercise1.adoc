@@ -19,7 +19,7 @@ However, we are only going to focus on a few of the key constructs that are requ
 
 You will find a shortcut on your desktop named "Ansible Tower", click this to open your personal Ansible Tower instance in Chrome.
 
-Your Tower instance has already been pre-configured for LDAP Login, so use your student credentials without the domain name to login.
+Your Tower instance has already been pre-configured for LDAP Login, so use your student credentials to login.
 
 Your Ansible Tower license has already been applied for you, so after logging in you should now see the Dashboard.
 
@@ -37,11 +37,11 @@ including machine, network, and various cloud providers.  In this workshop, we a
 
 Select CREDENTIALS from the left hand panel under resources   
 
-image:images/credentials.png[Cred,200,400]
+image:images/1-tower-credentials.png[Cred,200,400]
 
 === Step 2:
 
-Click on the image:images/add.png[Add,35,25] icon and add new credential   
+Click the image:images/add.png[Add,35,25] icon and add new credential
 
 === Step 3:
 
@@ -52,11 +52,11 @@ Complete the form using the following entries:
 |DESCRIPTION|
 |ORGANIZATION|Default
 |TYPE|Machine
-|USERNAME| <your USER ID - instructor provided (ie. domain_name\student1)>
+|USERNAME| <your USER ID - instructor provided (ie. student1@ansibleworkshop.com)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
-image::images/credential_add.png[title="Add Machine Credential",width=1000]
+image::images/1-tower-add-machine-credential.png[title="Add Machine Credential",width=1000]
 
 
 === Step 4:
@@ -72,13 +72,13 @@ Our first credential was to access our Windows machines.  We need another to acc
 |DESCRIPTION|SCM credential for playbook sync
 |ORGANIZATION|Default
 |TYPE|Source Control
-|USERNAME| <your USER ID - instructor provided (ie. student1)>
+|USERNAME| <your USER ID - instructor provided (ie. student1@ansibleworkshop.com)>
 |PASSWORD| <your AD account password - instructor provided>
 |===
 
 Select SAVE     image:images/at_save.png[Save,35,25] +
 
-image::images/credential_git.png[title="Add SCM Credential",width=1000]
+image::images/1-tower-add-scm-credential.png[title="Add SCM Credential",width=1000]
 
 == Creating a Project
 
@@ -89,14 +89,14 @@ a source code management (SCM) system supported by Tower, including Git, Subvers
 
 === Step 1:
 
-Click on PROJECTS on the left hand panel.
+Click *Projects* on the left hand panel.
 
-image:images/project.png[Proj,200,400]
+image:images/1-tower-project.png[Proj,200,400]
 
 
 === Step 2:
 
-Click on the image:images/add.png[Add,35,25] icon and add new project  
+Click the image:images/add.png[Add,35,25] icon and add new project
 
 === Step 3:
 
@@ -104,7 +104,7 @@ Complete the form using the following entries (*using your student number in SCM
 
 |===
 |NAME |Ansible Workshop Project
-|DESCRIPTION|workshop playbooks
+|DESCRIPTION|Workshop playbooks
 |ORGANIZATION|Default
 |SCM TYPE|Git
 |SCM URL|https://gitlab.ansibleworkshop.com/student#/student#.git
@@ -120,7 +120,7 @@ a|
 
 
 
-image::images/project_add.png[title="Defining a Project",width=1000]
+image::images/1-tower-create-project.png[title="Defining a Project",width=1000]
 
 
 
@@ -128,8 +128,11 @@ image::images/project_add.png[title="Defining a Project",width=1000]
 
 Select SAVE     image:images/at_save.png[Save,35,25]
 
+=== Step 5:
 
+Scroll down and validate that project has been successfully synchronized against the source control repo upon saving. You should see a green icon next to the project name in the list view at the bottom of the page.
 
+image::images/1-tower-project-success.png[title="Succesfull Sync",width=1000]
 
 == Inventories
 
@@ -142,29 +145,29 @@ A static Inventory has already been created for you today.  We will now take a l
 
 === Step 1:
 
-Click on INVENTORIES from the left hand panel.  You will see the preconfigured Inventory listed.  Click on the Inventories' name *Ansible Workshop Inventory* or on the Edit button. image:images/at_edit.png[Edit,35,35]
+Click *Inventories* from the left hand panel.  You will see the preconfigured Inventory listed.  Click the Inventories' name *Ansible Workshop Inventory* or the Edit button. image:images/at_edit.png[Edit,35,35]
 
 === Step 2:
 
 You will now be viewing the Inventory.  From here you can add Hosts, Groups, or even add Variables specific to this Inventory.
 
-image::images/inventory_host_edit.png[title="Edit Inventory",width=1000]
+image::images/1-tower-edit-inventory.png[title="Edit Inventory",width=1000]
 
-We will be viewing the hosts, so click on the *HOSTS* button.
+We will be viewing the hosts, so click the *HOSTS* button.
 
 === Step 3:
 
 In the Hosts view, we can see every host associated with with this inventory.  You will also see which groups a host is associated with.
 Hosts can be associated with multiple groups. These groups can later then be used to narrow down to the exact hosts we will later run our playbooks on.
 
-image::images/inventory_host.png[title="Hosts View",width=1000]
+image::images/1-tower-hosts-view.png[title="Hosts View",width=1000]
 
 
 === Step 4:
 
-If you click on the Host's name or on the Edit Button image:images/at_edit.png[Edit,35,35] we will be able to look at variables specific to this host.
+If you click the Host's name or on the Edit Button image:images/at_edit.png[Edit,35,35] we will be able to look at variables specific to this host.
 
-image::images/inventory_host_edit.png[title="Host Edit",width=1000]
+image::images/1-tower-host-edit.png[title="Host Edit",width=1000]
 
 
 Today we have already setup various variables to tell Ansible that this host is a Windows machine.  You do not have to define these variables as a Host variable here, they could also be Group variables or reside directly in your Template or Playbook.

@@ -1,0 +1,443 @@
+################### Build Instances ###################
+- name: DomainController | Launch Domain Controller Instance
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-dc"
+    template: "{{ ovirt_windc_template }}"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "4096MiB"
+    cpu_sockets: 2
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ ovirt_network_name }}"
+        network: "{{ ovirt_network_name }}"
+    sysprep:
+      custom_script: "{{ lookup('template', 'templates/unattended.xml.j2') }}"
+      host_name: "{{ hostname }}"
+      user_name: Administrator
+      root_password: "{{ domain_admin_password }}"
+  with_sequence: count=1
+  register: dc_jobs
+  vars:
+    hostname: windc
+  async: 7200
+  poll: 0
+
+- name: GitLab | Launch Gitlab Instance
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-gitlab"
+    template: "{{ ovirt_gitlab_template }}"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "4096MiB"
+    cpu_sockets: 2
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ ovirt_network_name }}"
+        network: "{{ ovirt_network_name }}"
+    cloud_init:
+      nic_boot_protocol: dhcp
+      nic_name: eth0
+      nic_on_boot: true
+      host_name: gitlab
+      user_name: "{{ root_user }}"
+      root_password: "{{ root_password }}"
+  with_sequence: count=1
+  register: gitlab_jobs
+  async: 7200
+  poll: 0
+
+- name: Docs | Launch Docs Instance
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-docs"
+    template: "{{ ovirt_docs_template }}"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "4096MiB"
+    cpu_sockets: 2
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ ovirt_network_name }}"
+        network: "{{ ovirt_network_name }}"
+    cloud_init:
+      nic_boot_protocol: dhcp
+      nic_name: eth0
+      nic_on_boot: true
+      host_name: docs
+      user_name: "{{ root_user }}"
+      root_password: "{{ root_password }}"
+  with_sequence: count=1
+  register: docs_jobs
+  async: 7200
+  poll: 0
+
+- name: Tower | Launch Tower Instance
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-s{{ item }}-tower"
+    template: "{{ ovirt_tower_template }}"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "4096MiB"
+    cpu_sockets: 2
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ ovirt_network_name }}"
+        network: "{{ ovirt_network_name }}"
+    cloud_init:
+      nic_boot_protocol: dhcp
+      nic_name: eth0
+      nic_on_boot: true
+      host_name: "s{{ item }}-tower"
+      user_name: "{{ root_user }}"
+      root_password: "{{ root_password }}"
+  with_sequence: count={{ user_count }}
+  register: tower_jobs
+  async: 7200
+  poll: 0
+
+- name: Windows | Launch instance 1
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-s{{ item }}-win1"
+    template: "{{ ovirt_windows_template }}"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "4096MiB"
+    cpu_sockets: 2
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ ovirt_network_name }}"
+        network: "{{ ovirt_network_name }}"
+    sysprep:
+      custom_script: "{{ lookup('template', 'templates/unattended.xml.j2') }}"
+      host_name: "hostname"
+      user_name: Administrator
+      root_password: "{{ domain_admin_password }}"
+  with_sequence: count={{user_count}}
+  register: windows1_jobs
+  vars:
+    hostname: "s{{ item }}-win1"
+  async: 7200
+  poll: 0
+
+- name: Workstation | Launch instance 1
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ name_prefix }}-s{{ item }}-work"
+    template: "{{ ovirt_windows_workstation_template }}"
+    cluster: "{{ ovirt_cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "4096MiB"
+    cpu_sockets: 2
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ ovirt_network_name }}"
+        network: "{{ ovirt_network_name }}"
+    sysprep:
+      custom_script: "{{ lookup('template', 'templates/unattended.xml.j2') }}"
+      host_name: "hostname"
+      user_name: Administrator
+      root_password: "{{ domain_admin_password }}"
+  with_sequence: count={{user_count}}
+  register: workstation_jobs
+  vars:
+    hostname: "s{{ item }}-work"
+  async: 7200
+  poll: 0
+
+###################  Wait for jobs to complete ###################
+
+- name: Wait for DC instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: dc_instances
+  until: dc_instances.finished
+  retries: 300
+  with_items: "{{ dc_jobs.results }}"
+
+- name: Wait for Gitlab instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: gitlab_instances
+  until: gitlab_instances.finished
+  retries: 300
+  with_items: "{{ gitlab_jobs.results }}"
+
+- name: Wait for Docs instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: docs_instances
+  until: docs_instances.finished
+  retries: 300
+  with_items: "{{ docs_jobs.results }}"
+
+- name: Wait for tower instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: tower_instances
+  until: tower_instances.finished
+  retries: 300
+  with_items: "{{ tower_jobs.results }}"
+
+- name: Wait for windows instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: windows_instances
+  until: windows_instances.finished
+  retries: 300
+  with_items:
+    - "{{ windows1_jobs.results }}"
+
+- name: Wait for Workstation instance creation to complete
+  async_status: jid="{{ item.ansible_job_id }}"
+  register: workstation_instances
+  until: workstation_instances.finished
+  retries: 300
+  with_items:
+    - "{{ workstation_jobs.results }}"
+
+###################  Wait for ip address to be assigned ###################
+
+- name: Wait for DC instance to have an ip address
+  ovirt_vm_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: "name={{ item.vm.name }}"
+    fetch_nested: true
+    nested_attributes: ips
+  register: dc_instances_ovirt_facts
+  until:
+    - ovirt_vms | length > 0
+    - ovirt_vms[0].reported_devices | length > 0
+    - ovirt_vms[0].reported_devices[0].ips | length > 0
+    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
+  retries: 100
+  delay: 5
+  with_items: "{{ dc_instances.results }}"
+
+- name: Wait for Gitlab instance to have an ip address
+  ovirt_vm_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: "name={{ item.vm.name }}"
+    fetch_nested: true
+    nested_attributes: ips
+  register: gitlab_instances_ovirt_facts
+  until:
+    - ovirt_vms | length > 0
+    - ovirt_vms[0].reported_devices | length > 0
+    - ovirt_vms[0].reported_devices[0].ips | length > 0
+    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
+  retries: 100
+  delay: 5
+  with_items: "{{ gitlab_instances.results }}"
+
+- name: Wait for Docs instance to have an ip address
+  ovirt_vm_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: "name={{ item.vm.name }}"
+    fetch_nested: true
+    nested_attributes: ips
+  register: docs_instances_ovirt_facts
+  until:
+    - ovirt_vms | length > 0
+    - ovirt_vms[0].reported_devices | length > 0
+    - ovirt_vms[0].reported_devices[0].ips | length > 0
+    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
+  retries: 100
+  delay: 5
+  with_items: "{{ docs_instances.results }}"
+
+- name: Wait for Tower instance to have an ip address
+  ovirt_vm_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: "name={{ item.vm.name }}"
+    fetch_nested: true
+    nested_attributes: ips
+  register: tower_instances_ovirt_facts
+  until:
+    - ovirt_vms | length > 0
+    - ovirt_vms[0].reported_devices | length > 0
+    - ovirt_vms[0].reported_devices[0].ips | length > 0
+    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
+  retries: 100
+  delay: 5
+  with_items: "{{ tower_instances.results }}"
+
+- name: Wait for Windows instance to have an ip address
+  ovirt_vm_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: "name={{ item.vm.name }}"
+    fetch_nested: true
+    nested_attributes: ips
+  register: windows_instances_ovirt_facts
+  until:
+    - ovirt_vms | length > 0
+    - ovirt_vms[0].reported_devices | length > 0
+    - ovirt_vms[0].reported_devices[0].ips | length > 0
+    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
+  retries: 100
+  delay: 5
+  with_items: "{{ windows_instances.results }}"
+
+- name: Wait for Workstation instance to have an ip address
+  ovirt_vm_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: "name={{ item.vm.name }}"
+    fetch_nested: true
+    nested_attributes: ips
+  register: workstation_instances_ovirt_facts
+  until:
+    - ovirt_vms | length > 0
+    - ovirt_vms[0].reported_devices | length > 0
+    - ovirt_vms[0].reported_devices[0].ips | length > 0
+    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
+  retries: 100
+  delay: 5
+  with_items: "{{ workstation_instances.results }}"
+
+################### Add hosts ######################
+
+- name: DomainController | Add new instance to host group
+  add_host:
+    hostname: "windc"
+    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
+    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_domain_controllers
+  with_items: "{{ dc_instances_ovirt_facts.results }}"
+
+- name: GitLab | Add new instance to host group
+  add_host:
+    hostname: "gitlab"
+    ansible_ssh_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: gitlab
+  with_items: "{{ gitlab_instances_ovirt_facts.results }}"
+
+- name: Docs | Add new instance to host group
+  add_host:
+    hostname: "docs"
+    ansible_ssh_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    public_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: docs
+  with_items: "{{ docs_instances_ovirt_facts.results }}"
+
+- name: Tower | Add new instance to host group
+  add_host:
+    hostname: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') }}"
+    ansible_ssh_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    tower_license: "{{ tower_license }}"
+    student: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    groups: tower
+  with_items: "{{ tower_instances_ovirt_facts.results }}"
+
+- name: Windows | Add new instance to host group
+  add_host:
+    hostname: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') }}"
+    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    student: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows
+  with_items: "{{ windows_instances_ovirt_facts.results }}"
+
+- name: Workstation | Add new instance to host group
+  add_host:
+    hostname: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') }}"
+    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
+    student: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_become_password: "{{ users_password }}"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_workstations
+  with_items: "{{ workstation_instances_ovirt_facts.results }}"
+
+################### Wait for Instances ###################
+
+- name: Tower | Wait for SSH to come up  
+  wait_for_connection:  
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['tower'] }}"  
+
+- name: GitLab | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['gitlab'] }}"  
+
+- name: Docs | Wait for SSH to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['docs'] }}"  
+
+- name: DomainController | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_domain_controllers'] }}"  
+
+- name: Windows | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows'] }}" 
+
+- name: Workstation | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['windows_workstations'] }}" 
+
+################### Inventory ###################
+
+- name: Generate instructor inventory
+  template:
+    src: instructor_inventory.j2
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/instructor_inventory.txt"
+
+- name: Generate student inventories
+  template:
+    src: instances.txt.j2
+    dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
+  with_sequence: count="{{ user_count }}"

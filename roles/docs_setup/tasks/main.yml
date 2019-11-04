@@ -2,6 +2,13 @@
   yum:
     name: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
     state: present
+  when: ansible_distribution_major_version|int < 8
+
+- name: Setup Remi PHP 8 Repo
+  yum:
+    name: http://rpms.famillecollet.com/enterprise/remi-release-8.rpm
+    state: present
+  when: ansible_distribution_major_version|int == 8
 
 - name: Install MySQL, PHP, Git
   yum:
@@ -15,7 +22,37 @@
       - rsync
     state: present
     enablerepo: remi-php72
+  when: ansible_distribution_major_version|int < 8
   notify: restart nginx
+
+- name: Install php 7.2 stream on RHEL8
+  dnf:
+    name: '@php:7.2'
+    state: present
+  when: ansible_distribution_major_version|int == 8
+
+- name: Install MySQL, PHP, Git
+  yum:
+    name:
+      - mariadb-server
+      - php-fpm
+      - php-mysqlnd
+      - php-pdo
+      - python36
+      - git
+      - rsync
+    state: present
+    enablerepo: remi-php72
+  when: ansible_distribution_major_version|int == 8
+  notify: restart nginx
+
+- name: Enable TCP port 9000 for php-fpm
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: '^listen ='
+    line: 'listen = 127.0.0.1:9000'
+  when: ansible_distribution_major_version|int == 8
+  notify: restart php-fpm
 
 - name: Start Services
   service:
@@ -35,28 +72,73 @@
     mode: 0777
     state: directory
 
-- name: Install asciidoc packages (RHEL)
+- name: Install asciidoc packages (RHEL7)
+  yum:
+    name:
+      - asciidoc
+      - rubygem-asciidoctor
+    state: present
+  when:
+    - ansible_distribution_major_version|int < 8
+    - (ansible_distribution == 'CentOS' and instance_loc == 'ec2') or (instance_loc != 'ec2')
+
+- name: Install asciidoc packages (RHEL7)
   yum:
     name:
       - asciidoc
       - rubygem-asciidoctor
     state: present
     enablerepo: rhui-REGION-rhel-server-optional
-  when: ansible_distribution == 'RedHat'
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version|int < 8
+    - instance_loc == 'ec2'
 
-- name: Install asciidoc packages (CentOS)
+- name: Install asciidoc packages (RHEL8)
   yum:
     name:
       - asciidoc
-      - rubygem-asciidoctor
     state: present
-  when: ansible_distribution == 'CentOS'
+  when: ansible_distribution_major_version|int == 8
 
-- name: Copy lab guides to server
-  synchronize:
-    src: docs/lab_guide/
-    dest: /usr/share/nginx/html/
-  register: copycontent
+- name: Create decks directory on server
+  file:
+    path: /usr/share/nginx/html/decks/
+    state: directory
+
+- block:
+    - name: Copy lab guides to server
+      synchronize:
+        src: docs/lab_guide/
+        dest: /usr/share/nginx/html/
+      register: copycontent
+
+    - name: Copy deck to server
+      synchronize:
+        src: docs/decks/
+        dest: /usr/share/nginx/html/decks/
+  rescue:
+    - name: Copy lab guides to server
+      copy:
+        src: docs/lab_guide/
+        dest: /usr/share/nginx/html/
+      register: copycontent
+
+    - name: Copy deck to server
+      copy:
+        src: docs/decks/
+        dest: /usr/share/nginx/html/decks/
+
+- name: Find existing HTML docs
+  find:
+    paths: /usr/share/nginx/html
+    file_type: file
+    use_regex: yes
+    patterns:
+      - '^index.html$'
+      - '^wrapup.html$'
+      - '^exercise[1-7].html$'
+  register: lab_guide_html_files
 
 - name: Build HTML Docs
   command: asciidoc -d book -v -o {{ item }}.html {{ item }}.adoc
@@ -72,7 +154,7 @@
     - exercise5
     - exercise6
     - exercise7
-  when: copycontent.changed
+  when: copycontent.changed or lab_guide_html_files.matched != 9
 
 - name: Create users directory on server
   file:
@@ -88,16 +170,6 @@
   template:
     src: templates/list.php.j2
     dest: /usr/share/nginx/html/users/list.php
-
-- name: Create deck directory on server
-  file:
-    path: /usr/share/nginx/html/decks/
-    state: directory
-
-- name: Copy deck to server
-  synchronize:
-    src: docs/decks/
-    dest: /usr/share/nginx/html/decks/
 
 - name: Install PyMySQL
   pip:

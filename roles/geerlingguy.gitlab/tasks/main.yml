@@ -40,7 +40,19 @@
   package:
     name: "{{ gitlab_package_name | default(gitlab_edition) }}"
     state: present
-  when: not gitlab_file.stat.exists
+  when:
+    - not gitlab_file.stat.exists
+    - ansible_python_version is version_compare('3.0', '>=')
+
+# There seems to an issue with using ansible 2.8.x and python <= 2.7.x when using the package module
+# this needs to be tested more but it seems to work better with yum
+- name: Install GitLab
+  yum:
+    name: "{{ gitlab_package_name | default(gitlab_edition) }}"
+    state: present
+  when:
+    - not gitlab_file.stat.exists
+    - ansible_python_version is version_compare('3.0', '<')
 
 # Start and configure GitLab. Sometimes the first run fails, but after that,
 # restarts fix problems, so ignore failures on this run.
