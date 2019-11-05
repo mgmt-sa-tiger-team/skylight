@@ -47,15 +47,25 @@
     path: C:\Temp\Myrtille_2.5.5_x86_x64_Setup.exe
   register: myrtille
 
+- name: Download Myrtille to specified path only if modified (<2.9)
+  win_get_url:
+    url: https://github.com/cedrozor/myrtille/releases/download/v2.5.5/Myrtille_2.5.5_x86_x64_Setup.exe
+    dest: C:\Temp\Myrtille_2.5.5_x86_x64_Setup.exe
+  when:
+    - ansible_version.full is version('2.9', '<')
+    - not myrtille.stat.exists
+
 - name: Download Myrtille to specified path only if modified
   win_get_url:
     url: https://github.com/cedrozor/myrtille/releases/download/v2.5.5/Myrtille_2.5.5_x86_x64_Setup.exe
     dest: C:\Temp\Myrtille_2.5.5_x86_x64_Setup.exe
-  when: not myrtille.stat.exists
-
+    follow_redirects: all
+  when:
+    - ansible_version.full is version('2.9', '>=')
+    - not myrtille.stat.exists
 
 - name: Extract the binary
-  win_command: Myrtille_2.5.5_x86_x64_Setup.exe -o "C:\Temp" -y
+  win_command: Myrtille_2.5.5_x86_x64_Setup.exe -o 'C:\Temp' -y
   args:
     chdir: C:\Temp\
     creates: C:\Temp\setup.exe
