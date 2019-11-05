@@ -1,7 +1,7 @@
 ---
 
 - name: Wait for DC instance to have an ip address
-  ovirt_nic_info:
+  ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
@@ -17,7 +17,7 @@
   with_items: "{{ dc_instances.results }}"
 
 - name: Wait for Gitlab instance to have an ip address
-  ovirt_nic_info:
+  ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
@@ -33,7 +33,7 @@
   with_items: "{{ gitlab_instances.results }}"
 
 - name: Wait for Docs instance to have an ip address
-  ovirt_nic_info:
+  ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
@@ -49,7 +49,7 @@
   with_items: "{{ docs_instances.results }}"
 
 - name: Wait for Tower instance to have an ip address
-  ovirt_nic_info:
+  ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
@@ -65,7 +65,7 @@
   with_items: "{{ tower_instances.results }}"
 
 - name: Wait for Windows instance to have an ip address
-  ovirt_nic_info:
+  ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
@@ -81,7 +81,7 @@
   with_items: "{{ windows_instances.results }}"
 
 - name: Wait for Workstation instance to have an ip address
-  ovirt_nic_info:
+  ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
