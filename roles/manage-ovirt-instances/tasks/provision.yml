@@ -215,219 +215,43 @@
 
 ###################  Wait for ip address to be assigned ###################
 
-- name: Wait for DC instance to have an ip address
-  ovirt_vm_facts:
-    auth: "{{ ovirt_auth }}"
-    pattern: "name={{ item.vm.name }}"
-    fetch_nested: true
-    nested_attributes: ips
-  register: dc_instances_ovirt_facts
-  until:
-    - ovirt_vms | length > 0
-    - ovirt_vms[0].reported_devices | length > 0
-    - ovirt_vms[0].reported_devices[0].ips | length > 0
-    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
-  retries: 100
-  delay: 5
-  with_items: "{{ dc_instances.results }}"
+- include_tasks: wait_for_ip_pre29.yml
+  when: ansible_version.full is version('2.9', '<')
 
-- name: Wait for Gitlab instance to have an ip address
-  ovirt_vm_facts:
-    auth: "{{ ovirt_auth }}"
-    pattern: "name={{ item.vm.name }}"
-    fetch_nested: true
-    nested_attributes: ips
-  register: gitlab_instances_ovirt_facts
-  until:
-    - ovirt_vms | length > 0
-    - ovirt_vms[0].reported_devices | length > 0
-    - ovirt_vms[0].reported_devices[0].ips | length > 0
-    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
-  retries: 100
-  delay: 5
-  with_items: "{{ gitlab_instances.results }}"
-
-- name: Wait for Docs instance to have an ip address
-  ovirt_vm_facts:
-    auth: "{{ ovirt_auth }}"
-    pattern: "name={{ item.vm.name }}"
-    fetch_nested: true
-    nested_attributes: ips
-  register: docs_instances_ovirt_facts
-  until:
-    - ovirt_vms | length > 0
-    - ovirt_vms[0].reported_devices | length > 0
-    - ovirt_vms[0].reported_devices[0].ips | length > 0
-    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
-  retries: 100
-  delay: 5
-  with_items: "{{ docs_instances.results }}"
-
-- name: Wait for Tower instance to have an ip address
-  ovirt_vm_facts:
-    auth: "{{ ovirt_auth }}"
-    pattern: "name={{ item.vm.name }}"
-    fetch_nested: true
-    nested_attributes: ips
-  register: tower_instances_ovirt_facts
-  until:
-    - ovirt_vms | length > 0
-    - ovirt_vms[0].reported_devices | length > 0
-    - ovirt_vms[0].reported_devices[0].ips | length > 0
-    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
-  retries: 100
-  delay: 5
-  with_items: "{{ tower_instances.results }}"
-
-- name: Wait for Windows instance to have an ip address
-  ovirt_vm_facts:
-    auth: "{{ ovirt_auth }}"
-    pattern: "name={{ item.vm.name }}"
-    fetch_nested: true
-    nested_attributes: ips
-  register: windows_instances_ovirt_facts
-  until:
-    - ovirt_vms | length > 0
-    - ovirt_vms[0].reported_devices | length > 0
-    - ovirt_vms[0].reported_devices[0].ips | length > 0
-    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
-  retries: 100
-  delay: 5
-  with_items: "{{ windows_instances.results }}"
-
-- name: Wait for Workstation instance to have an ip address
-  ovirt_vm_facts:
-    auth: "{{ ovirt_auth }}"
-    pattern: "name={{ item.vm.name }}"
-    fetch_nested: true
-    nested_attributes: ips
-  register: workstation_instances_ovirt_facts
-  until:
-    - ovirt_vms | length > 0
-    - ovirt_vms[0].reported_devices | length > 0
-    - ovirt_vms[0].reported_devices[0].ips | length > 0
-    - ovirt_vms[0].reported_devices[0].ips[0].address is defined
-  retries: 100
-  delay: 5
-  with_items: "{{ workstation_instances.results }}"
-
-################### Add hosts ######################
-
-- name: DomainController | Add new instance to host group
-  add_host:
-    hostname: "windc"
-    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
-    ansible_user: "Administrator"
-    ansible_password: "{{ domain_admin_password }}"
-    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
-    ansible_shell_type: "cmd"
-    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_winrm_transport: "basic"
-    ansible_winrm_server_cert_validation: "ignore"
-    groups: windows_domain_controllers
-  with_items: "{{ dc_instances_ovirt_facts.results }}"
-
-- name: GitLab | Add new instance to host group
-  add_host:
-    hostname: "gitlab"
-    ansible_ssh_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_user: "{{ root_user }}"
-    ansible_password: "{{ root_password }}"
-    groups: gitlab
-  with_items: "{{ gitlab_instances_ovirt_facts.results }}"
-
-- name: Docs | Add new instance to host group
-  add_host:
-    hostname: "docs"
-    ansible_ssh_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    public_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_user: "{{ root_user }}"
-    ansible_password: "{{ root_password }}"
-    groups: docs
-  with_items: "{{ docs_instances_ovirt_facts.results }}"
-
-- name: Tower | Add new instance to host group
-  add_host:
-    hostname: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') }}"
-    ansible_ssh_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_user: "{{ root_user }}"
-    ansible_password: "{{ root_password }}"
-    tower_license: "{{ tower_license }}"
-    student: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
-    groups: tower
-  with_items: "{{ tower_instances_ovirt_facts.results }}"
-
-- name: Windows | Add new instance to host group
-  add_host:
-    hostname: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') }}"
-    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    student: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
-    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
-    ansible_user: "Administrator"
-    ansible_password: "{{ domain_admin_password }}"
-    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
-    ansible_shell_type: "cmd"
-    ansible_winrm_transport: "basic"
-    ansible_winrm_server_cert_validation: "ignore"
-    groups: windows
-  with_items: "{{ windows_instances_ovirt_facts.results }}"
-
-- name: Workstation | Add new instance to host group
-  add_host:
-    hostname: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') }}"
-    private_ip: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    ansible_host: "{{ item.ansible_facts.ovirt_vms[0].reported_devices[0].ips[0].address }}"
-    student: "{{ item.ansible_facts.ovirt_vms[0].name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
-    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
-    ansible_user: "Administrator"
-    ansible_password: "{{ domain_admin_password }}"
-    ansible_become_password: "{{ users_password }}"
-    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
-    ansible_shell_type: "cmd"
-    ansible_winrm_transport: "basic"
-    ansible_winrm_server_cert_validation: "ignore"
-    groups: windows_workstations
-  with_items: "{{ workstation_instances_ovirt_facts.results }}"
+- include_tasks: wait_for_ip.yml
+  when: ansible_version.full is version('2.9', '>=')
 
 ################### Wait for Instances ###################
 
-- name: Tower | Wait for SSH to come up  
-  wait_for_connection:  
+- name: Tower | Wait for SSH to come up
+  wait_for_connection:
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['tower'] }}"  
+  with_items: "{{ groups['tower'] }}"
 
 - name: GitLab | Wait for SSH to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['gitlab'] }}"  
+  with_items: "{{ groups['gitlab'] }}"
 
 - name: Docs | Wait for SSH to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['docs'] }}"  
+  with_items: "{{ groups['docs'] }}"
 
 - name: DomainController | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['windows_domain_controllers'] }}"  
+  with_items: "{{ groups['windows_domain_controllers'] }}"
 
 - name: Windows | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['windows'] }}" 
+  with_items: "{{ groups['windows'] }}"
 
 - name: Workstation | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
   wait_for_connection:
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['windows_workstations'] }}" 
+  with_items: "{{ groups['windows_workstations'] }}"
 
 ################### Inventory ###################
 

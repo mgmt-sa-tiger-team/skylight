@@ -1,0 +1,183 @@
+---
+
+- name: Wait for DC instance to have an ip address
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: dc_instances_nics
+  until:
+    - dc_instances_nics.ovirt_nics | length > 0
+    - dc_instances_nics.ovirt_nics[0].reported_devices | length > 0
+    - dc_instances_nics.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - dc_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - dc_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 100
+  delay: 5
+  with_items: "{{ dc_instances.results }}"
+
+- name: Wait for Gitlab instance to have an ip address
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: gitlab_instances_nics
+  until:
+    - gitlab_instances_nics.ovirt_nics | length > 0
+    - gitlab_instances_nics.ovirt_nics[0].reported_devices | length > 0
+    - gitlab_instances_nics.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - gitlab_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - gitlab_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 100
+  delay: 5
+  with_items: "{{ gitlab_instances.results }}"
+
+- name: Wait for Docs instance to have an ip address
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: docs_instances_nics
+  until:
+    - docs_instances_nics.ovirt_nics | length > 0
+    - docs_instances_nics.ovirt_nics[0].reported_devices | length > 0
+    - docs_instances_nics.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - docs_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - docs_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 100
+  delay: 5
+  with_items: "{{ docs_instances.results }}"
+
+- name: Wait for Tower instance to have an ip address
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: tower_instances_nics
+  until:
+    - tower_instances_nics.ovirt_nics | length > 0
+    - tower_instances_nics.ovirt_nics[0].reported_devices | length > 0
+    - tower_instances_nics.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - tower_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - tower_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 100
+  delay: 5
+  with_items: "{{ tower_instances.results }}"
+
+- name: Wait for Windows instance to have an ip address
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: windows_instances_nics
+  until:
+    - windows_instances_nics.ovirt_nics | length > 0
+    - windows_instances_nics.ovirt_nics[0].reported_devices | length > 0
+    - windows_instances_nics.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - windows_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - windows_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 100
+  delay: 5
+  with_items: "{{ windows_instances.results }}"
+
+- name: Wait for Workstation instance to have an ip address
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: workstation_instances_nics
+  until:
+    - workstation_instances_nics.ovirt_nics | length > 0
+    - workstation_instances_nics.ovirt_nics[0].reported_devices | length > 0
+    - workstation_instances_nics.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - workstation_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - workstation_instances_nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 100
+  delay: 5
+  with_items: "{{ workstation_instances.results }}"
+
+################### Add hosts ######################
+
+- name: DomainController | Add new instance to host group
+  add_host:
+    hostname: "windc"
+    ansible_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
+    private_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_domain_controllers
+  with_items: "{{ dc_instances_nics.results }}"
+
+- name: GitLab | Add new instance to host group
+  add_host:
+    hostname: "gitlab"
+    ansible_ssh_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    private_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: gitlab
+  with_items: "{{ gitlab_instances_nics.results }}"
+
+- name: Docs | Add new instance to host group
+  add_host:
+    hostname: "docs"
+    ansible_ssh_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    private_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    public_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    groups: docs
+  with_items: "{{ docs_instances_nics.results }}"
+
+- name: Tower | Add new instance to host group
+  add_host:
+    hostname: "{{ item.item.vm.name | replace(name_prefix + '-', '') }}"
+    ansible_ssh_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    private_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_user: "{{ root_user }}"
+    ansible_password: "{{ root_password }}"
+    tower_license: "{{ tower_license }}"
+    student: "{{ item.item.vm.name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    groups: tower
+  with_items: "{{ tower_instances_nics.results }}"
+
+- name: Windows | Add new instance to host group
+  add_host:
+    hostname: "{{ item.item.vm.name | replace(name_prefix + '-', '') }}"
+    ansible_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    student: "{{ item.item.vm.name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    private_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows
+  with_items: "{{ windows_instances_nics.results }}"
+
+- name: Workstation | Add new instance to host group
+  add_host:
+    hostname: "{{ item.item.vm.name | replace(name_prefix + '-', '') }}"
+    private_ip: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    ansible_host: "{{ (item.ovirt_nics[0].reported_devices[0].ips | json_query('[?version==`v4`].address'))[0] }}"
+    student: "{{ item.item.vm.name | replace(name_prefix + '-', '') | regex_replace('[^0-9]', '') }}"
+    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
+    ansible_user: "Administrator"
+    ansible_password: "{{ domain_admin_password }}"
+    ansible_become_password: "{{ users_password }}"
+    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
+    ansible_shell_type: "cmd"
+    ansible_winrm_transport: "basic"
+    ansible_winrm_server_cert_validation: "ignore"
+    groups: windows_workstations
+  with_items: "{{ workstation_instances_nics.results }}"
