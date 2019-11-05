@@ -15,7 +15,7 @@
     read: '{{ chocolatey_share_read_access }}'
   when: chocolatey_setup_shared_repo|bool
 
-- name: ensure packages exist locally
+- name: ensure packages exist locally (<2.9)
   win_get_url:
     url: https://chocolatey.org/api/v2/package/{{ item.name }}/{{ item.version }}
     dest: '{{ chocolatey_repo_folder }}\{{ item.name }}.{{ item.version }}.nupkg'
@@ -24,8 +24,21 @@
   until: chocolatey_packages_1_download is success
   delay: 3
   retries: 5
+  when: ansible_version.full is version('2.9', '<')
 
-- name: ensure packages exist locally with remote binary
+- name: ensure packages exist locally
+  win_get_url:
+    url: https://chocolatey.org/api/v2/package/{{ item.name }}/{{ item.version }}
+    dest: '{{ chocolatey_repo_folder }}\{{ item.name }}.{{ item.version }}.nupkg'
+    follow_redirects: all
+  loop: "{{ chocolatey_packages | selectattr('url', 'undefined') | list }}"
+  register: chocolatey_packages_1_download
+  until: chocolatey_packages_1_download is success
+  delay: 3
+  retries: 5
+  when: ansible_version.full is version('2.9', '>=')
+
+- name: ensure packages exist locally with remote binary (<2.9)
   win_get_url:
     url: https://chocolatey.org/api/v2/package/{{ item.name }}/{{ item.version }}
     dest: '{{ chocolatey_repo_folder }}\{{ item.name }}.{{ item.version }}.nupkg'
@@ -34,7 +47,23 @@
   until: chocolatey_packages_2_download is success
   delay: 3
   retries: 5
-  when: not chocolatey_internalize_packages|bool
+  when:
+    - ansible_version.full is version('2.9', '<')
+    - not chocolatey_internalize_packages|bool
+
+- name: ensure packages exist locally with remote binary
+  win_get_url:
+    url: https://chocolatey.org/api/v2/package/{{ item.name }}/{{ item.version }}
+    dest: '{{ chocolatey_repo_folder }}\{{ item.name }}.{{ item.version }}.nupkg'
+    follow_redirects: all
+  loop: "{{ chocolatey_packages | selectattr('url', 'defined') | list }}"
+  register: chocolatey_packages_2_download
+  until: chocolatey_packages_2_download is success
+  delay: 3
+  retries: 5
+  when:
+    - ansible_version.full is version('2.9', '>=')
+    - not chocolatey_internalize_packages|bool
 
 - block:
     - name: install Chocolatey
