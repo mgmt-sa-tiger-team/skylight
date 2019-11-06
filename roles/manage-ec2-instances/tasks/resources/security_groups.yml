@@ -1,0 +1,21 @@
+- name: "{{ app.name | capitalize }} | Create Port Listing"
+  set_fact:
+    ports: "{% set output = [] %}\
+      {% for p in workshops[workshop_type].ports[app.ports] %}\
+        {{ output.append({'proto' : 'tcp', 'from_port': p, 'to_port': p, 'cidr_ip': '0.0.0.0/0' }) }}\
+      {% endfor %}\
+      {{ output.append({'proto' : 'all', 'cidr_ip': ptr_zone_cidr }) }}\
+      {{ output }}"
+
+- name: "{{ app.name | capitalize }} | Create security group"
+  ec2_group:
+    name: "{{ name_prefix }}-{{ app.ports }}sg"
+    description: "{{ app.ports | capitalize }} SG"
+    vpc_id: "{{ ec2_vpc_id }}"
+    region: "{{ ec2_region }}"
+    tags:
+      Username: "{{ skylight_user }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+    rules: "{{ ports }}"

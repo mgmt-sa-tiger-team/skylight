@@ -33,5 +33,11 @@ net start sshd
 Set-Service sshd -StartupType Automatic -ErrorAction SilentlyContinue
 {% endif %}
 
-Rename-Computer -NewName {{ vm_name }} -Force -Restart
+# We will set the hostname during first connect
+# Rename-Computer -NewName {{ vm_name }} -Force -Restart
+
+$SecurePassword = "{{ domain_admin_password }}" | ConvertTo-SecureString -AsPlainText -Force
+$UserAccount = Get-LocalUser -Name "Administrator"
+$UserAccount | Set-LocalUser -Password $SecurePassword
+
 </powershell>

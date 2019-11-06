@@ -1,8 +1,8 @@
 ---
 
-- include_tasks: aws_check_setup.yml
+- include_tasks: resources/aws_check_setup.yml
 
-- include_tasks: find_ami_ids.yml
+- include_tasks: resources/find_ami_ids.yml
 
 ################### Create Resources ###################
 - name: Create AWS VPC {{ name_prefix }}-vpc
@@ -91,515 +91,37 @@
   when: create_key.changed
 
 ################### Create Security Groups ###################
-- name: Tower | Create Ansible Control Node security group
-  ec2_group:
-    name: "{{ name_prefix }}-towersg"
-    description: "Ansible Tower SG"
-    vpc_id: "{{ ec2_vpc_id }}"
-    region: "{{ ec2_region }}"
-    tags:
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-    rules:
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: 0.0.0.0/0
-      - proto: all
-        cidr_ip: "{{ ptr_zone_cidr }}"
 
-- name: GitLab | Create Gitlab Node security group
-  ec2_group:
-    name: "{{ name_prefix }}-gitlabsg"
-    description: "Gitlab SG"
-    vpc_id: "{{ ec2_vpc_id }}"
-    region: "{{ ec2_region }}"
-    tags:
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-    rules:
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: 0.0.0.0/0
-      - proto: all
-        cidr_ip: "{{ ptr_zone_cidr }}"
+- include_tasks: resources/security_groups.yml
+  loop: "{{ workshops[workshop_type].instances }}"
+  loop_control:
+    loop_var: app
 
-- name: Docs | Create Docs Node security group
-  ec2_group:
-    name: "{{ name_prefix }}-docssg"
-    description: "Docs SG"
-    vpc_id: "{{ ec2_vpc_id }}"
-    region: "{{ ec2_region }}"
-    tags:
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-    rules:
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: 0.0.0.0/0
-      - proto: all
-        cidr_ip: "{{ ptr_zone_cidr }}"
-
-- name: DomainController | Create MS AD Domain Controller security group
-  ec2_group:
-    name: "{{ name_prefix }}-windcsg"
-    description: "Microsoft AD Domain Controller SG"
-    vpc_id: "{{ ec2_vpc_id }}"
-    region: "{{ ec2_region }}"
-    tags:
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-    rules:
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 5986
-        to_port: 5986
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 3389
-        to_port: 3389
-        cidr_ip: "0.0.0.0/0"
-      - proto: all
-        cidr_ip: "{{ ptr_zone_cidr }}"
-
-- name: Windows | Create MS Windows security group
-  ec2_group:
-    name: "{{ name_prefix }}-windowssg"
-    description: "Microsoft Windows SG"
-    vpc_id: "{{ ec2_vpc_id }}"
-    region: "{{ ec2_region }}"
-    tags:
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-    rules:
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 5986
-        to_port: 5986
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 3389
-        to_port: 3389
-        cidr_ip: "0.0.0.0/0"
-      - proto: all
-        cidr_ip: "{{ ptr_zone_cidr }}"
 
 ################### Build Instances ###################
 
-- name: DomainController | Launch instance
-  ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    group: "{{ name_prefix }}-windcsg"
-    instance_type: "{{ ec2_windc_instance_type }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ name_prefix }}-windc"
-      App: AnsibleWorkshop
-    instance_tags:
-      Name: "{{ name_prefix }}-windc"
-      App: AnsibleWorkshop
-      Workshop: "{{ name_prefix }}"
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-      short_name: "{{ 's' + item + '-windc' }}"
-      long_name: "{{ 's' + item + '-windc' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
-    image: "{{ ec2_ami_ids[ec2_windc_instance_ami_type] }}"
-    wait: true
-    region: "{{ ec2_region }}"
-    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'win_ec2_user_data.j2', template_vars=dict(vm_name='windc')) }}"
-    assign_public_ip: yes
-  with_sequence: count=1
-  register: dc_jobs
-  async: 7200
-  poll: 0
-
-- name: Windows | Launch instance 1
-  ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    group:
-      - "{{ name_prefix }}-windowssg"
-    instance_type: "{{ ec2_windows_instance_type }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ name_prefix + '-s' + item + '-win1'}}"
-      App: AnsibleWorkshop
-    instance_tags:
-      Name: "{{ name_prefix + '-s' + item + '-win1'}}"
-      App: AnsibleWorkshop
-      Workshop: "{{ name_prefix }}"
-      Student: "{{ user_prefix + item }}"
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-      short_name: "{{ 's' + item + '-win1' }}"
-      long_name: "{{ 's' + item + '-win1' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
-    image: "{{ ec2_ami_ids[ec2_windows_instance_ami_type] }}"
-    wait: true
-    region: "{{ ec2_region }}"
-    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'win_ec2_user_data.j2', template_vars=dict(vm_name='s' + item + '-win1')) }}"
-    assign_public_ip: yes
-  with_sequence: count={{user_count}}
-  register: windows1_jobs
-  async: 7200
-  poll: 0
-
-- name: Workstation | Launch instance
-  ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    group:
-      - "{{ name_prefix }}-windowssg"
-    instance_type: "{{ ec2_windows_workstation_instance_type }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ name_prefix + '-s' + item + '-work'}}"
-      App: AnsibleWorkshop
-    instance_tags:
-      Name: "{{ name_prefix + '-s' + item + '-work'}}"
-      App: AnsibleWorkshop
-      Workshop: "{{ name_prefix }}"
-      Student: "{{ user_prefix + item }}"
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-      short_name: "{{ 's' + item + '-work' }}"
-      long_name: "{{ 's' + item + '-work' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
-    image: "{{ ec2_ami_ids[ec2_windows_workstation_instance_ami_type] }}"
-    wait: true
-    region: "{{ ec2_region }}"
-    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'win_ec2_user_data.j2', template_vars=dict(vm_name='s' + item + '-work')) }}"
-    assign_public_ip: yes
-  with_sequence: count={{user_count}}
-  register: workstation_jobs
-  async: 7200
-  poll: 0
-
-- name: Launch Tower Instance
-  ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    group: "{{ name_prefix }}-towersg"
-    instance_type: "{{ ec2_tower_instance_type }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ name_prefix + '-s' + item + '-tower'}}"
-      App: AnsibleWorkshop
-    instance_tags:
-      Name: "{{ name_prefix + '-s' + item + '-tower'}}"
-      App: AnsibleWorkshop
-      Workshop: "{{ name_prefix }}"
-      Student: "{{ user_prefix + item }}"
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-      short_name: "{{ 's' + item + '-tower' }}"
-      long_name: "{{ 's' + item + '-tower' }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
-    image: "{{ ec2_ami_ids[ec2_tower_instance_ami_type] }}"
-    wait: true
-    region: "{{ ec2_region }}"
-    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'linux_ec2_user_data.j2') }}"
-    assign_public_ip: yes
-  with_sequence: count={{user_count}}
-  register: tower_jobs
-  async: 7200
-  poll: 0
-
-- name: GitLab | Launch Instance
-  ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    group: "{{ name_prefix }}-gitlabsg"
-    instance_type: "{{ ec2_gitlab_instance_type }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ name_prefix }}-gitlab"
-      App: AnsibleWorkshop
-    instance_tags:
-      Name: "{{ name_prefix }}-gitlab"
-      App: AnsibleWorkshop
-      Workshop: "{{ name_prefix }}"
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-      short_name: 'gitlab'
-      long_name: "gitlab.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
-    image: "{{ ec2_ami_ids[ec2_gitlab_instance_ami_type] }}"
-    wait: true
-    region: "{{ ec2_region }}"
-    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'gitlab_ec2_user_data.j2') }}"
-    assign_public_ip: yes
-  with_sequence: count=1
-  register: gitlab_jobs
-  async: 7200
-  poll: 0
-
-- name: Docs | Launch Instance
-  ec2:
-    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
-    group: "{{ name_prefix }}-docssg"
-    instance_type: "{{ ec2_docs_instance_type }}"
-    exact_count: 1
-    count_tag:
-      Name: "{{ name_prefix }}-docs"
-      App: AnsibleWorkshop
-    instance_tags:
-      Name: "{{ name_prefix }}-docs"
-      App: AnsibleWorkshop
-      Workshop: "{{ name_prefix }}"
-      Username: "{{ skylight_user }}"
-      Info: "Username that provisioned this-> {{ skylight_user }}"
-      Skylight: "This was provisioned through the skylight provisioner"
-      Students: "{{ user_count }}"
-      short_name: 'docs'
-      long_name: "docs.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
-    image: "{{ ec2_ami_ids[ec2_docs_instance_ami_type] }}"
-    wait: true
-    region: "{{ ec2_region }}"
-    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
-    user_data: "{{ lookup('template', 'docs_ec2_user_data.j2') }}"
-    assign_public_ip: yes
-  with_sequence: count=1
-  register: docs_jobs
-  async: 7200
-  poll: 0
-
-################### Wait for Jobs ###################
-
-- name: Wait for tower instance creation to complete
-  async_status: jid="{{ item.ansible_job_id }}"
-  register: tower_instances
-  until: tower_instances.finished
-  retries: 300
-  with_items: "{{ tower_jobs.results }}"
-
-- name: Wait for gitlab instance creation to complete
-  async_status: jid="{{ item.ansible_job_id }}"
-  register: gitlab_instances
-  until: gitlab_instances.finished
-  retries: 300
-  with_items: "{{ gitlab_jobs.results }}"
-
-- name: Wait for docs instance creation to complete
-  async_status: jid="{{ item.ansible_job_id }}"
-  register: docs_instances
-  until: docs_instances.finished
-  retries: 300
-  with_items: "{{ docs_jobs.results }}"
-
-- name: Wait for DC instance creation to complete
-  async_status: jid="{{ item.ansible_job_id }}"
-  register: dc_instances
-  until: dc_instances.finished
-  retries: 300
-  with_items: "{{ dc_jobs.results }}"
-
-- name: Wait for windows instance creation to complete
-  async_status: jid="{{ item.ansible_job_id }}"
-  register: windows_instances
-  until: windows_instances.finished
-  retries: 300
-  with_items:
-    - "{{ windows1_jobs.results }}"
-#    - "{{ windows2_jobs.results }}"
-
-- name: Workstation | Wait for instance creation to complete
-  async_status: jid="{{ item.ansible_job_id }}"
-  register: workstation_instances
-  until: workstation_instances.finished
-  retries: 300
-  with_items: "{{ workstation_jobs.results }}"
+- include_tasks: resources/instances.yml
+  loop: "{{ workshops[workshop_type].instances }}"
+  loop_control:
+    loop_var: app
 
 
-################### Get Passwords ###################
 
-- name: DomainController | Obtain windows passwords for instances
-  ec2_win_password:
-    region: '{{ ec2_region }}'
-    instance_id: "{{ item.id }}"
-    key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    wait: yes
-    wait_timeout: 300
-  with_items: "{{ dc_instances.results | map(attribute='tagged_instances') | list }}"
-  register: ec2dc_password
-  when: dc_instances is defined
 
-- name: Workstation | Obtain windows passwords for instances
-  ec2_win_password:
-    region: '{{ ec2_region }}'
-    instance_id: "{{ item.id }}"
-    key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    wait: yes
-    wait_timeout: 300
-  with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
-  register: ec2workstation_password
-  when: workstation_instances is defined
-
-- name: Windows | Obtain windows passwords for instances
-  ec2_win_password:
-    region: '{{ ec2_region }}'
-    instance_id: "{{ item.id }}"
-    key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    wait: yes
-    wait_timeout: 300
-  with_items: "{{ windows_instances.results | map(attribute='tagged_instances') | list }}"
-  register: ec2windows_password
-  when: windows_instances is defined
-
-################### Add Hosts ###################
-
-- name: Tower | Add new instance to host group
-  add_host:
-    hostname: "s{{ item.tags.Student | regex_replace('[^0-9]', '') }}-tower"
-    ansible_user: "{{ root_user }}"
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    ansible_host: "{{ item.public_ip }}"
-    private_ip: "{{ item.private_ip }}"
-    tower_license: "{{ tower_license }}"
-    student: "{{ item.tags.Student | regex_replace('[^0-9]', '') }}"
-    groups: tower
-  with_items: "{{ tower_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: GitLab | Add new instance to host group
-  add_host:
-    hostname: 'gitlab'
-    ansible_user: "{{ root_user }}"
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    ansible_host: "{{ item.public_ip }}"
-    private_ip: "{{ item.private_ip }}"
-    groups: gitlab
-  with_items: "{{ gitlab_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: Docs | Add new instance to host group
-  add_host:
-    hostname: 'docs'
-    ansible_user: "{{ root_user }}"
-    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
-    ansible_host: "{{ item.public_ip }}"
-    private_ip: "{{ item.private_ip }}"
-    groups: docs
-  with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
-
-- name: DomainController | Add new instance to host group
-  add_host:
-    hostname: "windc"
-    ansible_host: "{{ item.item.public_ip }}"
-    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
-    ansible_user: "Administrator"
-    ansible_password: "{{ item.win_password }}"
-    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
-    ansible_shell_type: "cmd"
-    private_ip: "{{ item.item.private_ip }}"
-    ansible_winrm_transport: "ntlm"
-    ansible_winrm_server_cert_validation: "ignore"
-    ansible_winrm_operation_timeout_sec: 120
-    ansible_winrm_read_timeout_sec: 150
-    groups: windows_domain_controllers
-  with_items: "{{ ec2dc_password.results }}"
-  when: ec2dc_password is defined
-
-- name: Windows | Add new instance to host group
-  add_host:
-    hostname: "s{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}-win1"
-    ansible_host: "{{ item.item.public_ip }}"
-    private_ip: "{{ item.item.private_ip }}"
-    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
-    ansible_user: "Administrator"
-    ansible_password: "{{ item.win_password }}"
-    ansible_become_password: "{{ domain_admin_password }}"
-    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
-    ansible_shell_type: "cmd"
-    ansible_winrm_transport: "ntlm"
-    ansible_winrm_server_cert_validation: "ignore"
-    ansible_winrm_operation_timeout_sec: 120
-    ansible_winrm_read_timeout_sec: 150
-    student: "{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}"
-    groups: windows
-  with_items: "{{ ec2windows_password.results }}"
-  when: ec2windows_password is defined
-
-- name: Workstation | Add new instance to host group
-  add_host:
-    hostname: "s{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}-work"
-    ansible_host: "{{ item.item.public_ip }}"
-    private_ip: "{{ item.item.private_ip }}"
-    ansible_port: "{{ '22' if (windows_ansible_connection is defined and windows_ansible_connection == 'ssh') else '5986' }}"
-    ansible_user: "Administrator"
-    ansible_password: "{{ item.win_password }}"
-    ansible_become_password: "{{ users_password }}"
-    ansible_connection: "{{ windows_ansible_connection | default('winrm') }}"
-    ansible_shell_type: "cmd"
-    ansible_winrm_transport: "ntlm"
-    ansible_winrm_server_cert_validation: "ignore"
-    ansible_winrm_operation_timeout_sec: 120
-    ansible_winrm_read_timeout_sec: 150
-    student: "{{ item.item.tags.Student | regex_replace('[^0-9]', '') }}"
-    groups: windows_workstations
-  with_items: "{{ ec2workstation_password.results }}"
-  when: ec2workstation_password is defined
 
 # Add new dns entries to make the url pretty
-- block:
-
-  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
-    route53:
-      state: present
-      zone: "{{ public_dns_zone }}"
-      record: "{{ name_prefix }}.{{ public_dns_zone }}"
-      type: A
-      ttl: 600
-      value: "{{ item.public_ip }}"
-      wait: yes
-    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
+#- block:
+#
+#  - name: "Docs | Create DNS entry for {{ name_prefix }}.{{ public_dns_zone }}"
+#    route53:
+#      state: present
+#      zone: "{{ public_dns_zone }}"
+#      record: "{{ name_prefix }}.{{ public_dns_zone }}"
+#      type: A
+#      ttl: 600
+#      value: "{{ item.public_ip }}"
+#      wait: yes
+#    with_items: "{{ docs_instances.results | map(attribute='tagged_instances') | list }}"
 
 #  - name: "Docs | Create DNS entry for docs.{{ item.tags.long_name }}"
 #    route53:
@@ -634,41 +156,18 @@
 #      wait: yes
 #    with_items: "{{ workstation_instances.results | map(attribute='tagged_instances') | list }}"
 
-  when: public_dns_zone is defined
+#  when: public_dns_zone is defined
 
 
 ################### Wait for Instances ###################
 
-- name: Tower | Wait for SSH to come up  
-  wait_for_connection:  
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['tower'] }}"  
-
-- name: GitLab | Wait for SSH to come up
-  wait_for_connection:
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['gitlab'] }}"  
-
-- name: Docs | Wait for SSH to come up
-  wait_for_connection:
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['docs'] }}"  
-
-- name: DomainController | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
-  wait_for_connection:
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['windows_domain_controllers'] }}"  
-
-- name: Windows | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
-  wait_for_connection:
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['windows'] }}" 
-
-- name: Workstation | Wait for {{ windows_ansible_connection | default('winrm') }} to come up
-  wait_for_connection:
-  delegate_to: "{{ item }}"
-  with_items: "{{ groups['windows_workstations'] }}" 
-
+- include_tasks: resources/connection.yml
+  with_dict: "{{ groups }}"
+  loop_control:
+    loop_var: group
+  when:
+    - group.key != 'ungrouped'
+    - group.key != 'all'
 
 ################### Create Inventories ###################
 
@@ -682,8 +181,3 @@
     src: instances.txt.j2
     dest: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ user_prefix }}{{ item }}-instances.txt"
   with_sequence: count="{{ user_count }}"
-
-# - name: Configure external tower if needed
-#   include: external_tower.yml
-#   when: skylight_external_tower
-

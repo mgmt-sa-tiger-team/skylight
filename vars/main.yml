@@ -205,3 +205,97 @@ azure_win_offer: "WindowsServer"
 azure_win_sku: "2019-Datacenter"
 azure_win_version: "latest"
 
+
+
+
+
+
+
+ec2_image_users:
+  rhel7: "ec2-user"
+  rhel8: "ec2-user"
+  centos7: "centos"
+  win2016_core: "Administrator"
+  win2016_full: "Administrator"
+  win2019_core: "Administrator"
+  win2019_full: "Administrator"
+  
+workshop_type: windows
+
+workshops:
+  windows:
+    instances:
+      - name: windc
+        type: windows
+        os: win2019_core
+        app_type: windc
+        ports: windc
+        size: t3.medium
+        template: win_ec2_user_data.j2
+        groups: windows_domain_controllers
+        count: 1
+      - name: win1
+        type: windows
+        os: win2019_core
+        app_type: windows
+        ports: windows
+        size: t3.small
+        template: win_ec2_user_data.j2
+        groups: windows
+        count: "{{ user_count }}"
+      - name: work
+        type: windows
+        os: win2019_full
+        app_type: work
+        ports: windows
+        size: t3.medium
+        template: win_ec2_user_data.j2
+        groups: windows_workstations
+        count: "{{ user_count }}"
+      - name: tower
+        type: linux
+        os: rhel8
+        app_type: tower
+        ports: linux
+        size: t2.medium
+        template: linux_ec2_user_data.j2
+        groups: tower
+        count: "{{ user_count }}"
+      - name: gitlab
+        type: linux
+        os: rhel8
+        app_type: gitlab
+        ports: gitlab
+        size: t2.medium
+        template: linux_ec2_user_data.j2
+        groups: gitlab
+        count: 1
+      - name: docs
+        type: linux
+        os: rhel8
+        app_type: docs
+        ports: linux
+        size: t2.medium
+        template: linux_ec2_user_data.j2
+        groups: docs
+        count: 1
+    ports:
+      linux:
+        - 22
+        - 80
+        - 443
+      gitlab:
+        - 22
+#        - 80
+#        - 443
+      windc:
+        - 22
+        - 3389
+        - 5986
+      windows:
+        - 22
+        - 80
+        - 443
+        - 3389
+        - 5986
+

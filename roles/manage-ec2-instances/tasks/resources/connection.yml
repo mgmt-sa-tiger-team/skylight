@@ -1,0 +1,15 @@
+- name: Testing
+  debug:
+    msg: "{{ item }}"
+  with_items: "{{ group.value }}"
+
+- name: show all the hosts matching the pattern, ie all but the group www
+  debug:
+    msg: "{{ hostvars[item] }}"
+  with_items: "{{ group.value }}"
+
+
+- name: "{{ group.key }} | Wait for connection to come up"
+  wait_for_connection:
+  delegate_to: "{{ item }}"
+  with_items: "{{ group.value }}"

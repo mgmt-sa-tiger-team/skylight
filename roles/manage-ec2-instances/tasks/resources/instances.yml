@@ -1,0 +1,62 @@
+- name: "{{ app.name | capitalize }} | Launch Instance"
+  ec2:
+    key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
+    group: "{{ name_prefix }}-{{ app.ports }}sg"
+    instance_type: "{{ app.size }}"
+    exact_count: "{{ app.count }}"
+    count_tag:
+      Username: "{{ skylight_user }}"
+      Workshop: "{{ name_prefix }}"
+      AppName: "{{ app.name }}"
+    image: "{{ ec2_ami_ids[app.os] }}"
+    wait: true
+    region: "{{ ec2_region }}"
+    vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
+    user_data: "{{ lookup('template', app.template, template_vars=dict(vm_name=app.name)) }}"
+    assign_public_ip: yes
+  register: instance_output
+
+- debug:
+    var: instance_output
+
+- name: "{{ app.name | capitalize }} | Tag Instances"
+  ec2_tag:
+    region: "{{ ec2_region }}"
+    resource: "{{ item.1 }}"
+    state: present
+    tags:
+      Name: "{{ name_prefix }}-{% if app.count > 1 %}s{{ item.0 + 1 }}-{% endif %}{{ app.name }}"
+      Username: "{{ skylight_user }}"
+      Workshop: "{{ name_prefix }}"
+      AppName: "{{ app.name }}"
+      Student: "student{{ item.0 + 1 }}"
+      Info: "Username that provisioned this-> {{ skylight_user }}"
+      Skylight: "This was provisioned through the skylight provisioner"
+      Students: "{{ user_count }}"
+      short_name: "s{{ item.0 + 1 }}-{{ app.name }}"
+      long_name: "s{{ item.0 + 1 }}-{{ app.name }}.{{ name_prefix }}.{{ public_dns_zone | default('') }}"
+  with_indexed_items:
+    - "{{ instance_output.instance_ids }}"
+  when: instance_output.instance_ids is not none
+
+- name: "{{ app.name | capitalize }} | Add new instance to host group"
+  add_host:
+    hostname: "{% if app.count > 1 %}s{{ item.0 + 1 }}-{% endif %}{{ app.name }}"
+    ansible_user: "{{ ec2_image_users[app.os] }}"
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
+    ansible_host: "{{ item.1.public_ip }}"
+    ansible_password: "{% if app.type == 'windows' %}{{ domain_admin_password }}{% endif %}"
+    ansible_become_password: "{% if app.type == 'windows' %}{{ users_password }}{% endif %}"
+    ansible_connection: "{% if app.type == 'windows' %}{{ windows_ansible_connection | default('winrm') }}{% else %}ssh{% endif %}"
+    ansible_port: "{% if app.type == 'windows' %}5986{% else %}22{% endif %}"
+    ansible_shell_type: "{% if app.type == 'windows' %}cmd{% endif %}"
+    ansible_winrm_transport: "{% if app.type == 'windows' %}credssp{% endif %}"
+    ansible_winrm_server_cert_validation: "{% if app.type == 'windows' %}ignore{% endif %}"
+    ansible_winrm_operation_timeout_sec: 120
+    ansible_winrm_read_timeout_sec: 150
+    private_ip: "{{ item.1.private_ip }}"
+    tower_license: "{{ tower_license }}"
+    student: "{{ item.0 + 1 }}"
+    groups: "{{ app.groups }}"
+  with_indexed_items:
+    - "{{ instance_output.tagged_instances }}"

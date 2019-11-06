@@ -9,7 +9,12 @@
 - name: use set fact for easier variables
   set_fact:
     ec2_vpc_id: "{{ vpc_net_facts.vpcs[0].id }}"
-  when: vpc_net_facts.vpcs|length > 0
+  when: vpc_net_facts.vpcs | length > 0
+
+- name: Exit if the VPC doesn't exist
+  fail:
+    msg: "VPC doesn't exist"
+  when: ec2_vpc_id is not defined
 
 - name: grab route information for {{ ec2_name_prefix }} on {{ ec2_region }}
   ec2_vpc_route_table_facts:
@@ -17,7 +22,7 @@
     filters:
       vpc_id: "{{ ec2_vpc_id }}"
   register: route_table_facts
-  when: vpc_net_facts.vpcs|length > 0
+  when: vpc_net_facts.vpcs | length > 0
 
 - name: grab information about AWS user
   aws_caller_facts:
@@ -28,167 +33,26 @@
   set_fact:
     skylight_user: '{{ whoami.arn.split("/")[-1] }}'
 
-# ----------------------- Destroy Tower Instances -----------------------
-- name: Get ec2 Tower instance information
+# ----------------------- Destroy All Instances -----------------------
+
+- name: Get ec2 instance information
   ec2_instance_facts:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
-      "tag:Name": "{{ name_prefix + '-s' + item + '-tower'}}"
   with_sequence: count={{ user_count }}
-  register: ec2_tower_instances
+  register: ec2_instances
 
-- name: Terminate Tower Instances
+- name: Terminate All Instances
   ec2:
     region: "{{ ec2_region }}"
     state: "absent"
     instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
   with_items:
-    - "{{ ec2_tower_instances.results }}"
+    - "{{ ec2_instances.results }}"
   when: item.instances.0 is defined and item.instances.0.instance_id is defined
 
-# ----------------------- Destroy Gitlab Instances -----------------------
-- name: Get ec2 Gitlab instance information
-  ec2_instance_facts:
-    region: "{{ ec2_region }}"
-    filters:
-      vpc-id: "{{ ec2_vpc_id }}"
-      "tag:Name": "{{ name_prefix }}-gitlab"
-  register: ec2_gitlab_instances
-
-#- name: "Delete GitLab DNS entry for gitlab.{{ name_prefix }}.{{ public_dns_zone }}"
-#  route53:
-#    state: absent
-#    zone: "{{ public_dns_zone }}"
-#    record: "{{ item.tags.long_name }}"
-#    type: A
-#    value: "{{ item.public_ip }}"
-#    wait: yes
-#  with_items: "{{ ec2_gitlab_instances }}"
-#  when: public_dns_zone is defined and item.instances.0 is defined
-#  ignore_errors: yes
-
-- name: Terminate Gitlab Instances
-  ec2:
-    region: "{{ ec2_region }}"
-    state: "absent"
-    instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-  with_items:
-    - "{{ ec2_gitlab_instances }}"
-  when: item.instances.0 is defined
-
-# ----------------------- Destroy Docs Instances -----------------------
-- name: Get ec2 Docs instance information
-  ec2_instance_facts:
-    region: "{{ ec2_region }}"
-    filters:
-      vpc-id: "{{ ec2_vpc_id }}"
-      "tag:Name": "{{ name_prefix }}-docs"
-  register: ec2_docs_instances
-
-#- name: "Delete Docs DNS entry for docs.{{ name_prefix }}.{{ public_dns_zone }}"
-#  route53:
-#    state: absent
-#    zone: "{{ public_dns_zone }}"
-#    record: "{{ name_prefix }}.{{ public_dns_zone }}"
-#    type: A
-#    value: "{{ item.public_ip }}"
-#    wait: yes
-#  with_items:
-#    - "{{ ec2_docs_instances }}"
-#  when: public_dns_zone is defined and item.instances.0 is defined
-#  ignore_errors: yes
-
-#- name: "Delete Docs DNS entry for docs.{{ item.tags.long_name }}"
-#  route53:
-#    state: absent
-#    zone: "{{ public_dns_zone }}"
-#    record: "{{ item.tags.long_name }}"
-#    type: A
-#    value: "{{ item.public_ip }}"
-#    wait: yes
-#  with_items:
-#    - "{{ ec2_docs_instances }}"
-#  when: public_dns_zone is defined and item.instances.0 is defined
-#  ignore_errors: yes
-
-- name: Terminate Docs Instances
-  ec2:
-    region: "{{ ec2_region }}"
-    state: "absent"
-    instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-  with_items:
-    - "{{ ec2_docs_instances }}"
-  when: item.instances.0 is defined
-
-# ----------------------- Destroy DC Instances -----------------------
-- name: Get ec2 DC instance information
-  ec2_instance_facts:
-    region: "{{ ec2_region }}"
-    filters:
-      vpc-id: "{{ ec2_vpc_id }}"
-      "tag:Name": "{{ name_prefix }}-windc"
-  register: ec2_dc_instances
-
-- name: Terminate DC Instances
-  ec2:
-    region: "{{ ec2_region }}"
-    state: "absent"
-    instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-  with_items:
-    - "{{ ec2_dc_instances }}"
-  when: item.instances.0 is defined
-
-# ----------------------- Destroy Windows Instances -----------------------
-- name: Get ec2 Windows instance information
-  ec2_instance_facts:
-    region: "{{ ec2_region }}"
-    filters:
-      vpc-id: "{{ ec2_vpc_id }}"
-      "tag:Name": "{{ name_prefix + '-s' + item + '-win1'}}"
-  with_sequence: count={{user_count}}
-  register: ec2_windows_instances
-
-- name: Terminate Windows Instances
-  ec2:
-    region: "{{ ec2_region }}"
-    state: "absent"
-    instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-  with_items:
-    - "{{ ec2_windows_instances.results }}"
-  when: item.instances.0 is defined and item.instances.0.instance_id is defined
-
-# ----------------------- Destroy Workstation Instances -----------------------
-- name: Get ec2 Workstation instance information
-  ec2_instance_facts:
-    region: "{{ ec2_region }}"
-    filters:
-      vpc-id: "{{ ec2_vpc_id }}"
-      "tag:Name": "{{ name_prefix + '-s' + item + '-work'}}"
-  with_sequence: count="{{ user_count }}"
-  register: ec2_workstation_instances
-
-- name: Terminate Workstation Instances
-  ec2:
-    region: "{{ ec2_region }}"
-    state: "absent"
-    instance_ids: "{{ item.instances | map(attribute='instance_id') | list }}"
-  with_items:
-    - "{{ ec2_workstation_instances.results }}"
-  when: item.instances.0 is defined and item.instances.0.instance_id is defined
-
-#- name: "Workstation | Delete DNS entries for student workstations"
-#  route53:
-#    state: absent
-#    zone: "{{ public_dns_zone }}"
-#    record: "{{ item.tags.long_name }}"
-#    type: A
-#    ttl: 600
-#    value: "{{ item.public_ip }}"
-#    wait: yes
-#  with_items: "{{ ec2_workstation_instances.results }}"
-#  when: public_dns_zone is defined and item.instances.0 is defined and item.instances.0.instance_id is defined
-#  ignore_errors: yes
+# ----------------------- Destroy Workstation DNS -----------------------
 
 - name: Get route53 dns information
   route53:
@@ -212,71 +76,29 @@
 
 ################### Remove Security Groups ###################
 
-- name: Remove Tower security group
+- name: Get ec2 security group information
+  ec2_group_facts:
+    region: "{{ ec2_region }}"
+    filters:
+      vpc-id: "{{ ec2_vpc_id }}"
+  with_sequence: count={{ user_count }}
+  register: ec2_security_groups
+
+- name: Remove security groups
   ec2_group:
-    name: "{{ name_prefix }}-towersg"
+    group_id: "{{ item.group_id }}"
     region: "{{ ec2_region }}"
     vpc_id: "{{ ec2_vpc_id }}"
     state: absent
+  when: item.group_name != 'default'
+  with_items:
+    - "{{ ec2_security_groups.results[0].security_groups }}"
   register: result
   until: result is success
   retries: 20
   delay: 10
 
-- name: Remove Gitlab security group
-  ec2_group:
-    name: "{{ name_prefix }}-gitlabsg"
-    region: "{{ ec2_region }}"
-    vpc_id: "{{ ec2_vpc_id }}"
-    state: absent
-  register: result
-  until: result is success
-  retries: 20
-  delay: 10
-
-- name: Remove Docs security group
-  ec2_group:
-    name: "{{ name_prefix }}-docssg"
-    region: "{{ ec2_region }}"
-    vpc_id: "{{ ec2_vpc_id }}"
-    state: absent
-  register: result
-  until: result is success
-  retries: 20
-  delay: 10
-
-- name: Remove DC security group
-  ec2_group:
-    name: "{{ name_prefix }}-windcsg"
-    region: "{{ ec2_region }}"
-    vpc_id: "{{ ec2_vpc_id }}"
-    state: absent
-  register: result
-  until: result is success
-  retries: 20
-  delay: 10
-
-- name: Remove Web security group
-  ec2_group:
-    name: "{{ name_prefix }}-websg"
-    region: "{{ ec2_region }}"
-    vpc_id: "{{ ec2_vpc_id }}"
-    state: absent
-  register: result
-  until: result is success
-  retries: 20
-  delay: 10
-
-- name: Remove Windows security group
-  ec2_group:
-    name: "{{ name_prefix }}-windowssg"
-    region: "{{ ec2_region }}"
-    vpc_id: "{{ ec2_vpc_id }}"
-    state: absent
-  register: result
-  until: result is success
-  retries: 20
-  delay: 10
+################### Remove Everything Else ###################
 
 - name: Remove ssh key pair for workshop {{ name_prefix }}
   ec2_key:
@@ -318,6 +140,7 @@
     route_table_id: "{{ item.id }}"
     lookup: id
     state: absent
+  when: item.associations|length == 0
   with_items: "{{ route_table_facts.route_tables }}"
   register: result
   until: result is success
