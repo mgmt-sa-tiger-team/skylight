@@ -158,9 +158,11 @@ ansible-playbook teardown.yml -e vars/AnsibleAutomatesDallas.yml
 
 The following describes some of the common issues when deploying the environment.
 
-- **Missing variables**: if the `provision.yml` complains about missing variables, make sure to **copy** the `main.yml` to `custom.yml` instead of overriding the values of some of the variables in the file.
+- **Missing variables**  
+  If the `provision.yml` complains about missing variables, make sure to **copy** the `main.yml` to `custom.yml` instead of overriding the values of some of the variables in the file.
 
-- **DNS issues between hosts**: If there are DNS issues between servers, it could be related to a misconfiguration of the Windows Domain controller. Settings are managed by the following three variables in the main configuration file:
+- **DNS issues between hosts**  
+  If there are DNS issues between servers, it could be related to a misconfiguration of the Windows Domain controller. Settings are managed by the following three variables in the main configuration file:
   ```
   # Used by Active Directory and windows client provision
   dns_domain_name: "ansibleworkshop.com"
@@ -169,8 +171,9 @@ The following describes some of the common issues when deploying the environment
   ```
   If you decide to use another domain, make sure to update the **three** variables. The DN must match the DNS domain name. If the domain is not the same in the three variables, the domain controller will fail to properly resolve server DNS names in the environment.
 
-- **Connection times out**: the installer sometimes times out during the execution of some of the tasks (this is indicated by a message of `Control master terminated unexpectedly. Shared connection closed`).  
-  This would mostly happen during the `run the tower installer` task of the `ansible-tower` role and the `Copy lab guides to server` task of the `docs_setup` role.
+- **Connection times out**
+  The installer sometimes times out during the execution of some of the tasks (this is indicated by a message of `Control master terminated unexpectedly. Shared connection closed`).  
+  This would mostly happen during the `run the tower installer` task of the `ansible-tower` role and the `Copy lab guides to server` task of the `docs_setup` role.  
   To trace the execution time for all of the tasks that the playbook invokes, update the `ansible.cfg` to add some callback plugins before deploying the environment.
 
   ```
@@ -202,10 +205,40 @@ The following describes some of the common issues when deploying the environment
     ServerAliveCountMax 2
   ```
 
-- **Missing WinRM Module**: If the installation of the Windows environment fails, make sure that you use the right version of the `python-winrm` package, which exists for both Python 2 and Python 3 versions. In Fedora, the `python-winrm` packages provides WinRM for Python 2 whereas `python3-winrm` provides WinRM for Python 3.
+- **Missing WinRM Module**  
+  If the installation of the Windows environment fails, make sure that you use the right version of the `python-winrm` package, which exists for both Python 2 and Python 3 versions. In Fedora, the `python-winrm` packages provides WinRM for Python 2 whereas `python3-winrm` provides WinRM for Python 3.
 
-- **Breaking on a fork**: When deploying on MacOS Mojave, some will experience an error `TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
-objc[43678]: +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
-`
-In most situations, this can be fixed by setting this environment variable in your shell before running the playbook:
-`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
+- **Breaking on a fork**  
+  When deploying on MacOS Mojave, some will experience the following errror:
+  ```
+  TASK [Gathering Facts] **********************************************
+  objc[43678]: +[__NSPlaceholderDate initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
+  ```
+  In most situations, this can be fixed by setting this environment variable in your shell before running the playbook:
+  `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
+
+- **Ansible `[ansible-tower : run the tower installer]` Task Fails**  
+  If you are using RHEL 7 images and are deploying in Amazon, the Ansible Tower installation will fail. The issue is related to a mismatch in repository name between what the `rh-amazon-rhui-client` package configures (Amazon RPM for configuring repos) and what the Tower installer is looking for.
+
+  In the Tower installer role that deploys the prerequisites, there are three lists that define the repository names - one of which is used in EC2 deployments.
+
+  The fix consists in the following:
+
+  1: Create a environment file that overrides the repository names that the Tower installation module looks for.  
+  2: Run the `setup.sh` installer with this environment file using the `-e` flag.
+
+  To apply those changes, update the `roles/ansible-tower/tasks/setup.yml` playbook. Create the first task, and update the one that runs the installer to add `-e "@install_vars.yml"`:
+
+    ```
+  - name: Create the environment file
+    copy:
+      dest: /tmp/ansible-tower-setup-{{ towerversion }}/install_vars.yml
+      content: |
+        redhat_aws_rhui_repos:
+          - rhel-server-rhui-rhscl-7-rpms
+          - rhel-7-server-rhui-extras-rpms
+
+  - name: Run the tower installer
+    shell: ./setup.sh -e "@install_vars.yml" chdir=/tmp/ansible-tower-setup-{{ towerversion }}
+    when: towerchk not in towerversion
+  ```
