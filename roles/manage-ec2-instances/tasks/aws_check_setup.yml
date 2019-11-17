@@ -27,7 +27,7 @@
     ec2_az: "{{ az_names.availability_zones[0].zone_name }}"
 
 - name: grab information about AWS user
-  aws_caller_facts:
+  aws_caller_info:
     region: "{{ ec2_region }}"
   register: whoami
 
