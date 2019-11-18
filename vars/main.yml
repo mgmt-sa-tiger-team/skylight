@@ -20,7 +20,7 @@ users_password: "Ans1bl3--"
 
 # Tower Admin Password
 towerpass: "MyPassw0rd21"
-towerversion: 3.5.2-1
+towerversion: 3.6.0-1
 pgpass: awx
 rabbitpass: tower
 
@@ -98,7 +98,7 @@ ec2_region: "us-east-1"
 # Internal lookup dict for image names and types
 ec2_image_names:
   rhel7: "RHEL-7.7_HVM_GA*x86_64*"
-  rhel8: "RHEL-8.0.0_HVM_GA*x86_64*"
+  rhel8: "RHEL-8.1.0_HVM_GA*x86_64*"
   centos7: "CentOS Linux 7 x86_64 HVM EBS ENA 1901_01*"
   win2016_core: "Windows_Server-2016-English-Core-Base*"
   win2016_full: "Windows_Server-2016-English-Full-Base*"
