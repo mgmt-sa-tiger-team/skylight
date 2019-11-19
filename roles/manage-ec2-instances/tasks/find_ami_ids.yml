@@ -66,3 +66,34 @@
     var: ec2_ami_ids
   when:
     - ec2_ami_ids is defined
+
+- name: fail if one/more of the selected EC2 AMIs not found
+  fail:
+    msg: |
+      One of the specified EC2 AMIs not found:
+
+      {% if ec2_ami_ids[ec2_tower_instance_ami_type] == '' %}
+      ec2_tower_instance_ami_type is set to "{{ ec2_tower_instance_ami_type }}" but not found, see the debug output above.
+      {% endif %}
+      {% if ec2_ami_ids[ec2_gitlab_instance_ami_type] == '' %}
+      ec2_gitlab_instance_ami_type is set to "{{ ec2_gitlab_instance_ami_type }}" but not found, see the debug output above.
+      {% endif %}
+      {% if ec2_ami_ids[ec2_docs_instance_ami_type] == '' %}
+      ec2_docs_instance_ami_type is set to "{{ ec2_docs_instance_ami_type }}" but not found, see the debug output above.
+      {% endif %}
+      {% if ec2_ami_ids[ec2_windc_instance_ami_type] == '' %}
+      ec2_windc_instance_ami_type is set to "{{ ec2_windc_instance_ami_type }}" but not found, see the debug output above.
+      {% endif %}
+      {% if ec2_ami_ids[ec2_windows_workstation_instance_ami_type] == '' %}
+      ec2_windows_workstation_instance_ami_type is set to "{{ ec2_windows_workstation_instance_ami_type }}" but not found, see the debug output above.
+      {% endif %}
+      {% if ec2_ami_ids[ec2_windows_instance_ami_type] == '' %}
+      ec2_windows_instance_ami_type is set to "{{ ec2_windows_instance_ami_type }}" but not found, see the debug output above.
+      {% endif %}
+  when: >
+    ec2_ami_ids[ec2_tower_instance_ami_type] == '' or
+    ec2_ami_ids[ec2_gitlab_instance_ami_type] == '' or
+    ec2_ami_ids[ec2_docs_instance_ami_type] == '' or
+    ec2_ami_ids[ec2_windc_instance_ami_type] == '' or
+    ec2_ami_ids[ec2_windows_workstation_instance_ami_type] == '' or
+    ec2_ami_ids[ec2_windows_instance_ami_type] == ''
