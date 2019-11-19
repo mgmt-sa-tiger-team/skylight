@@ -9,6 +9,9 @@ name_prefix: "skylight"
 
 # Needed for AD and windows client provision
 dns_domain_name: "ansibleworkshop.com"
+# The 'short' name here is a subset of the full domain name
+# e.g. if the full dns domain name is workshop1.mydomain.com, 
+# the short name would be 'workshop1' . 
 dns_domain_name_short: "ansibleworkshop"
 ldap_basedn: "DC=ansibleworkshop,DC=com"
 domain_admin_password: "MyP@ssw0rd21"
