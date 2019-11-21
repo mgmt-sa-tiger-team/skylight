@@ -71,7 +71,7 @@
     ttl: "{{ route53_dns_record.set.ttl }}"
     type: "{{ route53_dns_record.set.type }}"
     value: "{{ route53_dns_record.set.value }}"
-  when: public_dns_zone is defined and route53_dns_record.set is defined
+  when: public_dns_zone is defined and route53_dns_record.set.record is defined
   ignore_errors: yes
 
 ################### Remove Security Groups ###################
@@ -140,12 +140,14 @@
     route_table_id: "{{ item.id }}"
     lookup: id
     state: absent
-  when: item.associations|length == 0
+  when:
+    - item.associations[0]|length > 0
+    - item.associations[0].main == False
   with_items: "{{ route_table_facts.route_tables }}"
   register: result
   until: result is success
-  retries: 5
-  delay: 5
+  retries: 2
+  delay: 2
   ignore_errors: true
 
 - name: Remove VPC {{ name_prefix }}-vpc
