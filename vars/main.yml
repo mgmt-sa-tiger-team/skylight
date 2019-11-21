@@ -232,6 +232,12 @@ workshops:
         ports: windc
         size: t3.medium
         template: win_ec2_user_data.j2
+        password: "{{ domain_admin_password }}"
+        become_password: "{{ users_password }}"
+        connection: "{{ windows_ansible_connection | default('winrm') }}"
+        port: 5986
+        shell_type: cmd
+        winrm_transport: credssp
         groups: windows_domain_controllers
         count: 1
       - name: win1
@@ -241,6 +247,12 @@ workshops:
         ports: windows
         size: t3.small
         template: win_ec2_user_data.j2
+        password: "{{ domain_admin_password }}"
+        become_password: "{{ users_password }}"
+        connection: "{{ windows_ansible_connection | default('winrm') }}"
+        port: 5986
+        shell_type: cmd
+        winrm_transport: credssp
         groups: windows
         count: "{{ user_count }}"
       - name: work
@@ -250,6 +262,12 @@ workshops:
         ports: windows
         size: t3.medium
         template: win_ec2_user_data.j2
+        password: "{{ domain_admin_password }}"
+        become_password: "{{ users_password }}"
+        connection: "{{ windows_ansible_connection | default('winrm') }}"
+        port: 5986
+        shell_type: cmd
+        winrm_transport: credssp
         groups: windows_workstations
         count: "{{ user_count }}"
       - name: tower

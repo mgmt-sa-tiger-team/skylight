@@ -1,3 +1,4 @@
+
 - name: "{{ app.name | capitalize }} | Launch Instance"
   ec2:
     key_name: "{{ skylight_user }}-{{ name_prefix }}-key"
@@ -15,9 +16,6 @@
     user_data: "{{ lookup('template', app.template, template_vars=dict(vm_name=app.name)) }}"
     assign_public_ip: yes
   register: instance_output
-
-- debug:
-    var: instance_output
 
 - name: "{{ app.name | capitalize }} | Tag Instances"
   ec2_tag:
@@ -45,13 +43,13 @@
     ansible_user: "{{ ec2_image_users[app.os] }}"
     ansible_ssh_private_key_file: "{{ playbook_dir }}/workshops/{{ name_prefix }}/{{ skylight_user }}-{{ name_prefix }}-private.pem"
     ansible_host: "{{ item.1.public_ip }}"
-    ansible_password: "{% if app.type == 'windows' %}{{ domain_admin_password }}{% endif %}"
-    ansible_become_password: "{% if app.type == 'windows' %}{{ users_password }}{% endif %}"
-    ansible_connection: "{% if app.type == 'windows' %}{{ windows_ansible_connection | default('winrm') }}{% else %}ssh{% endif %}"
-    ansible_port: "{% if app.type == 'windows' %}5986{% else %}22{% endif %}"
-    ansible_shell_type: "{% if app.type == 'windows' %}cmd{% endif %}"
-    ansible_winrm_transport: "{% if app.type == 'windows' %}credssp{% endif %}"
-    ansible_winrm_server_cert_validation: "{% if app.type == 'windows' %}ignore{% endif %}"
+    ansible_password: "{{ app.password | default(omit, true) }}"
+    ansible_become_password: "{{ app.become_password | default(omit, true) }}"
+    ansible_connection: "{{ app.connection | default(omit, true) }}"
+    ansible_port: "{{ app.port | default(omit, true) }}"
+    ansible_shell_type: "{{ app.shell_type | default(omit, true) }}"
+    ansible_winrm_transport: "{{ app.winrm_transport | default(omit, true) }}"
+    ansible_winrm_server_cert_validation: ignore
     ansible_winrm_operation_timeout_sec: 120
     ansible_winrm_read_timeout_sec: 150
     private_ip: "{{ item.1.private_ip }}"

@@ -97,15 +97,12 @@
   loop_control:
     loop_var: app
 
-
 ################### Build Instances ###################
 
 - include_tasks: resources/instances.yml
   loop: "{{ workshops[workshop_type].instances }}"
   loop_control:
     loop_var: app
-
-
 
 
 
