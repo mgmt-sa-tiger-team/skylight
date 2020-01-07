@@ -9,6 +9,9 @@ name_prefix: "skylight"
 
 # Needed for AD and windows client provision
 dns_domain_name: "ansibleworkshop.com"
+# The 'short' name here is a subset of the full domain name
+# e.g. if the full dns domain name is workshop1.mydomain.com, 
+# the short name would be 'workshop1' . 
 dns_domain_name_short: "ansibleworkshop"
 ldap_basedn: "DC=ansibleworkshop,DC=com"
 domain_admin_password: "MyP@ssw0rd21"
@@ -20,7 +23,7 @@ users_password: "Ans1bl3--"
 
 # Tower Admin Password
 towerpass: "MyPassw0rd21"
-towerversion: 3.5.2-1
+towerversion: 3.6.0-1
 pgpass: awx
 rabbitpass: tower
 
@@ -98,7 +101,7 @@ ec2_region: "us-east-1"
 # Internal lookup dict for image names and types
 ec2_image_names:
   rhel7: "RHEL-7.7_HVM_GA*x86_64*"
-  rhel8: "RHEL-8.0.0_HVM_GA*x86_64*"
+  rhel8: "RHEL-8.1.0_HVM_GA*x86_64*"
   centos7: "CentOS Linux 7 x86_64 HVM EBS ENA 1901_01*"
   win2016_core: "Windows_Server-2016-English-Core-Base*"
   win2016_full: "Windows_Server-2016-English-Full-Base*"
@@ -119,6 +122,11 @@ ec2_windows_workstation_instance_type: "t3.medium"   # t2.small was slowwwwww...
 ec2_windows_workstation_instance_ami_type: win2019_full # See the ec2_image_names variable for lookup
 ec2_windows_instance_type: "t3.small"   # Small = 1 vCPU / 2GB
 ec2_windows_instance_ami_type: win2019_core # See the ec2_image_names variable for lookup
+
+# This is needed when using python 2.x on the control point against rhel8 on ec2 as it doesn't seem to properly find the python environment
+# This should be safe to do because it works against rhel7 and rhel8 targets713881
+
+ansible_python_interpreter: /usr/libexec/platform-python
 
 # letsencrypt config
 certbot_admin_email: register@{{ public_dns_zone | default ('') }}
