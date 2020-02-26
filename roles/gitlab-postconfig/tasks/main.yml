@@ -42,7 +42,7 @@
             "username": "root",
             "password": "{{ domain_admin_password }}"
           }
-      no_log: True
+      no_log: false
 
   rescue:
 
