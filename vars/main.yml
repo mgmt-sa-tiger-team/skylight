@@ -17,7 +17,7 @@ ldap_basedn: "DC=ansibleworkshop,DC=com"
 domain_admin_password: "MyP@ssw0rd21"
 
 # Number of users and prefix for user name
-user_count: 1
+user_count: 16
 user_prefix: student
 users_password: "Ans1bl3--"
 
@@ -33,7 +33,7 @@ ldap_access_filter: "(&(objectClass=user)(memberOf=CN=Ansible Users,CN=Users,{{ 
 tower_ldap_search_dn: "CN=Users,{{ ldap_search_base }}"
 
 # Root user (ec2-user for AWS)
-root_user: root
+root_user: ec2-user
 root_password: MyPassw0rd21
 centos_root_user: centos
 
@@ -84,6 +84,7 @@ gitlab_download_validate_certs: yes
 # install latest version of gitlab when using ansible 2.8
 # enable gitlab_version below when using ansible < 2.8
 # gitlab_version: "10.0.6-ce.0.el7"
+gitlab_version: "12.6.7-ce.0.el7"
 # Email configuration.
 gitlab_email_enabled: "false"
 gitlab_smtp_enable: "false"
@@ -93,7 +94,7 @@ gitlab_smtp_enable: "false"
 ######################## EC2 INFO ########################
 ##########################################################
 
-ec2_region: "us-east-1"
+ec2_region: "ap-southeast-2"
 
 # If this is defined, create a dns entries in the route53 zone
 #public_dns_zone: "labs.ansibleworkshop.com"
@@ -101,7 +102,7 @@ ec2_region: "us-east-1"
 # Internal lookup dict for image names and types
 ec2_image_names:
   rhel7: "RHEL-7.7_HVM_GA*x86_64*"
-  rhel8: "RHEL-8.1.0_HVM_GA*x86_64*"
+  rhel8: "RHEL-8.1.0_HVM-20191029-x86_64-0-Hourly2-GP2"
   centos7: "CentOS Linux 7 x86_64 HVM EBS ENA 1901_01*"
   win2016_core: "Windows_Server-2016-English-Core-Base*"
   win2016_full: "Windows_Server-2016-English-Full-Base*"

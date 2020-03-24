@@ -30,6 +30,20 @@ Requirements for running the provisioner will vary based upon your environment a
   * sshpass (use brew to install if OSX)
 * Ansible Tower License
 
+#### rhel8, fedora28=>
+
+After cloning this repository to your deployment node, create a python3 virtualenv inside the repository (remember to add this to .gitignore)
+
+`python3 -m venv env`
+
+Activate the virtual environment
+
+`source env/bin/activate`
+
+Install the dependancies locally using pip
+
+`pip install pywinrm boto boto3 requests requests-credssp ansible[azure]`
+
 ### AWS
 
 You will need to setup your AWS configuration and Credentials.  Note that a standard AWS account is limited to 20 ec2 instances, so update your quota in advance.  Also note that each student gets 3 machines.  Make certain your VPC is large enough.  
