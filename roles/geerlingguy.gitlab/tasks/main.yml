@@ -31,6 +31,14 @@
   command: bash /tmp/gitlab_install_repository.sh
   when: not gitlab_file.stat.exists
 
+# disable the gpg validation for now
+- name: disable repo validation for now
+  replace:
+    path: /etc/yum.repos.d/gitlab_gitlab-ce.repo
+    regexp: '^repo_gpgcheck=1'
+    replace: repo_gpgcheck=0
+  when: ansible_distribution_major_version|int == 7
+
 - name: Define the Gitlab package name.
   set_fact:
     gitlab_package_name: "{{ gitlab_edition }}{{ gitlab_package_version_separator }}{{ gitlab_version }}"
