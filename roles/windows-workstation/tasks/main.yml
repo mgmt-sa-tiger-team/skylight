@@ -60,16 +60,16 @@
       icon: '%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe,0'
 
   - name: Set git to cache credentials
-    win_command: git config --global credential.helper manager
+    win_command: git config -f C:\Windows\.gitconfig credential.helper manager
 
   - name: Allow insecure git repos for self signed certificates
-    win_command: git config --global http.sslVerify "false"
+    win_command: git config -f C:\Windows\.gitconfig http.sslVerify "false"
 
   - name: Set git user
-    win_command: git config --global user.name "{{ user }}"
+    win_command: git config -f C:\Windows\.gitconfig user.name "{{ user }}"
 
   - name: Set git user email
-    win_command: git config --global user.email "{{ user }}@{{ dns_domain_name }}"
+    win_command: git config -f C:\Windows\.gitconfig user.email "{{ user }}@{{ dns_domain_name }}"
 
   - name: Set git password
     win_shell: cmdkey /generic:LegacyGeneric:target=git:https://gitlab.{{ dns_domain_name }} /user:{{ user }} /pass:"{{ users_password }}"
