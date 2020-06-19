@@ -23,7 +23,7 @@ users_password: "Ans1bl3--"
 
 # Tower Admin Password
 towerpass: "MyPassw0rd21"
-towerversion: 3.6.0-1
+towerversion: 3.6.4-1
 pgpass: awx
 rabbitpass: tower
 

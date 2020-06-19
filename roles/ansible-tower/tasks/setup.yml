@@ -52,14 +52,14 @@
 
 - name: download tower installer
   get_url:
-    url: https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}.tar.gz
-    dest: /tmp/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}.tar.gz
+    url: https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-{{ towerversion }}.tar.gz
+    dest: /tmp/ansible-tower-setup-bundle-{{ towerversion }}.tar.gz
     mode: 0640
   when: towerchk not in towerversion
 
 - name: extract installer
   unarchive:
-    src: /tmp/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}.tar.gz
+    src: /tmp/ansible-tower-setup-bundle-{{ towerversion }}.tar.gz
     dest: /tmp/
     remote_src: True
   when: towerchk not in towerversion
@@ -67,11 +67,11 @@
 - name: template inventory file
   template:
     src: inventory
-    dest: /tmp/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}/inventory
+    dest: /tmp/ansible-tower-setup-bundle-{{ towerversion }}/inventory
   when: towerchk != towerversion
 
 - name: run the tower installer
-  shell: ./setup.sh chdir=/tmp/ansible-tower-setup-bundle-{{ towerversion }}.el{{ ansible_distribution_major_version }}
+  shell: ./setup.sh chdir=/tmp/ansible-tower-setup-bundle-{{ towerversion }}
   when: towerchk not in towerversion
 
 - name: wait for tower to be up
