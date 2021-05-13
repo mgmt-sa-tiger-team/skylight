@@ -1,51 +1,54 @@
 ---
 - name: find ami id for rhel 7
-  ec2_ami_facts:
+  ec2_ami_info:
     owners: 309956199498
     filters:
       name: "{{ ec2_image_names['rhel7'] }}"
+      architecture: x86_64
     region: "{{ ec2_region }}"
   register: rhel7_ami_find
 
 - name: find ami id for rhel 8
-  ec2_ami_facts:
+  ec2_ami_info:
     owners: 309956199498
     filters:
       name: "{{ ec2_image_names['rhel8'] }}"
+      architecture: x86_64
     region: "{{ ec2_region }}"
   register: rhel8_ami_find
 
 - name: find ami id for centos 7
-  ec2_ami_facts:
+  ec2_ami_info:
     owners: aws-marketplace
     filters:
       name: "{{ ec2_image_names['centos7'] }}"
+      architecture: x86_64
     region: "{{ ec2_region }}"
   register: centos7_ami_find
 
 - name: find ami for windows 2016 core
-  ec2_ami_facts:
+  ec2_ami_info:
     filters:
       name: "{{ ec2_image_names['win2016_core'] }}"
     region: "{{ ec2_region }}"
   register: win2016_core_ami_find
 
 - name: find ami for windows 2016 full
-  ec2_ami_facts:
+  ec2_ami_info:
     filters:
       name: "{{ ec2_image_names['win2016_full'] }}"
     region: "{{ ec2_region }}"
   register: win2016_full_ami_find
 
 - name: find ami for windows 2019 core
-  ec2_ami_facts:
+  ec2_ami_info:
     filters:
       name: "{{ ec2_image_names['win2019_core'] }}"
     region: "{{ ec2_region }}"
   register: win2019_core_ami_find
 
 - name: find ami for windows 2019 full
-  ec2_ami_facts:
+  ec2_ami_info:
     filters:
       name: "{{ ec2_image_names['win2019_full'] }}"
     region: "{{ ec2_region }}"

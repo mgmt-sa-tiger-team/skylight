@@ -5,6 +5,7 @@ localhost ansible_connection=local
 
 [all:vars]
 admin_password='{{towerpass}}'
+ignore_preflight_errors=true
 
 pg_host=''
 pg_port=''
