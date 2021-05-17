@@ -46,7 +46,6 @@
     cloud_init:
       nic_boot_protocol: dhcp
       nic_name: eth0
-      nic_on_boot: true
       host_name: gitlab
       user_name: "{{ root_user }}"
       root_password: "{{ root_password }}"
@@ -74,7 +73,6 @@
     cloud_init:
       nic_boot_protocol: dhcp
       nic_name: eth0
-      nic_on_boot: true
       host_name: docs
       user_name: "{{ root_user }}"
       root_password: "{{ root_password }}"
@@ -102,7 +100,6 @@
     cloud_init:
       nic_boot_protocol: dhcp
       nic_name: eth0
-      nic_on_boot: true
       host_name: "s{{ item }}-tower"
       user_name: "{{ root_user }}"
       root_password: "{{ root_password }}"

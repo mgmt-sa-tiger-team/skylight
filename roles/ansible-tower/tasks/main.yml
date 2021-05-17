@@ -69,11 +69,6 @@
     group: root
     mode: 0644
 
-#- name: install the last version of OpenSSL
-#  pip:
-#    name: pyOpenSSL
-#    state: latest
-
 - name: Install dependencies for Kerberos auth
   package:
     name:
@@ -89,12 +84,18 @@
 - name: Install dependencies for Kerberos auth
   package:
     name:
+      - python3-devel
       - krb5-devel
       - krb5-libs
       - krb5-workstation
       - gcc
     state: present
   when: ansible_distribution_major_version|int == 8
+
+- name: upgrade pip
+  pip:
+    name: pip
+    state: latest
 
 - name: Install pywinrm for connecting to windows hosts
   pip:

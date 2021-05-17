@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
   gitlab_hostname= "gitlab"
   nid = (nid - 1)
   config.vm.define "#{gitlab_hostname}" do |node|
-    node.vm.box = "centos/7"
+    node.vm.box = "generic/centos8"
     node.vm.hostname = "#{gitlab_hostname}"
     node.vm.boot_timeout = 600
     node.ssh.insert_key = false
@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
       v.gui = false
       v.vmx["memsize"] = "3072"
       v.vmx["numvcpus"] = "2"
-      v.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      #v.vmx["ethernet0.virtualDev"] = "vmxnet3"
       v.vmx["RemoteDisplay.vnc.enabled"] = "false"
       v.vmx["RemoteDisplay.vnc.port"] = "5900"
       v.enable_vmrun_ip_lookup = false
@@ -46,11 +46,11 @@ Vagrant.configure("2") do |config|
   docs_hostname= "docs"
   nid = (nid - 1)
   config.vm.define "#{docs_hostname}" do |node|
-    node.vm.box = "centos/7"
+    node.vm.box = "generic/centos8"
     node.vm.hostname = "#{docs_hostname}"
     node.vm.boot_timeout = 600
     node.ssh.insert_key = false
-    node.vm.network "forwarded_port", guest: 80, host: 80
+    node.vm.network "forwarded_port", guest: 80, host: 80, auto_correct: true
     node.vm.network :private_network, ip: "10.0.1.5"
 
     node.vm.provider "virtualbox" do |vb, override|
@@ -73,7 +73,7 @@ Vagrant.configure("2") do |config|
         v.gui = false
         v.vmx["memsize"] = "2048"
         v.vmx["numvcpus"] = "2"
-        v.vmx["ethernet0.virtualDev"] = "vmxnet3"
+        #v.vmx["ethernet0.virtualDev"] = "vmxnet3"
         v.vmx["RemoteDisplay.vnc.enabled"] = "false"
         v.vmx["RemoteDisplay.vnc.port"] = "5900"
         v.enable_vmrun_ip_lookup = false
@@ -91,7 +91,7 @@ Vagrant.configure("2") do |config|
     node.winrm.basic_auth_only = false
     node.winrm.timeout = 300
     node.winrm.retry_limit = 20
-    node.vm.network "forwarded_port", guest: 5986, host: 5902
+    node.vm.network "forwarded_port", guest: 5986, host: 5902, auto_correct: true
     node.vm.network :private_network, ip: "10.0.1.6"
     node.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -129,7 +129,7 @@ Vagrant.configure("2") do |config|
   s1_tower_hostname= "s1-tower"
   nid = (nid - 1)
   config.vm.define "#{s1_tower_hostname}" do |node|
-    node.vm.box = "centos/7"
+    node.vm.box = "generic/centos8"
     node.vm.hostname = "#{s1_tower_hostname}"
     node.vm.boot_timeout = 600
     node.ssh.insert_key = false
@@ -155,7 +155,7 @@ Vagrant.configure("2") do |config|
         v.gui = false
         v.vmx["memsize"] = "4096"
         v.vmx["numvcpus"] = "2"
-        v.vmx["ethernet0.virtualDev"] = "vmxnet3"
+        #v.vmx["ethernet0.virtualDev"] = "vmxnet3"
         v.vmx["RemoteDisplay.vnc.enabled"] = "false"
         v.vmx["RemoteDisplay.vnc.port"] = "5900"
         v.enable_vmrun_ip_lookup = false
