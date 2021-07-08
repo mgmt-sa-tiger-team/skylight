@@ -1,6 +1,6 @@
 ---
 - name: Get the VPC ID for {{ name_prefix }}
-  ec2_vpc_net_facts:
+  ec2_vpc_net_info:
     filters:
       "tag:Name": "{{ name_prefix }}-vpc"
     region: "{{ ec2_region }}"
@@ -12,7 +12,7 @@
   when: vpc_net_facts.vpcs|length > 0
 
 - name: grab route information for {{ ec2_name_prefix }} on {{ ec2_region }}
-  ec2_vpc_route_table_facts:
+  ec2_vpc_route_table_info:
     region: "{{ ec2_region }}"
     filters:
       vpc_id: "{{ ec2_vpc_id }}"
@@ -20,7 +20,7 @@
   when: vpc_net_facts.vpcs|length > 0
 
 - name: grab information about AWS user
-  aws_caller_facts:
+  aws_caller_info:
     region: "{{ ec2_region }}"
   register: whoami
 
@@ -30,7 +30,7 @@
 
 # ----------------------- Destroy Tower Instances -----------------------
 - name: Get ec2 Tower instance information
-  ec2_instance_facts:
+  ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
@@ -49,7 +49,7 @@
 
 # ----------------------- Destroy Gitlab Instances -----------------------
 - name: Get ec2 Gitlab instance information
-  ec2_instance_facts:
+  ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
@@ -79,7 +79,7 @@
 
 # ----------------------- Destroy Docs Instances -----------------------
 - name: Get ec2 Docs instance information
-  ec2_instance_facts:
+  ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
@@ -123,7 +123,7 @@
 
 # ----------------------- Destroy DC Instances -----------------------
 - name: Get ec2 DC instance information
-  ec2_instance_facts:
+  ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
@@ -141,7 +141,7 @@
 
 # ----------------------- Destroy Windows Instances -----------------------
 - name: Get ec2 Windows instance information
-  ec2_instance_facts:
+  ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"
@@ -160,7 +160,7 @@
 
 # ----------------------- Destroy Workstation Instances -----------------------
 - name: Get ec2 Workstation instance information
-  ec2_instance_facts:
+  ec2_instance_info:
     region: "{{ ec2_region }}"
     filters:
       vpc-id: "{{ ec2_vpc_id }}"

@@ -5,6 +5,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: dc_instances_nics
   until:
     - dc_instances_nics.ovirt_nics | length > 0
@@ -21,6 +24,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: gitlab_instances_nics
   until:
     - gitlab_instances_nics.ovirt_nics | length > 0
@@ -37,6 +43,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: docs_instances_nics
   until:
     - docs_instances_nics.ovirt_nics | length > 0
@@ -53,6 +62,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: tower_instances_nics
   until:
     - tower_instances_nics.ovirt_nics | length > 0
@@ -69,6 +81,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: windows_instances_nics
   until:
     - windows_instances_nics.ovirt_nics | length > 0
@@ -85,6 +100,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: workstation_instances_nics
   until:
     - workstation_instances_nics.ovirt_nics | length > 0

@@ -4,7 +4,11 @@ localhost ansible_connection=local
 [database]
 
 [all:vars]
-admin_password='{{towerpass}}'
+admin_password='{{ towerpass }}'
+ignore_preflight_errors=true
+{% if ansible_distribution != 'RedHat' %}
+gpgcheck=false
+{% endif %}
 
 pg_host=''
 pg_port=''
