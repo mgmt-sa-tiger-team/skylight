@@ -1,0 +1,16 @@
+---
+
+chocolatey_repo_folder: 'C:\repo'
+chocolatey_internalize_packages: true
+chocolatey_setup_shared_repo: true
+chocolatey_share_name: repo
+chocolatey_share_description: nuget repo
+chocolatey_share_full_access: Administrator
+chocolatey_share_read_access: Administrator
+
+chocolatey_packages:
+  - name: git.install
+    version: 2.23.0
+  - name: googlechrome
+    version: 77.0.3865.120
+    url: https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise64.msi

@@ -1,0 +1,87 @@
+---
+
+- name: ensure temp package directory exists
+  win_file:
+    path: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}'
+    state: directory
+
+- name: ensure package exist locally with remote binary (<2.9)
+  win_get_url:
+    url: https://chocolatey.org/api/v2/package/{{ package.name }}/{{ package.version }}
+    dest: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}.nupkg.zip'
+  register: chocolatey_package_download
+  until: chocolatey_package_download is success
+  delay: 3
+  retries: 5
+  when: ansible_version.full is version('2.9', '<')
+
+- name: ensure package exist locally with remote binary
+  win_get_url:
+    url: https://chocolatey.org/api/v2/package/{{ package.name }}/{{ package.version }}
+    dest: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}.nupkg.zip'
+    follow_redirects: all
+  register: chocolatey_package_download
+  until: chocolatey_package_download is success
+  delay: 3
+  retries: 5
+  when: ansible_version.full is version('2.9', '>=')
+
+- name: unzip package file
+  win_unzip:
+    src: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}.nupkg.zip'
+    dest: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}'
+    delete_archive: yes
+    creates: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\tools'
+
+- name: delete extraneous files/folders
+  win_file:
+    path: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\{{ item }}'
+    state: absent
+  loop:
+    - '[Content_Types].xml'
+    - '_rels'
+    - 'package'
+
+- name: ensure binary file exist locally (<2.9)
+  win_get_url:
+    url: "{{ package.url }}"
+    dest: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\tools\{{ package.url | urlsplit("path") | basename }}'
+  register: chocolatey_binary_download
+  until: chocolatey_binary_download is success
+  delay: 3
+  retries: 5
+  when: ansible_version.full is version('2.9', '<')
+
+- name: ensure binary file exist locally
+  win_get_url:
+    url: "{{ package.url }}"
+    dest: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\tools\{{ package.url | urlsplit("path") | basename }}'
+    follow_redirects: all
+  register: chocolatey_binary_download
+  until: chocolatey_binary_download is success
+  delay: 3
+  retries: 5
+  when: ansible_version.full is version('2.9', '>=')
+
+- name: add file path
+  win_lineinfile:
+    path: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\tools\chocolateyInstall.ps1'
+    insertafter: '^  fileType '
+    line: '  File64              = Get-Item $toolsPath\{{ package.url | urlsplit("path") | basename }}'
+
+- name: remove urls
+  win_lineinfile:
+    path: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\tools\chocolateyInstall.ps1'
+    regexp: '^  url'
+    state: absent
+
+- name: create package
+  win_shell: >
+    C:\ProgramData\chocolatey\choco pack -y
+    '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}\{{ package.name }}.nuspec'
+    --out='{{ chocolatey_repo_folder }}'
+
+- name: ensure temp directory is removed
+  win_file:
+    path: '{{ chocolatey_repo_folder }}\temp\{{ package.name }}.{{ package.version }}'
+    state: absent

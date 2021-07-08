@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: Orcun Atakan
+  description: Ansible galaxy role for internalizing Chocolatey packages for Windows.
+  role_name: chocolatey_package_localize
+  company: Red Hat
+
+  license: MIT
+
+  min_ansible_version: 2.8
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+    - windows
+    - chocolatey
+    - package
+    - internalize
+
+dependencies: []

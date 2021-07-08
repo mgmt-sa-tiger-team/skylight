@@ -1,0 +1,10 @@
+---
+
+- name: check if package is already internalized
+  win_stat:
+    path: '{{ chocolatey_repo_folder }}\{{ package.name }}.{{ package.version }}.nupkg'
+  register: chocolatey_package_file
+
+- include_tasks: internalize_package.yml
+  when:
+    - not chocolatey_package_file.stat.exists
